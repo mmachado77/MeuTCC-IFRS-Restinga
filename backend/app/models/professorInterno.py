@@ -6,5 +6,5 @@ class ProfessorInterno(Professor):
     matricula = models.IntegerField()
     horarios_atendimento = models.ListField(DateTimeField)
 
-class meta:
-    abstract = False
+    class meta:
+        abstract = False
