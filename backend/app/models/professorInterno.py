@@ -1,5 +1,4 @@
 from django.forms import DateTimeField
-from .base import BaseModel
 from django.db import models
 from .professor import Professor
 
