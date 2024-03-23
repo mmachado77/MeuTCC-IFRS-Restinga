@@ -1,6 +1,6 @@
-from enum import StrEnum
+from enum import Enum
 
-class StatusConvite(StrEnum):
+class StatusConvite(Enum):
     ANALISE = 'Convite em Análise'
     ACEITO = 'Convite Aceito'
     RECUSADO = 'Convite Recusado'

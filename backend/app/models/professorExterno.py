@@ -1,5 +1,3 @@
-from django.forms import DateTimeField
-from .base import BaseModel
 from django.db import models
 from .professor import Professor
 
@@ -12,5 +10,5 @@ class ProfessorExterno(Professor):
     statusCadastro = models.BooleanField()
     dataStatus = models.DateTimeField()
 
-class meta:
-    abstract = False
+    class meta:
+        abstract = False
