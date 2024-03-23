@@ -1,12 +1,12 @@
 from .base import BaseModel
 from django.db import models
-from .professor import Professor
+from .professorInterno import ProfessorInterno
 
 class Configuracoes(BaseModel):
     
     dataAberturaPrazoPropostas = models.DateTimeField
     dataFechamentoPrazoPropostas = models.DateTimeField
-    coordenadorAtual = models.ForeignKey(Professor, on_delete=models.PROTECT)
+    coordenadorAtual = models.ForeignKey(ProfessorInterno, on_delete=models.PROTECT)
 
     class Meta:
-        abstract: False
+        abstract = False

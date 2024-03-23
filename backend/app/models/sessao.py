@@ -12,3 +12,6 @@ class Sessao(BaseModel):
     data_inicio = models.DateTimeField()
     data_termino = models.DateTimeField()
     tcc = models.ForeignKey(Tcc, on_delete=models.PROTECT)
+
+    class Meta:
+        abstract = False

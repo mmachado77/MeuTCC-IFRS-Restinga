@@ -7,4 +7,4 @@ class Estudante(Usuario):
     matricula = models.IntegerField
 
     class Meta:
-        abstract: False
+        abstract = False
