@@ -5,7 +5,7 @@ from .avaliacao import Avaliacao
 
 class SessaoFinal(Sessao):
 
-    avaliacao = models.ForeignKey(Avaliacao, on_delete=models.PROTECT)
+    avaliacao = models.OneToOneField(Avaliacao, on_delete=models.PROTECT, primary_key=True)
 
     class Meta:
         abstract = False

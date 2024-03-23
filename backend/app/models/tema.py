@@ -7,5 +7,5 @@ class Tema(BaseModel):
     descricao = models.TextField(max_length=500)
     professor = models.ForeignKey(Professor, on_delete=models.CASCADE)
 
-class meta:
-    abstract = False
+    class meta:
+        abstract = False
