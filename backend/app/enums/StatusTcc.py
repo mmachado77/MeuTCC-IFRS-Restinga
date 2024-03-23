@@ -1,6 +1,7 @@
-from enum import StrEnum
+from enum import Enum
 
-class StatusTcc(StrEnum):
+class StatusTcc(Enum):
+
     PROPOSTA_ANALISE = 'Proposta em Análise'
     PROPOSTA_RECUSADA = 'Proposta Recusada'
     DESENVOVIMENTO = 'TCC em Desenvolvimento'
@@ -10,3 +11,7 @@ class StatusTcc(StrEnum):
     REPROVADO_FINAL = 'Reprovado na Sessão Final'
     AJUSTE = 'TCC em Fase de Ajuste'
     APROVADO = 'TCC Aprovado'
+
+    @classmethod
+    def choices(cls):
+        return [(key.value, key.name) for key in cls]
