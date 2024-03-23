@@ -9,7 +9,7 @@ class Tcc(BaseModel):
     coorientador = models.ForeignKey(Professor, on_delete=models.PROTECT)
     tema = models.CharField
     resumo = models.TextField
-    dataSubmissaoProposta = models.DateTimeField.auto_now_add
+    dataSubmissaoProposta = models.DateTimeField(auto_now_add=True)
     documentoTCC = models.FileField(upload_to='tcc/documento')
     autorizacaoPublicacao = models.FileField(upload_to='tcc/autorizacaoPublicacao')
     #TODO - mudar caminho dos arquivos

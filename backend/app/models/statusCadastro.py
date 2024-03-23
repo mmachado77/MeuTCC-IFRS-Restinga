@@ -9,5 +9,5 @@ class StatusCadastro(BaseModel):
     dataStatus = models.DateTimeField(auto_now_add=True)
     professorExterno = models.ForeignKey(ProfessorExterno, on_delete=models.CASCADE)
 
-class meta:
-    abstract = False
+    class meta:
+        abstract = False
