@@ -37,3 +37,5 @@ ricardo = ProfessorInterno(nome="Ricardo dos Santos",
                          titulos="Inventou o Django",
                          matricula="1903000401")
 ricardo.save()
+
+print("Professores Internos criados com sucesso!")
