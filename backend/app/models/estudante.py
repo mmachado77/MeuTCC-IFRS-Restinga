@@ -4,7 +4,7 @@ from .usuario import Usuario
 
 class Estudante(Usuario):
 
-    matricula = models.IntegerField
+    matricula = models.CharField(max_length=255)
 
     class Meta:
         abstract = False

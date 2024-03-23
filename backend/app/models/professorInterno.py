@@ -2,7 +2,7 @@ from django.db import models
 from .professor import Professor
 
 class ProfessorInterno(Professor):
-    matricula = models.IntegerField()
+    matricula = models.CharField(max_length=255)
 
     class Meta:
         abstract = False
