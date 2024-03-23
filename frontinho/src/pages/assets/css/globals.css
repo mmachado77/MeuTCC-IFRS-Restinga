@@ -1,0 +1,19 @@
+html,
+body{
+    background-color: #E9ECEF;
+}
+
+body {
+    margin: 0;
+}
+
+.content{
+    display: flex;
+    justify-content: center;
+    background-color: #ffffff;
+    margin: 200px;
+    padding: 100px;
+    border: 1px solid #c9c9c9; 
+    border-radius: 10px;
+    size-adjust: 80%;
+}
