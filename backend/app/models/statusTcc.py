@@ -1,6 +1,6 @@
 from .base import BaseModel
 from django.db import models
-from..enums import StatusTcc
+from ..enums import StatusTcc
 from .tcc import Tcc
 
 class StatusTCC(BaseModel):
