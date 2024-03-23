@@ -10,5 +10,5 @@ class ProfessorExterno(Professor):
     statusCadastro = models.BooleanField()
     dataStatus = models.DateTimeField()
 
-class meta:
-    abstract = False
+    class meta:
+        abstract = False
