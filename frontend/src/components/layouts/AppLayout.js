@@ -29,6 +29,13 @@ export const AppLayout = ({ children, logged, showMenu }) => {
             </div>
 
             {children}
+
+            <footer className='bg-gray-800 text-white text-center py-9 mt-10'>
+                <p>Instituto Federal do Rio Grande do Sul – Campus Restinga</p>
+                <p>Rua Alberto Hoffmann, 285 | Bairro Restinga | CEP: 91791-508 | Porto Alegre/RS</p>
+                <p>Créditos do site Matheus Costa Krenn, Matheus Machado, Cid Monza, Carlos Eduardo, Carlos Rafael, Bruno Lopes, Ricardo Professor, Eliana Professora</p>
+                <p>Coordenador: Roben Lunardi - ads@restinga.ifrs.edu.br</p>
+            </footer>
         </div>
     );
 };

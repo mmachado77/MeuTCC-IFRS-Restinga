@@ -4,10 +4,8 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import React from 'react';
 import { Dropdown } from 'primereact/dropdown';
 import { Checkbox } from 'primereact/checkbox';
-import { AppLayout } from 'meutcc/components/layouts/AppLayout';
 import TccService from 'meutcc/services/TccService';
 import ProfessorService from 'meutcc/services/ProfessorService';
-import { Message } from 'primereact/message';
 
 const MeusTccsPage = () => {
 
@@ -16,26 +14,19 @@ const MeusTccsPage = () => {
     const [selectedCoorientador, setSelectedCoorientador] = React.useState(null);
     const [temCoorientador, setTemCoorientador] = React.useState(false);
     const [afirmoQueConversei, setAfirmoQueConversei] = React.useState(false);
-
-    const orientadores = [
-        {name: 'Gleison', code: 1},
-        {name: 'Rome', code: 2},
-        {name: 'London', code: 3},
-    ];
-
-    const coorientadores = [
-        {name: 'Gleison', code: 1},
-        {name: 'Rome', code: 2},
-        {name: 'London', code: 3},
-    ];
+    const [orientadores, setOrientadores] = React.useState([]);
+    const [coorientadores, setCoorientadores] = React.useState([]);
 
     React.useEffect(() => {
         const fetchProfessores = async () => {
             try {
-                const { data } = await ProfessorService.getProfessores();
+                const data = await ProfessorService.getProfessores();
+
+                const professores = data.map((professor) => ({ name: professor.nome, code: professor.id }));
     
-                orientadores.push(...data.filter((professor) => professor.tipo === 'INTERNO'));
-                coorientadores.push(...data);
+                setOrientadores(professores);
+                setCoorientadores(professores);
+
             } catch (error) {
                 console.error('Erro ao buscar professores', error);
             }
