@@ -9,9 +9,8 @@ const AuthPage = () => {
     const router = useRouter();
 
     const handleClick = () => {
-        console.log('Submetendo proposta');
         toast.loading('Autenticando...', { duration: 500 });
-        router.push('/meus-tccs');
+        router.push('/submeter-proposta');
     }
 
     return <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>

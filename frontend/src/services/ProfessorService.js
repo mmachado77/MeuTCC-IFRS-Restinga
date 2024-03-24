@@ -1,12 +1,7 @@
-async function getProfessores(data) {
-    return fetch('http://localhost:8000/api/professores/', {
+async function getProfessores() {
+    return await fetch('http://127.0.0.1:8000/app/getprofessores/', {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: data,
-    }).then((response) => response.json()).catch((error) => console.error(error));
+    }).then((response) => response.json());
 }
 
 export default {
