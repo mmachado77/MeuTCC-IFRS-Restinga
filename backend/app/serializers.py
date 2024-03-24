@@ -18,3 +18,4 @@ class EstudanteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Estudante
         fields = ['id', 'nome', 'cpf', 'email', 'matricula']
+

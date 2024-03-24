@@ -10,6 +10,7 @@ from .serializers import ProfessorSerializer
 from .serializers import TccSerializer
 from .serializers import EstudanteSerializer
 from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
 
 
 # Create your views here.
@@ -40,3 +41,19 @@ class CriarUsuarioView(APIView):
             usuario = Estudante.objects.create(user=user, **usuario_data)
             return Response({'id': usuario.id}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class ObterTokenView(APIView):
+    def post(self, request, format=None):
+        username = request.data.get('username')
+        
+        try:
+            user = User.objects.get(username=username)
+            token = Token.objects.get_or_create(user=user)
+            return Response({'token': token[0].key}, status=200)
+
+
+        except User.DoesNotExist:
+            return Response({'error': 'Usuário não encontrado.'}, status=404)
+        
+        
