@@ -8,7 +8,7 @@ class ProfessorExterno(Professor):
     diploma = models.FileField(upload_to='professoresExterno/diploma')
 
     statusCadastro = models.BooleanField()
-    dataStatus = models.DateTimeField()
+    dataStatus = models.DateTimeField(auto_now=True)
 
     class meta:
         abstract = False
