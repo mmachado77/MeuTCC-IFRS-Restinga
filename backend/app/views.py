@@ -11,6 +11,7 @@ from .serializers import TccSerializer
 from .serializers import EstudanteSerializer
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
 
 
 # Create your views here.
@@ -57,3 +58,16 @@ class ObterTokenView(APIView):
             return Response({'error': 'Usuário não encontrado.'}, status=404)
         
         
+class DetalhesEstudanteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        estudante = Estudante.objects.get(user=request.user)
+        data = {
+            'nome': estudante.nome,
+            'cpf': estudante.cpf,
+            'email': estudante.email,
+            'data_cadastro': estudante.dataCadastro,
+            'matricula': estudante.matricula,
+        }
+        return Response(data)
