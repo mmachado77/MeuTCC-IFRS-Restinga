@@ -5,7 +5,7 @@ async function submeterProposta(data) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
-        body: data,
+        body: JSON.stringify(data),
     }).then((response) => response.json()).catch((error) => console.error(error));
 }
 
