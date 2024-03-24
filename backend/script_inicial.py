@@ -4,6 +4,10 @@
 from app.models.usuario import Usuario
 from app.models.professor import Professor
 from app.models.professorInterno import ProfessorInterno
+from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
+
+teste = User.objects.get(pk=1)
 
 andre = ProfessorInterno(nome="André Schneider", 
                          cpf="12345678911", 
@@ -11,8 +15,15 @@ andre = ProfessorInterno(nome="André Schneider",
                          area = "Informática",
                          grau_academico = "Mestre",
                          titulos="Rei do VPL, Inimigo do Python",
-                         matricula="1994000401")
+                         matricula="1994000401",
+                         user = teste
+                        )
 andre.save()
+
+# dedecoUser = andre.user
+# token = Token.objects.create(user=dedecoUser)
+# print(token.key)
+
 roben = ProfessorInterno(nome="Roben Lunardi", 
                          cpf="12345678913", 
                          email="roben@restinga.ifrs.edu.br",
