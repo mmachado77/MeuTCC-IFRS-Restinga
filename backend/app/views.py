@@ -17,12 +17,18 @@ from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 
 class GetProfessores(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+
     queryset = Professor.objects.all()
     serializer_class = ProfessorSerializer
 
 class CriarTCView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        serializer = TccSerializer(data=request.data)
+        data = request.data
+        data['autor'] = Estudante.objects.get(user=request.user).id
+        serializer = TccSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
