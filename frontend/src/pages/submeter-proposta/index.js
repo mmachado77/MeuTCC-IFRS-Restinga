@@ -8,7 +8,7 @@ import TccService from 'meutcc/services/TccService';
 import ProfessorService from 'meutcc/services/ProfessorService';
 import toast from 'react-hot-toast';
 
-const MeusTccsPage = () => {
+const SubmeterPropostaPage = () => {
 
     const [loading, setLoading] = React.useState(false);
     const [selectedOrientador, setSelectedOrientador] = React.useState(null);
@@ -144,7 +144,7 @@ const MeusTccsPage = () => {
 
 }
 
-MeusTccsPage.logged = true;
-MeusTccsPage.showMenu = true;
+SubmeterPropostaPage.logged = true;
+SubmeterPropostaPage.showMenu = true;
 
-export default MeusTccsPage;
+export default SubmeterPropostaPage;
