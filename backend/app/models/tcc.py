@@ -1,8 +1,7 @@
 from django.db import models
 from .base import BaseModel
 from datetime import datetime  
-from .estudante import Estudante
-from .professor import Professor
+from . import Estudante, Professor
 
 class Tcc(BaseModel):
     autor = models.ForeignKey(Estudante, on_delete=models.PROTECT)

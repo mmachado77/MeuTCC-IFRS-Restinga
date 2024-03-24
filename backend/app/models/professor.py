@@ -1,5 +1,5 @@
 from django.db import models
-from .usuario import Usuario
+from . import Usuario
 
 class Professor(Usuario):
 

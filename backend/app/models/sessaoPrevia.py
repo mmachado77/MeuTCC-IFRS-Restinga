@@ -1,6 +1,6 @@
 from .base import BaseModel
 from django.db import models
-from .sessao import Sessao
+from . import Sessao
 
 class SessaoPrevia(Sessao):
 

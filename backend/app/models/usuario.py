@@ -2,7 +2,6 @@ from .base import BaseModel
 from django.db import models
 from django.contrib.auth.models import User
 
-
 class Usuario(BaseModel):
     user = models.OneToOneField(User, related_name="perfil", on_delete=models.CASCADE)
     nome = models.CharField(verbose_name="Nome", max_length=255)

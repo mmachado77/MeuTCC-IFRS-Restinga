@@ -1,6 +1,6 @@
 from .base import BaseModel
 from django.db import models
-from .professor import Professor
+from . import Professor
 
 class Tema(BaseModel):
     titulo = models.CharField(max_length=255)

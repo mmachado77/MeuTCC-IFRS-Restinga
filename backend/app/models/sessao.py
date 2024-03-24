@@ -1,7 +1,6 @@
 from .base import BaseModel
 from django.db import models
-from .tcc import Tcc
-from .avaliacao import Avaliacao
+from . import Tcc
 
 class Sessao(BaseModel):
     local = models.CharField(max_length=255)

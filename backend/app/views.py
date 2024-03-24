@@ -3,9 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
-from .models.professor import Professor
-from .models.estudante import Estudante
-from .models.tcc import Tcc
+from app.models import Professor, Estudante, Tcc
 from .serializers import ProfessorSerializer
 from .serializers import TccSerializer
 from .serializers import EstudanteSerializer
@@ -58,7 +56,6 @@ class ObterTokenView(APIView):
             user = User.objects.get(username=username)
             token = Token.objects.get_or_create(user=user)
             return Response({'token': token[0].key}, status=200)
-
 
         except User.DoesNotExist:
             return Response({'error': 'Usuário não encontrado.'}, status=404)

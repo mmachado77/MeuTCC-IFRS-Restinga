@@ -1,6 +1,6 @@
 from .base import BaseModel
 from django.db import models
-from .professorInterno import ProfessorInterno
+from . import ProfessorInterno
 
 class Configuracoes(BaseModel):
     

@@ -1,6 +1,6 @@
 from .base import BaseModel
 from django.db import models
-from .professorExterno import ProfessorExterno
+from . import ProfessorExterno
 
 class StatusCadastro(BaseModel):
     aprovacao = models.BooleanField()

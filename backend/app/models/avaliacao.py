@@ -1,8 +1,7 @@
 from .base import BaseModel
 from django.db import models
 
-
-class Avaliacao(models.Model):
+class Avaliacao(BaseModel):
     # TODO - Verificar se é necessário utilizar ListField
     notas_orientador = models.FloatField()
     notas_avaliador1 = models.FloatField()

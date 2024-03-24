@@ -1,8 +1,6 @@
 from rest_framework import serializers
-from .models.professor import Professor
 from django.contrib.auth.models import User
-from .models.tcc import Tcc
-from .models.estudante import Estudante
+from app.models import Tcc, Estudante, Professor
 
 class ProfessorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,7 +10,7 @@ class ProfessorSerializer(serializers.ModelSerializer):
 class TccSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tcc
-        fields = 'autor','tema', 'resumo', 'orientador', 'coorientador'
+        fields = 'autor', 'tema', 'resumo', 'orientador', 'coorientador'
 
 class EstudanteSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,7 +1,6 @@
 from .base import BaseModel
 from django.db import models
-from .professor import Professor
-from .banca import Banca
+from . import Professor, Banca
 
 class BancaPrioridade(BaseModel):
 

@@ -1,7 +1,6 @@
 from .base import BaseModel
 from django.db import models
-from .sessao import Sessao
-from .avaliacao import Avaliacao
+from . import Sessao, Avaliacao
 
 class SessaoFinal(Sessao):
 

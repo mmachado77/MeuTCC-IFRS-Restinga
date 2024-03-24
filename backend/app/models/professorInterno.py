@@ -1,5 +1,5 @@
 from django.db import models
-from .professor import Professor
+from . import Professor
 
 class ProfessorInterno(Professor):
     matricula = models.CharField(max_length=255)
