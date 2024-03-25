@@ -123,7 +123,7 @@ const SubmeterPropostaPage = () => {
                             <Dropdown value={selectedCoorientador} name='coorientador' disabled={!temCoorientador} onChange={(e) => setSelectedCoorientador(e.value)} options={coorientadores} optionLabel="name" placeholder="Selecione o coorientador" className={"w-full md:w-14rem" + (coorientadorMensagemErro ? 'p-invalid' : '')} />
                             { coorientadorMensagemErro && <small id='tema-help' className='text-red-500 py-1 px-2'>{coorientadorMensagemErro}</small> }
                             <div className="flex align-items-center py-3">
-                                <Checkbox inputId="temCoorientador" value="temCoorientador" onChange={(e) => setTemCoorientador(!temCoorientador)} checked={temCoorientador} />
+                                <Checkbox inputId="temCoorientador" onChange={(e) => setTemCoorientador(!temCoorientador)} checked={temCoorientador} />
                                 <label htmlFor="temCoorientador" className="ml-2">Tem coorientador</label>
                             </div>
                         </div>
@@ -131,7 +131,7 @@ const SubmeterPropostaPage = () => {
 
 
                     <div className="flex flex-wrap align-items-center mb-3 gap-1 pt-2">
-                        <Checkbox inputId="afirmoQueConversei" value="Cheese" onChange={(e) => setAfirmoQueConversei(!afirmoQueConversei)} checked={afirmoQueConversei} />
+                        <Checkbox inputId="afirmoQueConversei" onChange={(e) => setAfirmoQueConversei(!afirmoQueConversei)} checked={afirmoQueConversei} />
                         <label htmlFor="afirmoQueConversei" className="ml-2">Afirmo que conversei presencialmente com o professor sobre minha proposta de TCC</label>
                     </div>
 
