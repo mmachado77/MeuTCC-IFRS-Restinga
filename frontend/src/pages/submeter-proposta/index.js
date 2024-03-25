@@ -84,6 +84,12 @@ const SubmeterPropostaPage = () => {
             return;
         }
 
+        if(!afirmoQueConversei) {
+            toast.error('Você precisa afirmar que conversou com o professor sobre a proposta de TCC');
+            setLoading(false);
+            return;
+        }
+
         const response = await TccService.submeterProposta(jsonData);
 
         if (response) {
