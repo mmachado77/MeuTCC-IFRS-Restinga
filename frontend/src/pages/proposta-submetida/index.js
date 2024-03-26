@@ -7,7 +7,6 @@ import { Checkbox } from 'primereact/checkbox';
 import TccService from 'meutcc/services/TccService';
 import ProfessorService from 'meutcc/services/ProfessorService';
 import toast from 'react-hot-toast';
-import { useRouter } from 'next/router';
 
 const SubmeterPropostaPage = () => {
 
@@ -23,22 +22,13 @@ const SubmeterPropostaPage = () => {
     const [orientadorMensagemErro, setOrientadorMensagemErro] = React.useState('');
     const [coorientadorMensagemErro, setCoorientadorMensagemErro] = React.useState('');
 
-    React.useEffect(() => {
-        const fetchTcc = async () => {
-            try {
-                const data = await TccService.propostaSubmetida();
-                if (data) {
-                    router.push('/proposta-submetida');
-                }
-            } catch (error) {
-                console.error('Erro ao buscar proposta de TCC', error);
-            }
-        }
-        fetchTcc();
 
+    /*
+    React.useEffect(() => {
         const fetchProfessores = async () => {
             try {
                 const data = await ProfessorService.getProfessores();
+
                 const professores = data.map((professor) => ({ name: professor.nome, value: professor.id }));
     
                 setOrientadores(professores);
@@ -51,68 +41,7 @@ const SubmeterPropostaPage = () => {
 
         fetchProfessores();
     }, []);
-
-
-    const onSubmit = async (event) => {
-        event.preventDefault();
-
-        let isValid = true;
-
-        setLoading(true);
-
-        const formData = new FormData(event.currentTarget);
-        const jsonData = Object.fromEntries(formData);
-
-        if (jsonData.tema === '') {
-            isValid = false;
-            setTemaMensagemErro('O campo tema é obrigatório');
-        } else {
-            setTemaMensagemErro('');
-        }
-
-        if (jsonData.resumo === '') {
-            isValid = false;
-            setResumoMensagemErro('O campo resumo é obrigatório');
-        } else {
-            setResumoMensagemErro('');
-        }
-
-        if (!selectedOrientador) {
-            isValid = false;
-            setOrientadorMensagemErro('O campo orientador é obrigatório');
-        } else {
-            setOrientadorMensagemErro('');
-        }
-
-        if (temCoorientador && !selectedCoorientador) {
-            isValid = false;
-            setCoorientadorMensagemErro('O campo coorientador é obrigatório');
-        } else {
-            setCoorientadorMensagemErro('');
-        }
-
-        if (!isValid) {
-            setLoading(false);
-            return;
-        }
-
-        if(!afirmoQueConversei) {
-            toast.error('Você precisa afirmar que conversou com o professor sobre a proposta de TCC');
-            setLoading(false);
-            return;
-        }
-
-        const response = await TccService.submeterProposta(jsonData);
-
-        if (response) {
-            toast.success('Proposta submetida com sucesso');
-        } else {
-            toast.error('Erro ao submeter proposta');
-        }
-
-        setLoading(false);
-
-    }
+    */
 
     return <div className='max-w-screen-md mx-auto bg-white m-3 mt-6 flex flex-col'>
             <div className='py-3 border-0 border-b border-dashed border-gray-200'>
@@ -147,7 +76,6 @@ const SubmeterPropostaPage = () => {
                         </div>
                     </div>
 
-
                     <div className="flex flex-wrap align-items-center mb-3 gap-1 pt-2">
                         <Checkbox inputId="afirmoQueConversei" onChange={(e) => setAfirmoQueConversei(!afirmoQueConversei)} checked={afirmoQueConversei} />
                         <label htmlFor="afirmoQueConversei" className="ml-2">Afirmo que conversei presencialmente com o professor sobre minha proposta de TCC</label>
@@ -159,7 +87,6 @@ const SubmeterPropostaPage = () => {
                 </form>
             </div>
     </div>;
-
 }
 
 SubmeterPropostaPage.logged = true;

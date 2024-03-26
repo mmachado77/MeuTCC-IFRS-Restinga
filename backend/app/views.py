@@ -47,7 +47,6 @@ class CriarUsuarioView(APIView):
             return Response({'id': usuario.id}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
 class ObterTokenView(APIView):
     def post(self, request, format=None):
         username = request.data.get('username')
@@ -73,4 +72,21 @@ class DetalhesEstudanteView(APIView):
             'data_cadastro': estudante.dataCadastro,
             'matricula': estudante.matricula,
         }
+        return Response(data)
+    
+class PropostaSubmetidaView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        estudante = Estudante.objects.get(user=request.user)
+        proposta = Tcc.objects.get(autor=estudante)
+     
+        #data = {
+        #    'titulo': proposta.titulo,
+        #    'autor': proposta.autor.nome,
+        #    'orientador': proposta.orientador.nome,
+        #    'data_submissao': proposta.dataSubmissao,
+        #    'status': proposta.status,
+        #}
+  
         return Response(data)

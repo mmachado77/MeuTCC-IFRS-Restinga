@@ -9,6 +9,5 @@ class Usuario(BaseModel):
     email = models.EmailField(max_length = 254)
     dataCadastro = models.DateTimeField(auto_now_add=True)
 
-
     class Meta:
         abstract = False
