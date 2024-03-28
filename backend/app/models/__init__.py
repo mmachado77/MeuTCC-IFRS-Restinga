@@ -16,3 +16,4 @@ from .coordenador import *
 from .statusCadastro import *
 from .statusTcc import *
 from .tema import *
+from .semestre import *
