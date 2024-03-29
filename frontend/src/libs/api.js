@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useRouter } from 'next/router';
 
 export const baseURL = 'http://localhost:8000';
 
@@ -18,8 +17,7 @@ apiClient.interceptors.response.use(
     (error) => {
         if (error.response.status === 401) {
             localStorage.removeItem('token');
-            const router = useRouter();
-            router.push('/auth');
+            window.location.pathname = '/auth';
         }
         return Promise.reject(error);
     }
