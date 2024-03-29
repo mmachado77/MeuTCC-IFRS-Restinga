@@ -87,5 +87,5 @@ const ConfiguracoesPage = () => {
 };
 
 ConfiguracoesPage.guards = [Guards.Auth, Guards.Coordenador];
-ConfiguracoesPage.showMenu = true;
+
 export default ConfiguracoesPage;

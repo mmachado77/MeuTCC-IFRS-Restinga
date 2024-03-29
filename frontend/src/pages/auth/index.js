@@ -53,6 +53,4 @@ const AuthPage = () => {
     </div>;
 }
 
-AuthPage.showMenu = false;
-
 export default AuthPage;

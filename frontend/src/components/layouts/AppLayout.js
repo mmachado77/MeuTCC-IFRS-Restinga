@@ -4,7 +4,7 @@ import { Toaster } from "react-hot-toast";
 import { Guards } from "meutcc/core/constants";
 import { useAuth } from "meutcc/core/context/AuthContext";
 
-export const AppLayout = ({ children, guards, showMenu }) => {
+export const AppLayout = ({ children, guards }) => {
 
     const { user } = useAuth();
 
@@ -22,17 +22,19 @@ export const AppLayout = ({ children, guards, showMenu }) => {
 
     const items = typesMenu.Todos.concat(typesMenu[user?.resourcetype] || []);
 
+    const isUserAuth = !!user || false;
+
     return (
         <div className='bg-gray-100 min-h-screen'>
             <Toaster
                 position="top-center"
                 reverseOrder={false}
             />
-            <NavBar auth={guards.includes(Guards.Auth)} />
+            <NavBar auth={isUserAuth} />
 
             <div style={{backgroundColor: '#f9fafb'}}>
                 {
-                    showMenu &&
+                    isUserAuth &&
                     <Menubar model={items} style={{borderWidth: 0}} className='max-w-screen-lg mx-auto' />
                     ||
                     <div>

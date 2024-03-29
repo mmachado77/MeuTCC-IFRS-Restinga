@@ -80,6 +80,4 @@ const SugestoesTemasTccPage = () => {
 
 }
 
-SugestoesTemasTccPage.showMenu = false;
-
 export default SugestoesTemasTccPage;

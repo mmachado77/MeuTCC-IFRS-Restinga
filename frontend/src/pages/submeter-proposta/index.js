@@ -164,6 +164,5 @@ const SubmeterPropostaPage = () => {
 }
 
 SubmeterPropostaPage.guards = [Guards.Auth, Guards.Estudante];
-SubmeterPropostaPage.showMenu = true;
 
 export default SubmeterPropostaPage;
