@@ -7,6 +7,7 @@ import { Checkbox } from 'primereact/checkbox';
 import TccService from 'meutcc/services/TccService';
 import ProfessorService from 'meutcc/services/ProfessorService';
 import toast from 'react-hot-toast';
+import { Guards } from 'meutcc/core/constants';
 
 const SubmeterPropostaPage = () => {
 
@@ -89,7 +90,7 @@ const SubmeterPropostaPage = () => {
     </div>;
 }
 
-SubmeterPropostaPage.logged = true;
+SubmeterPropostaPage.guards = [Guards.Auth, Guards.Estudante];
 SubmeterPropostaPage.showMenu = true;
 
 export default SubmeterPropostaPage;

@@ -1,8 +1,10 @@
 import AuthService from "meutcc/services/AuthService";
 import { useRouter } from "next/router";
-import React, { useMemo } from "react";
+import React from "react";
 
-const AuthContext = React.createContext();
+const AuthContext = React.createContext({
+    user: null,
+});
 
 export const useAuth = () => {
     const context = React.useContext(AuthContext);
@@ -12,7 +14,7 @@ export const useAuth = () => {
     return context;
 }
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children, guards }) => {
     const [user, setUser] = React.useState(null);
     const [loading, setLoading] = React.useState(true);
 
@@ -48,9 +50,12 @@ export const AuthProvider = ({ children }) => {
 
     const value = {
         user,
-        setUser,
-        loading,
     };
 
     return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
+}
+
+const handleUserLogout = async () => {
+    localStorage.removeItem('token');
+    window.location.href = '/auth';
 }

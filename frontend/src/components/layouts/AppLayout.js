@@ -1,13 +1,26 @@
 import { Menubar } from "primereact/menubar";
 import NavBar from "../ui/NavBar";
 import { Toaster } from "react-hot-toast";
+import { Guards } from "meutcc/core/constants";
+import { useAuth } from "meutcc/core/context/AuthContext";
 
-export const AppLayout = ({ children, logged, showMenu }) => {
-    const items = [
-        { label: 'Inicio', icon: 'pi pi-fw pi-home' },
-        { label: 'Meus TCCs', icon: 'pi pi-fw pi-book' },
-        { label: 'Configurações', icon: 'pi pi-fw pi-cog' },
-    ];
+export const AppLayout = ({ children, guards, showMenu }) => {
+
+    const { user } = useAuth();
+
+    const typesMenu = {
+        Todos: [
+            { label: 'Inicio', icon: 'pi pi-fw pi-home', url: '/' },
+            { label: 'Meus TCCs', icon: 'pi pi-fw pi-book', url: '/meus-tccs' },
+        ],
+        Estudante: [
+        ],
+        Coordenador: [
+            { label: 'Configurações', icon: 'pi pi-fw pi-cog', url: '/painel-configuracoes' },    
+        ]
+    }
+
+    const items = typesMenu.Todos.concat(typesMenu[user?.resourcetype] || []);
 
     return (
         <div className='bg-gray-100 min-h-screen'>
@@ -15,7 +28,7 @@ export const AppLayout = ({ children, logged, showMenu }) => {
                 position="top-center"
                 reverseOrder={false}
             />
-            <NavBar logged={logged} />
+            <NavBar auth={guards.includes(Guards.Auth)} />
 
             <div style={{backgroundColor: '#f9fafb'}}>
                 {

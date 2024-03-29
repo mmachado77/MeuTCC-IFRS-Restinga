@@ -1,18 +1,21 @@
+import { useAuth, handleUserLogout } from "meutcc/core/context/AuthContext";
 import Image from "next/image";
 import Link from "next/link";
 
-const NavBar = ({ logged = false }) => {
+const NavBar = ({ auth = false }) => {
 
-    const menuLogged = () => (
+    const { user } = useAuth();
+
+    const menuAuth = () => (
         <>
-            <div className='px-3'><span className='pi pi-fw pi-user me-2'></span> Bem vindo, <b>Aluno</b></div>
+            <div className='px-3'><span className='pi pi-fw pi-user me-2'></span> Bem vindo, <b>{user?.nome || 'Usuário'}</b></div>
             <div className='px-2'>
-                <Link href='/'>Sair</Link>
+                <Link href='/#logout' onClick={handleUserLogout}>Sair</Link>
             </div>
         </>
     );
 
-    const menuNotLogged = () => (
+    const menuNotAuth = () => (
         <>
             <div className='px-3'>Você ainda não se identificou</div>
             <div className='px-2'>
@@ -35,7 +38,7 @@ const NavBar = ({ logged = false }) => {
                 </Link>
 
                 <div className='flex justify-around text-white'>
-                    { logged ? menuLogged() : menuNotLogged() }
+                    { auth ? menuAuth() : menuNotAuth() }
                 </div>
             </div>
         </div>        
