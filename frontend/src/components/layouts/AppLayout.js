@@ -16,8 +16,9 @@ export const AppLayout = ({ children, guards }) => {
         Estudante: [
         ],
         Coordenador: [
-            { label: 'Configurações', icon: 'pi pi-fw pi-cog', url: '/painel-configuracoes' },    
             { label: 'Atualizar Permissões', icon: 'pi pi-fw pi-users', url: '/atualizar-permissoes' },    
+            { label: 'Propostas', icon: 'pi pi-fw pi-book', url: '/listar-propostas' },
+            { label: 'Configurações', icon: 'pi pi-fw pi-cog', url: '/painel-configuracoes' },
         ]
     }
 
