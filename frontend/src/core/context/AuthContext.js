@@ -14,7 +14,7 @@ export const useAuth = () => {
     return context;
 }
 
-export const AuthProvider = ({ children, guards }) => {
+export const AuthProvider = ({ children }) => {
     const [user, setUser] = React.useState(null);
     const [loading, setLoading] = React.useState(true);
 
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children, guards }) => {
     return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
 }
 
-const handleUserLogout = async () => {
+export const handleUserLogout = async () => {
     localStorage.removeItem('token');
     window.location.href = '/auth';
 }

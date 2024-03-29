@@ -2,7 +2,7 @@
 # >>> exec(open('script_inicial.py').read())
 
 from django.contrib.auth.models import User
-from app.models import Configuracoes, ProfessorInterno, Estudante, StatusCadastro
+from app.models import Configuracoes, ProfessorInterno, Estudante, StatusCadastro, Coordenador
 
 # Criando usuário admin
 user = User.objects.create_superuser("admin", "admin@admin.com", "admin")
@@ -33,5 +33,8 @@ estudante = Estudante.objects.create(nome="Estudante",
                       cpf="12345678912", 
                       email="estudante@gmail.com",
                       user=estudanteUser)
+
+coordenadorUser = User.objects.create_user("coordenador@gmail.com", "coordenador@gmail.com", "151515")
+coordenador = Coordenador.objects.create(nome="Coordenador", cpf="151515", email="coordenador@gmail.com", user = coordenadorUser)
 
 print("Professores Internos criados com sucesso!")
