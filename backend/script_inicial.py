@@ -1,8 +1,7 @@
 # py manage.py shell
 # >>> exec(open('script_inicial.py').read())
 
-from app.models.usuario import Usuario
-from app.models.professor import Professor
+from app.models.configuracoes import Configuracoes
 from app.models.professorInterno import ProfessorInterno
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
@@ -19,34 +18,8 @@ andre = ProfessorInterno(nome="André Schneider",
                          user = teste
                         )
 andre.save()
+andre = ProfessorInterno.objects.get(pk=1)
 
-# dedecoUser = andre.user
-# token = Token.objects.create(user=dedecoUser)
-# print(token.key)
-
-roben = ProfessorInterno(nome="Roben Lunardi", 
-                         cpf="12345678913", 
-                         email="roben@restinga.ifrs.edu.br",
-                         area = "Segurança da Informação",
-                         grau_academico = "Mestre",
-                         titulos="Coordenador Supremo, Inimigo do MD5",
-                         matricula="2024000401")
-roben.save()
-eliana = ProfessorInterno(nome="Eliana Pereira", 
-                         cpf="12345678915", 
-                         email="eliana@restinga.ifrs.edu.br",
-                         area = "Gestão de Projetos",
-                         grau_academico = "Mestre",
-                         titulos="Scrum Professional, Rainha dos Diagramas",
-                         matricula="1987000401")
-eliana.save()
-ricardo = ProfessorInterno(nome="Ricardo dos Santos", 
-                         cpf="12345678917", 
-                         email="ricardo@restinga.ifrs.edu.br",
-                         area = "FULL-STACK",
-                         grau_academico = "Mestre",
-                         titulos="Inventou o Django",
-                         matricula="1903000401")
-ricardo.save()
+configMaster = Configuracoes (coordenadorAtual=andre)
 
 print("Professores Internos criados com sucesso!")

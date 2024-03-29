@@ -3,6 +3,8 @@ from .estudante import *
 from .professor import *
 from .professorInterno import *
 from .professorExterno import *
+from .configuracoes import *
+from .semestre import *
 from .tcc import *
 from .avaliacao import *
 from .sessao import *
@@ -10,10 +12,8 @@ from .sessaoFinal import *
 from .sessaoPrevia import *
 from .banca import *
 from .bancaPrioridade import *
-from .configuracoes import *
 from .convite import *
 from .coordenador import *
 from .statusCadastro import *
 from .statusTcc import *
 from .tema import *
-from .semestre import *
