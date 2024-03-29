@@ -3,12 +3,14 @@ import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
 import Link from 'next/link';
 import { Dialog } from 'primereact/dialog';
+import ConfiguracoesService from 'meutcc/services/ConfiguracoesService';
 
-import { locale, addLocale } from 'primereact/api';
-
+import { locale, addLocale, updateLocaleOption, updateLocaleOptions, localeOption, localeOptions } from 'primereact/api';
+import toast from 'react-hot-toast';
 
 addLocale('ptbr', {
-    today:'Hoje', clear: 'Limpar', monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'], monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun', 'Jul','Ago','Set','Out','Nov','Dez'], dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'], dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'], dayNamesMin: ['D','S','T','Q','Q','S','S'], weekHeader: 'Semana', firstDay: 0, isRTL: false, showMonthAfterYear: false, yearSuffix: '', timeOnlyTitle: 'Só Horas', timeText: 'Tempo', hourText: 'Hora', minuteText: 'Minuto', secondText: 'Segundo', ampm: false, month: 'Mês', week: 'Semana', day: 'Dia', allDayText : 'Todo o Dia' });
+    today: 'Hoje', clear: 'Limpar', monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'], monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'], dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'], dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'], weekHeader: 'Semana', firstDay: 0, isRTL: false, showMonthAfterYear: false, yearSuffix: '', timeOnlyTitle: 'Só Horas', timeText: 'Tempo', hourText: 'Hora', minuteText: 'Minuto', secondText: 'Segundo', ampm: false, month: 'Mês', week: 'Semana', day: 'Dia', allDayText: 'Todo o Dia'
+});
 
 const ConfiguracoesPage = () => {
     const [dialogVisible, setDialogVisible] = useState(false);
@@ -22,10 +24,18 @@ const ConfiguracoesPage = () => {
         setDialogVisible(false);
     };
 
-    const handleSaveDates = () => {
+    const handleSaveDates = async () => {
         console.log('Data de Início:', dates[0]);
         console.log('Data de Fim:', dates[1]);
         setDialogVisible(false);
+        const data = await toast.promise(ConfiguracoesService.atualizaDataProposta({
+            dataAberturaPrazoPropostas: dates[0],
+            dataFechamentoPrazoPropostas: dates[1]
+        }), {
+            loading: 'Conectando...',
+            success: 'Conectado!',
+            error: 'Erro ao conectar',
+        });
     };
 
     return (
@@ -40,7 +50,7 @@ const ConfiguracoesPage = () => {
                     <Button icon="pi pi-list" label="Propostas de TCC" size="large" outlined />
                 </Link>
                 <Link href='/permissoes-usuarios'>
-                    <Button icon="pi pi-users" label="Permissões de Usuários"  size="large" outlined />
+                    <Button icon="pi pi-users" label="Permissões de Usuários" size="large" outlined />
                 </Link>
             </div>
 
