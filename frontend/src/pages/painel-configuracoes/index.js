@@ -27,11 +27,13 @@ const ConfiguracoesPage = () => {
     const handleSaveDates = async () => {
         console.log('Data de Início:', dates[0]);
         console.log('Data de Fim:', dates[1]);
+        const formatDate = (date) => `${date.getUTCFullYear()}-${date.getUTCMonth().toString().padStart(2, '0')}-${date.getUTCDay().toString().padStart(2, '0')}`;
+        const datas = {
+            dataAberturaPrazoPropostas: formatDate(dates[0]),
+            dataFechamentoPrazoPropostas: formatDate(dates[1])
+        }
         setDialogVisible(false);
-        const data = await toast.promise(ConfiguracoesService.atualizaDataProposta({
-            dataAberturaPrazoPropostas: dates[0],
-            dataFechamentoPrazoPropostas: dates[1]
-        }), {
+        const data = await toast.promise(ConfiguracoesService.atualizaDataProposta(datas), {
             loading: 'Conectando...',
             success: 'Conectado!',
             error: 'Erro ao conectar',
@@ -56,7 +58,15 @@ const ConfiguracoesPage = () => {
 
             <Dialog header="Envio de Propostas" visible={dialogVisible} style={{ width: 'fit-content' }} onHide={handleCloseDialog}>
                 <label>Período: </label>
-                <Calendar value={dates} onChange={(e) => setDates(e.value)} dateFormat='dd/mm/yy' locale='ptbr' selectionMode="range" readOnlyInput hideOnRangeSelection showButtonBar />
+                <Calendar 
+                    value={dates} 
+                    onChange={(e) => setDates(e.value)} 
+                    dateFormat='dd/mm/yy' 
+                    locale='ptbr' 
+                    selectionMode="range" 
+                    readOnlyInput 
+                    hideOnRangeSelection 
+                    showButtonBar />
                 <div className="flex justify-between mt-5">
                     <Button onClick={handleSaveDates} label="Salvar" severity="success" />
                     <Button onClick={handleCloseDialog} label="Cancelar" severity="danger" />
