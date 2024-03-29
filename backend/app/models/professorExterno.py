@@ -4,11 +4,10 @@ from . import Professor
 class ProfessorExterno(Professor):
 
     # TODO - Verificar como será feito os campos de arquivo "identidade" e "diploma"
-    identidade = models.FileField(upload_to='professoresExterno/identidade')
-    diploma = models.FileField(upload_to='professoresExterno/diploma')
-
-    statusCadastro = models.BooleanField()
+    # TODO - Modificar para que seja obrigatório anexar um arquivo
+    identidade = models.FileField(blank=True, null=True, upload_to='professoresExterno/identidade')
+    diploma = models.FileField(blank=True, null=True, upload_to='professoresExterno/diploma')
     dataStatus = models.DateTimeField(auto_now=True)
 
-    class meta:
+    class Meta:
         abstract = False
