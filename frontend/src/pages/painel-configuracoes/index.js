@@ -39,7 +39,7 @@ const ConfiguracoesPage = () => {
 
             <div className='max-w-screen-md mx-auto bg-white m-3 mt-6'>
                 <div className='py-3 border-0 border-b border-dashed border-gray-200'>
-                    <h1 className='heading-1 text-center text-gray-700'>Configurações</h1>
+                    <h1 className='heading-1 text-center text-gray-700'>Configurações do Sistema</h1>
                 </div>
                 <div className="card">
                 <TabView>
@@ -84,7 +84,9 @@ const ConfiguracoesPage = () => {
                                     />
                                 </div>
                             </div>
-                                <Button label="Enviar" severity="success" onClick={handleSaveDates} />
+                            <div className='text-right'>
+                                <Button label="Salvar Alterações" severity="success" onClick={handleSaveDates} />
+                            </div>
                     </TabPanel>
                 </TabView>
             </div>

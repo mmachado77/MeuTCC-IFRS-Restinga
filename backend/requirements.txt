@@ -3,3 +3,4 @@ django-cors-headers==4.3.1
 djangorestframework==3.15.1
 django-polymorphic==3.1.0
 django-rest-polymorphic==0.1.10
+setuptools==69.2.0
