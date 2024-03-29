@@ -4,6 +4,7 @@ import { Calendar } from 'primereact/calendar';
 import Link from 'next/link';
 import { Dialog } from 'primereact/dialog';
 import ConfiguracoesService from 'meutcc/services/ConfiguracoesService';
+import { format } from 'date-fns';
 
 import { locale, addLocale, updateLocaleOption, updateLocaleOptions, localeOption, localeOptions } from 'primereact/api';
 import toast from 'react-hot-toast';
@@ -27,10 +28,10 @@ const ConfiguracoesPage = () => {
     const handleSaveDates = async () => {
         console.log('Data de Início:', dates[0]);
         console.log('Data de Fim:', dates[1]);
-        const formatDate = (date) => `${date.getUTCFullYear()}-${date.getUTCMonth().toString().padStart(2, '0')}-${date.getUTCDay().toString().padStart(2, '0')}`;
         const datas = {
-            dataAberturaPrazoPropostas: formatDate(dates[0]),
-            dataFechamentoPrazoPropostas: formatDate(dates[1])
+            //format(currentDate, 'MMMM do, yyyy');
+            dataAberturaPrazoPropostas: format(dates[0], 'yyyy-MM-dd'),
+            dataFechamentoPrazoPropostas: format(dates[1], 'yyyy-MM-dd')
         }
         setDialogVisible(false);
         const data = await toast.promise(ConfiguracoesService.atualizaDataProposta(datas), {

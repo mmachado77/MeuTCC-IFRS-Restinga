@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from datetime import datetime
+from datetime import date
 
 
 # Create your views here.
@@ -81,10 +82,10 @@ class AtualizarDatasPropostasView(APIView):
 
             configuracoes = Configuracoes.objects.first()  
 
-            if 'data_abertura' in data:
-                configuracoes.dataAberturaPrazoPropostas = datetime.strptime(data['data_abertura'], '%Y-%m-%d')
-            if 'data_fechamento' in data:
-                configuracoes.dataFechamentoPrazoPropostas = datetime.strptime(data['data_fechamento'], '%Y-%m-%d')
+            if 'dataAberturaPrazoPropostas' in data:
+                configuracoes.dataAberturaPrazoPropostas = date.fromisoformat(data['dataAberturaPrazoPropostas'])
+            if 'dataFechamentoPrazoPropostas' in data:
+                configuracoes.dataFechamentoPrazoPropostas = date.fromisoformat(data['dataFechamentoPrazoPropostas'])
 
             configuracoes.save()
 
