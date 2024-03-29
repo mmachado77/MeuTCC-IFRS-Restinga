@@ -2,10 +2,15 @@
 # >>> exec(open('script_inicial.py').read())
 
 from django.contrib.auth.models import User
-from app.models import Configuracoes, ProfessorInterno, Estudante
+from app.models import Configuracoes, ProfessorInterno, Estudante, StatusCadastro
 
 # Criando usuário admin
 user = User.objects.create_superuser("admin", "admin@admin.com", "admin")
+
+# Cria Status André
+status = StatusCadastro.objects.create(
+    aprovacao = True
+)
 
 # Cria um professor interno
 andre = ProfessorInterno.objects.create(nome="André Schneider", 
@@ -15,6 +20,7 @@ andre = ProfessorInterno.objects.create(nome="André Schneider",
                          grau_academico = "Mestre",
                          titulos="Rei do VPL, Inimigo do Python",
                          matricula="1994000401",
+                         status = status,
                          user = user
                         )
 

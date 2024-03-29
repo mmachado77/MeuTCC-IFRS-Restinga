@@ -1,5 +1,6 @@
 from .usuario import *
 from .estudante import *
+from .statusCadastro import *
 from .professor import *
 from .professorInterno import *
 from .professorExterno import *
@@ -14,6 +15,5 @@ from .banca import *
 from .bancaPrioridade import *
 from .convite import *
 from .coordenador import *
-from .statusCadastro import *
 from .statusTcc import *
 from .tema import *
