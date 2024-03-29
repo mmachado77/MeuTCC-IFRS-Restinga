@@ -1,25 +1,31 @@
 # py manage.py shell
 # >>> exec(open('script_inicial.py').read())
 
-from app.models.configuracoes import Configuracoes
-from app.models.professorInterno import ProfessorInterno
 from django.contrib.auth.models import User
-from rest_framework.authtoken.models import Token
+from app.models import Configuracoes, ProfessorInterno, Estudante
 
-teste = User.objects.get(pk=1)
+# Criando usuário admin
+user = User.objects.create_superuser("admin", "admin@admin.com", "admin")
 
-andre = ProfessorInterno(nome="André Schneider", 
+# Cria um professor interno
+andre = ProfessorInterno.objects.create(nome="André Schneider", 
                          cpf="12345678911", 
                          email="andre@restinga.ifrs.edu.br",
                          area = "Informática",
                          grau_academico = "Mestre",
                          titulos="Rei do VPL, Inimigo do Python",
                          matricula="1994000401",
-                         user = teste
+                         user = user
                         )
-andre.save()
-andre = ProfessorInterno.objects.get(pk=1)
 
+# Adiciona professor como atual coordenador
 configMaster = Configuracoes (coordenadorAtual=andre)
+
+# Cria usuario estudante
+estudanteUser = User.objects.create_user("estudante@gmail.com", "estudante@gmail.com", "12345678912")
+estudante = Estudante.objects.create(nome="Estudante", 
+                      cpf="12345678912", 
+                      email="estudante@gmail.com",
+                      user=estudanteUser)
 
 print("Professores Internos criados com sucesso!")

@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 from app.models import Professor, Estudante, Tcc, Configuracoes
-from .serializers import ProfessorSerializer, TccSerializer, EstudanteSerializer, ConfiguracoesSerializer
+from app.serializers import ProfessorSerializer, TccSerializer, EstudanteSerializer, ConfiguracoesSerializer
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
