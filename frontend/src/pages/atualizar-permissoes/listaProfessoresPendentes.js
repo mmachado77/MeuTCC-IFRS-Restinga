@@ -4,14 +4,20 @@ import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
-import { InputText } from 'primereact/inputtext';
 import ProfessorService from 'meutcc/services/ProfessorService'; 
 
 export default function ProfessorsDemo() {
     let emptyProfessor = {
         id: null,
         nome: '',
+        cpf: '',
         email: '',
+        dataCadastro: '',
+        area: '',
+        grau_academico: '',
+        matricula: '',
+        identidade: '',
+        diploma: '',
         resourcetype: ''
     };
 
@@ -50,7 +56,7 @@ export default function ProfessorsDemo() {
         setProfessorDialog(false);
     };
 
-    const editProfessor = (professor) => {
+    const detalhesProfessor = (professor) => {
         setProfessor({ ...professor });
         setProfessorDialog(true);
     };
@@ -58,7 +64,7 @@ export default function ProfessorsDemo() {
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
-                <Button label="Detalhes" severity="info" rounded onClick={() => editProfessor(rowData)} />
+                <Button label="Detalhes" severity="info" onClick={() => detalhesProfessor(rowData)} />
             </React.Fragment>
         );
     };
@@ -68,32 +74,54 @@ export default function ProfessorsDemo() {
             <Toast ref={toast} />
             <div className="card">
                 <DataTable value={professors} selection={selectedProfessor} onSelectionChange={(e) => setSelectedProfessor(e.value)} dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]} currentPageReportTemplate="Showing {first} to {last} of {totalRecords} professors">
-                    <Column field="nome" header="Nome" sortable style={{ minWidth: '16rem' }}></Column>
-                    <Column field="email" header="Email" sortable style={{ minWidth: '16rem' }}></Column>
-                    <Column field="resourcetype" header="Tipo de Registro" sortable style={{ minWidth: '16rem' }}></Column>
+                    <Column field="nome" header="Nome" sortable></Column>
+                    <Column field="email" header="Email" sortable></Column>
+                    <Column field="resourcetype" header="Tipo de Registro" sortable style={{ width: '12rem' }}></Column>
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
                 </DataTable>
             </div>
 
             <Dialog visible={professorDialog} style={{ width: '32rem' }} header="Detalhes do Cadastro" modal className="p-fluid" onHide={hideDialog}>
-                <div className="field">
-                    <label htmlFor="Nome" className="font-bold">
-                        Nome
-                    </label>
-                    <InputText id="nome" value={professor.nome} readOnly />
+                <div style={{ marginBottom: '1rem' }}>
+                    <label htmlFor="nome" className="font-bold">Nome:</label>
+                    <span>{professor.nome}</span>
                 </div>
-                <div className="field">
-                    <label htmlFor="email" className="font-bold">
-                        Email
-                    </label>
-                    <InputText id="email" value={professor.email} readOnly />
+                <div style={{ marginBottom: '1rem' }}>
+                    <label htmlFor="cpf" className="font-bold">CPF:</label>
+                    <span>{professor.cpf}</span>
                 </div>
-                <div className="field">
-                    <label htmlFor="resourcetype" className="font-bold">
-                        Tipo de Registro
-                    </label>
-                    <InputText id="resourcetype" value={professor.resourcetype} readOnly />
+                <div style={{ marginBottom: '1rem' }}>
+                    <label htmlFor="email" className="font-bold">Email:</label>
+                    <span>{professor.email}</span>
                 </div>
+                <div style={{ marginBottom: '1rem' }}>
+                    <label htmlFor="dataCadastro" className="font-bold">Data de Cadastro:</label>
+                    <span>{professor.dataCadastro}</span>
+                </div>
+                <div style={{ marginBottom: '1rem' }}>
+                    <label htmlFor="area" className="font-bold">Área:</label>
+                    <span>{professor.area}</span>
+                </div>
+                <div style={{ marginBottom: '1rem' }}>
+                    <label htmlFor="grauAcademico" className="font-bold">Grau Acadêmico:</label>
+                    <span>{professor.grau_academico}</span>
+                </div>
+                <div style={{ marginBottom: '1rem' }}>
+                    <label htmlFor="matricula" className="font-bold">Matrícula:</label>
+                    <span>{professor.matricula}</span>
+                </div>
+                {professor.resourcetype === 'Professor Externo' && (
+                    <React.Fragment>
+                        <div style={{ marginBottom: '1rem' }}>
+                            <label htmlFor="identidade" className="font-bold">Identidade:</label>
+                            <span>{professor.identidade || 'Não disponível'}</span>
+                        </div>
+                        <div style={{ marginBottom: '1rem' }}>
+                            <label htmlFor="diploma" className="font-bold">Diploma:</label>
+                            <span>{professor.diploma || 'Não disponível'}</span>
+                        </div>
+                    </React.Fragment>
+                )}
             </Dialog>
         </div>
     );
