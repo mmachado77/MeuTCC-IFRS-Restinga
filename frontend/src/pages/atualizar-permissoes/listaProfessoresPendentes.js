@@ -86,7 +86,7 @@ export default function ProfessorsDemo() {
                 </div>
                 <div style={{ marginBottom: '1rem' }}>
                     <label htmlFor="dataCadastro" className="font-bold">Data de Cadastro: </label>
-                    <span>{format(professor.dataCadastro, 'dd/MM/yyyy')}</span>
+                    <span>{professor.dataCadastro && format(professor.dataCadastro, 'dd/MM/yyyy')}</span>
                 </div>
                 <div style={{ marginBottom: '1rem' }}>
                     <label htmlFor="area" className="font-bold">Área: </label>
@@ -114,6 +114,14 @@ export default function ProfessorsDemo() {
                         </div>
                     </>
                 )}
+                <div className='flex justify-around'>
+                    <div>
+                        <Button label="Aprovar" severity="success" />
+                    </div>
+                    <div>
+                        <Button label="Recusar" severity="danger" />
+                    </div>
+                </div>
             </Dialog>
         </div>
     );

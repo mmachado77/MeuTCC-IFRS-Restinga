@@ -8,6 +8,6 @@ from rest_framework.permissions import IsAuthenticated
 class ProfessoresPendentesListAPIView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
-        professor = Professor.objects.filter(status__aprovacao=False)
+        professor = Professor.objects.filter(status__aprovacao=False, status__justificativa=None)
         serializer = UsuarioPolymorphicSerializer(professor, many=True)
         return Response(serializer.data)
