@@ -10,5 +10,15 @@ class Usuario(PolymorphicModel):
     email = models.EmailField(max_length = 254)
     dataCadastro = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def get_tipo(self):
+        return {
+            'Estudante': 'Estudante',
+            'Professor': 'Professor',
+            'ProfessorInterno': 'Professor Interno',
+            'ProfessorExterno': 'Professor Externo',
+            'Coordenador': 'Coordenador'
+        }[self.__class__.__name__]
+    
     class Meta:
         abstract = False
