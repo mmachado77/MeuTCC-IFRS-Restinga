@@ -15,5 +15,7 @@ urlpatterns = [
     path('detalhes-usuario', views.DetalhesUsuario.as_view(), name='detalhes-usuario'),
     path('listar-usuarios', views.ListarUsuarios.as_view(), name='listar-usuarios'),
     path('detalhes-tcc/<int:tccid>/', views.DetalhesTCCView.as_view(), name='detalhes_tcc'),
+    path('listar-tccs-pendente', views.ListarTccPendente.as_view(), name='listar-tccs'),
+    path('atualizar-tcc-status/<int:tccId>', views.AtualizarTccStatus.as_view(), name='atualizar-tcc-status'),
 ]
 
