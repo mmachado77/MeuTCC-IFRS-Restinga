@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
+import toast from 'react-hot-toast';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import ProfessorService from 'meutcc/services/ProfessorService'; 
@@ -27,7 +28,20 @@ export default function ProfessorsDemo() {
     const [professorDialog, setProfessorDialog] = useState(false);
     const [professor, setProfessor] = useState(emptyProfessor);
     const [selectedProfessor, setSelectedProfessor] = useState(null);
-    const toast = useRef(null);
+    const toastJanela = useRef(null);
+
+    const aprovarProfessor = async () => {
+        const data = await toast.promise(ProfessorService.aprovarProfessor(professor.id), {
+            loading: 'Aprovando professor...',
+            success: 'Professor aprovado com sucesso!',
+            error: 'Erro ao aprovar professor.',
+        });
+            const updatedProfessors = professors.filter(p => p.id !== professor.id);
+            setProfessors(updatedProfessors);
+            setProfessor({ ...professor, statusCadastro: { ...professor.statusCadastro, aprovacao: true } });
+            setProfessorDialog(false);
+    };
+    
 
     useEffect(() => {
         async function fetchProfessors() {
@@ -61,7 +75,7 @@ export default function ProfessorsDemo() {
 
     return (
         <div>
-            <Toast ref={toast} />
+            <Toast ref={toastJanela} />
             <div className="card">
                 <DataTable value={professors} selection={selectedProfessor} onSelectionChange={(e) => setSelectedProfessor(e.value)} dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]} currentPageReportTemplate="Showing {first} to {last} of {totalRecords} professors">
                     <Column field="nome" header="Nome" sortable></Column>
@@ -116,7 +130,7 @@ export default function ProfessorsDemo() {
                 )}
                 <div className='flex justify-around'>
                     <div>
-                        <Button label="Aprovar" severity="success" />
+                        <Button label="Aprovar" severity="success" onClick={aprovarProfessor} />
                     </div>
                     <div>
                         <Button label="Recusar" severity="danger" />

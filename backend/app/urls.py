@@ -10,6 +10,7 @@ urlpatterns = [
     path('proposta-submetida', views.PropostaSubmetidaView.as_view(), name='proposta-submetida'),
     path('atualizar-datas-propostas', views.AtualizarDatasPropostasView.as_view(), name='atualizar-datas-propostas'),
     path('professores-pendentes', views.ProfessoresPendentesListAPIView.as_view(), name='professores-pendentes'),
+    path('aprovar-professor/<int:idProfessor>', views.AprovarProfessorAPIView.as_view(), name='aprovar-professor'),
     path('detalhes-usuario', views.DetalhesUsuario.as_view(), name='detalhes-usuario'),
     path('listar-usuarios', views.ListarUsuarios.as_view(), name='listar-usuarios'),
 ]
