@@ -7,8 +7,9 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import ProfessorService from 'meutcc/services/ProfessorService'; 
 import { format } from 'date-fns';
+import FormularioJustificativa from './formularioJustificativa'
 
-export default function ProfessorsDemo() {
+export default function listaProfessores() {
     let emptyProfessor = {
         id: null,
         tipo: '',
@@ -30,31 +31,35 @@ export default function ProfessorsDemo() {
     const [selectedProfessor, setSelectedProfessor] = useState(null);
     const toastJanela = useRef(null);
 
+    const [exibeFormulario, setExibeFormulario] = useState(false);
+
+    const fetchProfessors = async () => {
+        try {
+            const professoresPendentes = await ProfessorService.getProfessoresPendentes();
+            
+            setProfessors(professoresPendentes);
+        } catch (error) {
+            console.error('Erro ao obter professores pendentes:', error);
+            // Exiba uma mensagem de erro se necessário
+        }
+    }
+
+    const atualizaProfessoresPosAvaliacao = async () => {
+        fetchProfessors()
+        hideDialog()
+    }
+
     const aprovarProfessor = async () => {
         const data = await toast.promise(ProfessorService.aprovarProfessor(professor.id), {
             loading: 'Aprovando professor...',
             success: 'Professor aprovado com sucesso!',
             error: 'Erro ao aprovar professor.',
         });
-            const updatedProfessors = professors.filter(p => p.id !== professor.id);
-            setProfessors(updatedProfessors);
-            setProfessor({ ...professor, statusCadastro: { ...professor.statusCadastro, aprovacao: true } });
-            setProfessorDialog(false);
+        atualizaProfessoresPosAvaliacao()
     };
     
 
-    useEffect(() => {
-        async function fetchProfessors() {
-            try {
-                const professoresPendentes = await ProfessorService.getProfessoresPendentes();
-                
-                setProfessors(professoresPendentes);
-            } catch (error) {
-                console.error('Erro ao obter professores pendentes:', error);
-                // Exiba uma mensagem de erro se necessário
-            }
-        }
-
+    useEffect(() => {       
         fetchProfessors();
     }, []); // Adicionando [] como dependência para garantir que o useEffect seja executado apenas uma vez
 
@@ -128,13 +133,16 @@ export default function ProfessorsDemo() {
                         </div>
                     </>
                 )}
-                <div className='flex justify-around'>
+                <div className={'flex justify-around ' + (exibeFormulario ? 'hidden': '')}>
                     <div>
-                        <Button label="Aprovar" severity="success" onClick={aprovarProfessor} />
+                        <Button label="Aprovar" severity="success" icon='pi pi-thumbs-up-fill' iconPos='right' onClick={aprovarProfessor} />
                     </div>
                     <div>
-                        <Button label="Recusar" severity="danger" />
+                        <Button label="Recusar" severity="danger" icon='pi pi-thumbs-down-fill' iconPos='right' onClick={ () => setExibeFormulario(!exibeFormulario) } />
                     </div>
+                </div>
+                <div className={'mt-10 ' + (!exibeFormulario ? 'hidden': '')} >
+                    <FormularioJustificativa onSetVisibility={setExibeFormulario} onPosAvaliacao={atualizaProfessoresPosAvaliacao} professor={professor}/>
                 </div>
             </Dialog>
         </div>
