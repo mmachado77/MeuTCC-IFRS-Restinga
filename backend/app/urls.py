@@ -11,6 +11,7 @@ urlpatterns = [
     path('atualizar-datas-propostas', views.AtualizarDatasPropostasView.as_view(), name='atualizar-datas-propostas'),
     path('professores-pendentes', views.ProfessoresPendentesListAPIView.as_view(), name='professores-pendentes'),
     path('aprovar-professor/<int:idProfessor>', views.AprovarProfessorAPIView.as_view(), name='aprovar-professor'),
+    path('recusar-professor/<int:idProfessor>', views.RecusarProfessorAPIView.as_view(), name='recusar-professor'),
     path('detalhes-usuario', views.DetalhesUsuario.as_view(), name='detalhes-usuario'),
     path('listar-usuarios', views.ListarUsuarios.as_view(), name='listar-usuarios'),
     path('detalhes-tcc/<int:tccid>/', views.DetalhesTCCView.as_view(), name='detalhes_tcc'),

@@ -12,9 +12,13 @@ async function aprovarProfessor(idProfessor) {
     return apiClient.put(`/app/aprovar-professor/${idProfessor}`).then((response) => response.data);
 }
 
+async function recusarProfessor(idProfessor, data) {
+    return apiClient.put(`/app/recusar-professor/${idProfessor}`, data).then((response) => response.data);
+}
 
 export default {
     getProfessores,
     getProfessoresPendentes,
     aprovarProfessor,
+    recusarProfessor,
 }
