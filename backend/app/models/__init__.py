@@ -13,7 +13,6 @@ from .sessaoFinal import *
 from .sessaoPrevia import *
 from .banca import *
 from .bancaPrioridade import *
-from .convite import *
 from .coordenador import *
-from .statusTcc import *
+from .tccStatus import *
 from .tema import *
