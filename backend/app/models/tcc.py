@@ -11,12 +11,12 @@ class Tcc(BaseModel):
     tema = models.CharField(max_length=255)
     resumo = models.TextField()
     dataSubmissaoProposta = models.DateTimeField(auto_now_add=True)
-    documentoTCC = models.FileField(upload_to='tcc/documento')
-    autorizacaoPublicacao = models.FileField(upload_to='tcc/autorizacaoPublicacao')
+    documentoTCC = models.FileField(upload_to='tcc/documento', null=True, blank=True)
+    autorizacaoPublicacao = models.FileField(upload_to='tcc/autorizacaoPublicacao', null=True, blank=True)
     #TODO - mudar caminho dos arquivos
-    dataInicio = models.DateTimeField(default=datetime.now)
-    prazoEntregaPrevia = models.DateTimeField(default=datetime.now)
-    prazoEntregaFinal = models.DateTimeField(default=datetime.now)
+    dataInicio = models.DateTimeField(default=datetime.now, null=True, blank=True)
+    prazoEntregaPrevia = models.DateTimeField(default=datetime.now, null=True, blank=True)
+    prazoEntregaFinal = models.DateTimeField(default=datetime.now, null=True, blank=True)
 
     class Meta:
         abstract = False
