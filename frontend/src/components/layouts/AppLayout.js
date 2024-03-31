@@ -3,14 +3,24 @@ import NavBar from "../ui/NavBar";
 import { Toaster } from "react-hot-toast";
 import { Guards } from "meutcc/core/constants";
 import { useAuth } from "meutcc/core/context/AuthContext";
+import { useRouter } from "next/router";
+import Link from "next/link";
 
 export const AppLayout = ({ children, guards }) => {
 
     const { user } = useAuth();
 
+    const menuItemTemplate = (item) => {
+        return <Link href={ item.url } className="p-menuitem-link" aria-hidden="true">
+            <span className={'p-menuitem-icon ' + item.icon || ''}></span>
+            <span className="p-menuitem-text">{ item.label }</span>
+        </Link>;
+    
+    };
+
     const typesMenu = {
         Todos: [
-            { label: 'Inicio', icon: 'pi pi-fw pi-home', url: '/' },
+            { label: 'Inicio', icon: 'pi pi-fw pi-home', url: '/', },
             { label: 'Meus TCCs', icon: 'pi pi-fw pi-book', url: '/meus-tccs' },
         ],
         Estudante: [
@@ -21,10 +31,10 @@ export const AppLayout = ({ children, guards }) => {
             { label: 'Configurações', icon: 'pi pi-fw pi-cog', url: '/painel-configuracoes' },
         ]
     }
-
-    const items = typesMenu.Todos.concat(typesMenu[user?.resourcetype] || []);
+    const items = typesMenu.Todos.concat(typesMenu[user?.resourcetype] || []).map((item) => ({ ...item, template: menuItemTemplate }));
 
     const isUserAuth = !!user || false;
+
 
     return (
         <div className='bg-gray-100 min-h-screen'>
