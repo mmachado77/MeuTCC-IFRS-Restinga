@@ -17,3 +17,12 @@ body {
     border-radius: 10px;
     size-adjust: 80%;
 }
+
+@tailwind components;
+
+/* cria um apply */
+@layer components {
+    .anchor-link {
+        @apply text-white no-underline hover:text-gray-300 hover:underline;
+    }
+}
