@@ -10,7 +10,10 @@ const NavBar = ({ auth = false }) => {
         <>
             <div className='px-3'><span className='pi pi-fw pi-user me-2'></span> Bem vindo, <b>{user?.nome || 'Usuário'}</b></div>
             <div className='px-2'>
-                <Link href='/#logout' onClick={handleUserLogout}>Sair</Link>
+                <Link href='/#logout' className="anchor-link" onClick={handleUserLogout}>
+                    <span>Sair</span>
+                    <span className='p-icon pi pi-fw pi-sign-out ms-2'></span>                
+                </Link>
             </div>
         </>
     );
@@ -19,7 +22,10 @@ const NavBar = ({ auth = false }) => {
         <>
             <div className='px-3'>Você ainda não se identificou</div>
             <div className='px-2'>
-                <Link href="/auth">Acessar</Link>
+                <Link href="/auth" className="anchor-link">
+                    <span>Acessar</span>
+                    <span className='p-icon pi pi-fw pi-sign-in ms-2'></span>
+                </Link>
             </div>
         </>
     );
