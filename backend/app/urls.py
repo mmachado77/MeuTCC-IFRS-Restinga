@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path('professores', views.GetProfessores.as_view(), name='professor-list-create'),
+    path('professores-internos', views.GetProfessoresInternos.as_view(), name='professores-internos'),
     path('criar-tcc', views.CriarTCView.as_view(), name='criar-tcc'),
     path('criar-usuario', views.CriarUsuarioView.as_view(), name='criar-usuario'),
     path('autenticar', views.ObterTokenView.as_view(), name='autenticar-usuario'),

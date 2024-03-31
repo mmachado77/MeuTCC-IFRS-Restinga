@@ -3,8 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
-from app.models import Professor, Estudante, Tcc, Configuracoes
-from app.serializers import ProfessorSerializer, TccSerializer, EstudanteSerializer, ConfiguracoesSerializer
+from app.models import Professor, Estudante, Tcc, Configuracoes, ProfessorInterno
+from app.serializers import ProfessorSerializer, UsuarioPolymorphicSerializer, TccSerializer, EstudanteSerializer, ConfiguracoesSerializer
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
@@ -19,6 +19,14 @@ class GetProfessores(generics.ListCreateAPIView):
 
     queryset = Professor.objects.all()
     serializer_class = ProfessorSerializer
+
+class GetProfessoresInternos(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        usuario = ProfessorInterno.objects.all()
+        serializer = UsuarioPolymorphicSerializer(usuario, many=True)
+        return Response(serializer.data)
 
 class CriarTCView(APIView):
     permission_classes = [IsAuthenticated]
