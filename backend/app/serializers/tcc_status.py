@@ -3,9 +3,10 @@ from app.models import TccStatus
 from app.enums import StatusTccEnum
 
 class TccStatusSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = TccStatus
-        fields = ['status', 'dataStatus']
+        fields = ['status', 'statusMensagem', 'dataStatus']
 
 class TccStatusAlterarSerializer(serializers.ModelSerializer):
 

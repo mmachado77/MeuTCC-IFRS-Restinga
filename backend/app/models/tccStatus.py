@@ -9,5 +9,9 @@ class TccStatus(BaseModel):
     dataStatus = models.DateTimeField(auto_now=True)
     tcc = models.ForeignKey(Tcc, on_delete=models.PROTECT)
 
+    @property
+    def statusMensagem(self):
+        return str(StatusTccEnum(self.status))
+
     class Meta:
         abstract = False

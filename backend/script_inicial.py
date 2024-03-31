@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from app.models import Configuracoes, ProfessorInterno, Estudante, StatusCadastro, Coordenador
 
 # Criando usuário admin
-user = User.objects.create_superuser("admin", "admin@admin.com", "admin")
+user = User.objects.create_superuser("admin@admin.com", "admin@admin.com", "12345678911")
 
 # Cria Status André
 status = StatusCadastro.objects.create(
