@@ -29,7 +29,7 @@ const NavBar = ({ auth = false }) => {
 
     const menuAuth = () => (
         <>
-            <div className='px-3'><span className='pi pi-fw pi-user me-2'></span> Bem vindo, <b>{user?.nome || 'Usuário'}</b></div>
+            <div className='px-3'>Bem vindo, <b>{user?.nome || 'Usuário'}</b></div>
             <div className='px-2'>
                 <div class="p-avatar p-component p-avatar-image p-avatar-circle cursor-pointer" style={{height: "40px", width: "40px"}} onClick={(event) => menuRight.current.toggle(event)} >
                     <img alt="avatar" className="hover:brightness-90" height="40" width="40" src="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" data-pc-section="image" element-id="348" />
