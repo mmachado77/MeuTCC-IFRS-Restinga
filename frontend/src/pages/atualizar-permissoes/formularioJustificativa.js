@@ -29,10 +29,11 @@ export default function formularioJustificativa({onSetVisibility, onPosAvaliacao
         onPosAvaliacao()
     };
 
-    return (
+    return (<>
         <span className="p-float-label">
             <InputTextarea className={(mensagemErro ? 'p-invalid' : '')} id="justificativa" value={mensagemJustificativa} onChange={(e) => setMensagemJustificativa(e.target.value)} rows={5} cols={30} />
             <label htmlFor="justificativa">Justifique o motivo para a recusa</label>
+        </span>
             { mensagemErro && <small id='tema-help' className='text-red-500 py-1 px-2'>{mensagemErro}</small> }
         <div className='flex justify-around mt-3'>
             <div>
@@ -42,7 +43,6 @@ export default function formularioJustificativa({onSetVisibility, onPosAvaliacao
                 <Button label="Cancelar" severity="secondary" icon='pi pi-times' iconPos='right' onClick={ () => onSetVisibility(false) } />
             </div>
         </div>
-</span>
-    )
+        </>)
 }
         

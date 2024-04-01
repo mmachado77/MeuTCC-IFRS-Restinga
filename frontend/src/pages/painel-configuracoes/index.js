@@ -78,7 +78,7 @@ const ConfiguracoesPage = () => {
                             </div>
                     </TabPanel>
                     <TabPanel header="Coordenador de Curso" leftIcon="pi pi-user-edit mr-2" >
-                    <div className="flex justify-between mb-5">
+                    <div className="mb-5">
                         <AtualizarCoordenador />
                     </div>
                     </TabPanel>

@@ -133,16 +133,18 @@ export default function listaProfessores() {
                         </div>
                     </>
                 )}
-                <div className={'flex justify-around ' + (exibeFormulario ? 'hidden': '')}>
-                    <div>
-                        <Button label="Aprovar" severity="success" icon='pi pi-thumbs-up-fill' iconPos='right' onClick={aprovarProfessor} />
+                <div className='border-0 border-t border-dashed border-gray-200 pt-4'>
+                    <div className={'flex justify-around ' + (exibeFormulario ? 'hidden': '')}>
+                        <div>
+                            <Button label="Aprovar" severity="success" icon='pi pi-thumbs-up-fill' iconPos='right' onClick={aprovarProfessor} />
+                        </div>
+                        <div>
+                            <Button label="Recusar" severity="danger" icon='pi pi-thumbs-down-fill' iconPos='right' onClick={ () => setExibeFormulario(!exibeFormulario) } />
+                        </div>
                     </div>
-                    <div>
-                        <Button label="Recusar" severity="danger" icon='pi pi-thumbs-down-fill' iconPos='right' onClick={ () => setExibeFormulario(!exibeFormulario) } />
+                    <div className={(!exibeFormulario ? 'hidden': '')} >
+                        <FormularioJustificativa onSetVisibility={setExibeFormulario} onPosAvaliacao={atualizaProfessoresPosAvaliacao} professor={professor}/>
                     </div>
-                </div>
-                <div className={'mt-10 ' + (!exibeFormulario ? 'hidden': '')} >
-                    <FormularioJustificativa onSetVisibility={setExibeFormulario} onPosAvaliacao={atualizaProfessoresPosAvaliacao} professor={professor}/>
                 </div>
             </Dialog>
         </div>

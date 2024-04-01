@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Dropdown } from 'primereact/dropdown';
 import ProfessorService from 'meutcc/services/ProfessorService'; 
+import AlternarCoordenadorService from 'meutcc/services/ConfiguracoesService';
+import { Button } from "primereact/button";
+import toast from "react-hot-toast";
 
 export default function ProfessoresDropdown() {
     const [selectedProfessor, setSelectedProfessor] = useState(null);
@@ -20,8 +23,21 @@ export default function ProfessoresDropdown() {
         fetchProfessores(); // Chama a função para buscar os professores quando o componente for montado
     }, []);
 
+    const handleAlternarCoordenador = async () => {
+        const coordenador = selectedProfessor
+        const data = await toast.promise(AlternarCoordenadorService.alterarCoordenador({coordenador}), {
+            loading: 'Alterando Coordenador...',
+            success: 'Coordenador Atualizado com Sucesso!',
+            error: 'Erro ao Alterar',
+        });
+    };
+
     return (
-            <div className="card">
+            <div className="flex flex-row justify-between">
+                <div>
+                    <p>Escolha o novo Coordenador:</p>
+                </div>
+                <div>
                     <Dropdown 
                         inputId="dd-professor" 
                         value={selectedProfessor} 
@@ -29,8 +45,11 @@ export default function ProfessoresDropdown() {
                         options={professores} 
                         placeholder="Selecione o novo Professor"
                         optionLabel="name" 
-                        className="w-full" 
                     />
+                </div>
+                <div>
+                <Button label="Confirmar" severity="success" icon='pi pi-check' iconPos='right' onClick={handleAlternarCoordenador}/>
+                </div>
             </div>
     )
 }
