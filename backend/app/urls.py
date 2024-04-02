@@ -5,7 +5,7 @@ from . import views
 urlpatterns = [
     path('professores', views.GetProfessores.as_view(), name='professor-list-create'),
     path('professores-internos', views.GetProfessoresInternos.as_view(), name='professores-internos'),
-    path('criar-tcc', views.CriarTCView.as_view(), name='criar-tcc'),
+    path('criar-tcc', views.CriarTCCView.as_view(), name='criar-tcc'),
     path('criar-usuario', views.CriarUsuarioView.as_view(), name='criar-usuario'),
     path('autenticar', views.ObterTokenView.as_view(), name='autenticar-usuario'),
     path('proposta-submetida', views.PropostaSubmetidaView.as_view(), name='proposta-submetida'),
@@ -19,5 +19,6 @@ urlpatterns = [
     path('detalhes-tcc/<int:tccid>/', views.DetalhesTCCView.as_view(), name='detalhes_tcc'),
     path('listar-tccs-pendente', views.ListarTccPendente.as_view(), name='listar-tccs'),
     path('atualizar-tcc-status/<int:tccId>', views.AtualizarTccStatus.as_view(), name='atualizar-tcc-status'),
+    path('tccs', views.MeusTCCs.as_view(), name='tccs'),
 ]
 

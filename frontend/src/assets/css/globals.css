@@ -19,7 +19,7 @@ body {
 }
 
 @tailwind components;
-@tailwind base;
+/* @tailwind base; */
 
 /* cria um apply */
 @layer components {

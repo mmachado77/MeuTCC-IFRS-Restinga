@@ -8,6 +8,10 @@ async function propostaSubmetida() {
     return apiClient.post('/app/proposta-submetida').then((response) => response.data);
 }
 
+async function getTccs() {
+    return apiClient.get('/app/tccs').then((response) => response.data);
+}
+
 export default {
-    submeterProposta, propostaSubmetida,
+    submeterProposta, propostaSubmetida, getTccs
 }

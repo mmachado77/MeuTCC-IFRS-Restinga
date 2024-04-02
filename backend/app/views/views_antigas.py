@@ -28,18 +28,6 @@ class GetProfessoresInternos(generics.ListCreateAPIView):
         serializer = UsuarioPolymorphicSerializer(usuario, many=True)
         return Response(serializer.data)
 
-class CriarTCView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        data = request.data
-        data['autor'] = Estudante.objects.get(user=request.user).id
-        serializer = TccSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class CriarUsuarioView(APIView):
     def post(self, request, format=None):
         serializer = EstudanteSerializer(data=request.data)
