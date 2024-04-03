@@ -12,6 +12,10 @@ async function getTccs() {
     return apiClient.get('/app/tccs').then((response) => response.data);
 }
 
+async function getDetalhesTCC(id) {
+    return apiClient.get('/app/detalhes-tcc/'+ id +'/').then((response) => response.data);
+}
+
 export default {
-    submeterProposta, propostaSubmetida, getTccs
+    submeterProposta, propostaSubmetida, getTccs, getDetalhesTCC
 }
