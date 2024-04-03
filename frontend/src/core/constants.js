@@ -3,4 +3,5 @@ export const Guards = {
     Estudante: 'Estudante',
     Professor: 'Professor',
     Coordenador: 'Coordenador',
+    ProfessorInterno: 'ProfessorInterno',
 }

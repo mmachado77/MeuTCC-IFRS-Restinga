@@ -29,7 +29,11 @@ export const AppLayout = ({ children, guards }) => {
             { label: 'Atualizar Permissões', icon: 'pi pi-fw pi-users', url: '/atualizar-permissoes' },    
             { label: 'Propostas', icon: 'pi pi-fw pi-book', url: '/listar-propostas' },
             { label: 'Configurações', icon: 'pi pi-fw pi-cog', url: '/painel-configuracoes' },
+        ],
+        ProfessorInterno: [
+            { label: 'Convites Orientar', icon: 'pi pi-fw pi-thumbs-up', url: '/convites-orientar' },    
         ]
+        
     }
     const items = typesMenu.Todos.concat(typesMenu[user?.resourcetype] || []).map((item) => ({ ...item, template: menuItemTemplate }));
 

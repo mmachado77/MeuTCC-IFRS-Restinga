@@ -40,13 +40,14 @@ class AtualizarTccStatus(APIView):
         usuario = Usuario.objects.get(user=request.user)
         serializer = TccStatusAlterarSerializer(data=request.data)
 
-        if usuario.get_tipo == 'Professor Interno' and serializer.validated_data['status'] not in [StatusTccEnum.PROPOSTA_ANALISE_COORDENADOR, StatusTccEnum.PROPOSTA_RECUSADA_ORIENTADOR]:
-            return Response({'message': 'Você não tem permissão para atualizar o status para este valor!'}, status=403)
-        elif usuario.get_tipo != 'Coordenador':
-            return Response({'message': 'Você não tem permissão para atualizar o status do TCC!'}, status=403)
-
         if not serializer.is_valid():
             return Response(serializer.errors, status=400)
+ 
+        if usuario.get_tipo == 'Professor Interno': 
+            if serializer.validated_data['status'] not in [StatusTccEnum.PROPOSTA_ANALISE_COORDENADOR, StatusTccEnum.PROPOSTA_RECUSADA_ORIENTADOR]:
+                return Response({'message': 'Você não tem permissão para atualizar o status para este valor!'}, status=403)
+        elif usuario.get_tipo != 'Coordenador':
+            return Response({'message': 'Você não tem permissão para atualizar o status do TCC!'}, status=403)
         
         TccStatus.objects.create(tcc_id=tccId, **serializer.validated_data)
 
