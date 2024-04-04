@@ -16,10 +16,11 @@ class ListarTccPendente(APIView):
         usuario = Usuario.objects.get(user=request.user)
         if usuario.get_tipo == 'Coordenador': 
             filtrar_status = StatusTccEnum.PROPOSTA_ANALISE_COORDENADOR
+            tccs = Tcc.objects.all().annotate(max_id=Max('tccstatus__id')).filter(tccstatus__id=F('max_id'), tccstatus__status=filtrar_status)
         elif usuario.get_tipo == 'Professor Interno':
             filtrar_status = StatusTccEnum.PROPOSTA_ANALISE_ORIENTADOR
+            tccs = Tcc.objects.all().annotate(max_id=Max('tccstatus__id')).filter(tccstatus__id=F('max_id'), tccstatus__status=filtrar_status, orientador=usuario)
 
-        tccs = Tcc.objects.all().annotate(max_id=Max('tccstatus__id')).filter(tccstatus__id=F('max_id'), tccstatus__status=filtrar_status)
         serializer = TccSerializer(tccs, many=True)
         return Response(serializer.data)
     
