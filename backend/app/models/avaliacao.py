@@ -8,7 +8,7 @@ class Avaliacao(BaseModel):
     notas_avaliador2 = models.FloatField()
     media_final = models.FloatField()
     # TODO - Atualizar o caminho do upload
-    ficha_avaliacao = models.FileField(upload_to='avaliacoes/fichas')
+    ficha_avaliacao = models.FileField(upload_to='avaliacoes/fichas', null=True, blank=True)
     data_avaliacao = models.DateTimeField()
 
     class meta:
