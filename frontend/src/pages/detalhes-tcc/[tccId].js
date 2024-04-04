@@ -145,7 +145,7 @@ const DetalhesTCC = () => {
     carregarDetalhesTCC();
   }, []);
 
-  if (TCCData.id == null) {
+  if (TCCData?.id == null) {
     return (
       <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
         <div className='py-3 border-0 border-b border-dashed border-gray-200'>
@@ -169,6 +169,7 @@ const DetalhesTCC = () => {
           <p><b>Fase: </b><Tag value={TCCData?.status?.[TCCData.status.length - 1]?.statusMensagem} style={{ backgroundColor: getClassForStatus(TCCData?.status?.[TCCData.status.length - 1]?.status)}} onClick={() => setVisible(true)}></Tag></p>
         </div>
         <p style={{ marginBottom: '35px' }}><b>Orientador:</b> {TCCData.orientador?.nome}</p>
+        {TCCData.coorientador && ( <p style={{ marginBottom: '35px' }}><b>Coorientador:</b> {TCCData.coorientador?.nome}</p> )}
         <p style={{ marginBottom: '35px' }}><b>Tema:</b> {TCCData.tema}</p>
         <p style={{ marginBottom: '35px' }}><b>Data de Submissão:</b> {format(TCCData.dataSubmissaoProposta || new Date(), 'dd/MM/yyyy')}</p>
         <p style={{ marginBottom: '35px' }}><b>Resumo:</b> {TCCData.resumo}</p>
