@@ -1,8 +1,8 @@
 from django.db import models
 
 class StatusTccEnum(models.TextChoices):
-    PROPOSTA_ANALISE_ORIENTADOR = "PROPOSTA_ANALISE_ORIENTADOR"
-    PROPOSTA_RECUSADA_ORIENTADOR = "PROPOSTA_RECUSADA_ORIENTADOR"
+    PROPOSTA_ANALISE_PROFESSOR = "PROPOSTA_ANALISE_PROFESSOR"
+    PROPOSTA_RECUSADA_PROFESSOR = "PROPOSTA_RECUSADA_PROFESSOR"
     PROPOSTA_ANALISE_COORDENADOR = "PROPOSTA_ANALISE_COORDENADOR"
     PROPOSTA_RECUSADA_COORDENADOR = "PROPOSTA_RECUSADA_COORDENADOR"
     DESENVOLVIMENTO = "DESENVOLVIMENTO"
@@ -14,12 +14,12 @@ class StatusTccEnum(models.TextChoices):
     APROVADO = "APROVADO"
 
     def justificativa_obrigatoria(self):
-        return self in [StatusTccEnum.PROPOSTA_RECUSADA_ORIENTADOR, StatusTccEnum.PROPOSTA_RECUSADA_COORDENADOR, StatusTccEnum.REPROVADO_PREVIA, StatusTccEnum.REPROVADO_FINAL]
+        return self in [StatusTccEnum.PROPOSTA_RECUSADA_PROFESSOR, StatusTccEnum.PROPOSTA_RECUSADA_COORDENADOR, StatusTccEnum.REPROVADO_PREVIA, StatusTccEnum.REPROVADO_FINAL]
     
     def __str__(self):
-        if self == StatusTccEnum.PROPOSTA_ANALISE_ORIENTADOR:
+        if self == StatusTccEnum.PROPOSTA_ANALISE_PROFESSOR:
             return "Proposta em Análise pelo Orientador"
-        if self == StatusTccEnum.PROPOSTA_RECUSADA_ORIENTADOR:
+        if self == StatusTccEnum.PROPOSTA_RECUSADA_PROFESSOR:
             return "Proposta Recusada pelo Orientador"
         if self == StatusTccEnum.PROPOSTA_ANALISE_COORDENADOR:
             return "Proposta em Análise pelo Coordenador"
