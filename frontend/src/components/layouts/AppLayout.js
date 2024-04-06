@@ -75,9 +75,11 @@ export const AppLayout = ({ children, guards }) => {
                 }
             </div>
 
-            {children}
+            <div style={{minHeight: '500px'}}>
+                {children}
+            </div>
 
-            <footer className='bg-gray-800 text-white text-center py-9 mt-10'>
+            <footer className='bg-green-900 text-white text-center py-9 mt-10'>
                 <p>Instituto Federal do Rio Grande do Sul – Campus Restinga</p>
                 <p>Rua Alberto Hoffmann, 285 | Bairro Restinga | CEP: 91791-508 | Porto Alegre/RS</p>
                 <p>Créditos do site:</p>
