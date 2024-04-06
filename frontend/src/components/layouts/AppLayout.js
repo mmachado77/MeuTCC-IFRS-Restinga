@@ -5,10 +5,13 @@ import { GUARDS } from "meutcc/core/constants";
 import { useAuth } from "meutcc/core/context/AuthContext";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import ConfiguracoesService from "meutcc/services/ConfiguracoesService";
+import React, { useState } from "react";
 
 export const AppLayout = ({ children, guards }) => {
 
     const { user } = useAuth();
+    const [coordenadorNome, setCoordenadorNome] = useState('');
 
     const menuItemTemplate = (item) => {
         return <Link href={ item.url } className="p-menuitem-link" aria-hidden="true">
@@ -40,6 +43,18 @@ export const AppLayout = ({ children, guards }) => {
 
     const isUserAuth = !!user || false;
 
+    const fetchConfigs = async () => {
+        try {
+            const data = await ConfiguracoesService.getCoordenador();
+            setCoordenadorNome(data.coordenador);
+        } catch (error) {
+            console.error('Erro ao buscar as configurações', error);
+        }
+    };
+
+    React.useEffect(() => {
+        fetchConfigs();
+    }, [])
 
     return (
         <div className='bg-gray-100 min-h-screen'>
@@ -68,7 +83,7 @@ export const AppLayout = ({ children, guards }) => {
                 <p>Créditos do site:</p>
                 <p>Alunos: Bruno Padilha, Carlos Eduardo, Carlos Rafael, Cid Monza, Matheus Machado, Matheus Costa Krenn</p>
                 <p>Professores: Ricardo dos Santos, Eliana Pereira</p>
-                <p>Coordenador: Roben Lunardi - ads@restinga.ifrs.edu.br</p>
+                <p>Coordenador: { coordenadorNome } - ads@restinga.ifrs.edu.br</p>
             </footer>
         </div>
     );

@@ -11,6 +11,7 @@ urlpatterns = [
     path('proposta-submetida', views.PropostaSubmetidaView.as_view(), name='proposta-submetida'),
     path('atualizar-datas-propostas', views.AtualizarDatasPropostasView.as_view(), name='atualizar-datas-propostas'),
     path('alterar-coordenador', views.AlterarCoordenador.as_view(), name='alterar-coordenador'),
+    path('coordenador', views.GetCoordenador.as_view(), name='coordenador'),
     path('professores-pendentes', views.ProfessoresPendentesListAPIView.as_view(), name='professores-pendentes'),
     path('aprovar-professor/<int:idProfessor>', views.AprovarProfessorAPIView.as_view(), name='aprovar-professor'),
     path('recusar-professor/<int:idProfessor>', views.RecusarProfessorAPIView.as_view(), name='recusar-professor'),
