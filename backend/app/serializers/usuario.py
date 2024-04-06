@@ -3,7 +3,7 @@ from app.models import Usuario, Estudante, Professor, ProfessorInterno, Professo
 from rest_polymorphic.serializers import PolymorphicSerializer
 
 class UsuarioSerializer(serializers.ModelSerializer):
-    tipo = serializers.CharField(source='get_tipo')
+    tipo = serializers.CharField(source='tipoString', read_only=True)
 
     class Meta:
         model = Usuario
