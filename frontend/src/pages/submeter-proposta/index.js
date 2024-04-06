@@ -8,7 +8,7 @@ import TccService from 'meutcc/services/TccService';
 import ProfessorService from 'meutcc/services/ProfessorService';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
-import { Guards } from 'meutcc/core/constants';
+import { GUARDS } from 'meutcc/core/constants';
 
 const SubmeterPropostaPage = () => {
 
@@ -163,6 +163,7 @@ const SubmeterPropostaPage = () => {
 
 }
 
-SubmeterPropostaPage.guards = [Guards.Auth, Guards.Estudante];
+SubmeterPropostaPage.guards = [GUARDS.ESTUDANTE];
+SubmeterPropostaPage.title = 'Submeter Proposta de TCC';
 
 export default SubmeterPropostaPage;

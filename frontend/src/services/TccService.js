@@ -16,18 +16,15 @@ async function getDetalhesTCC(id) {
     return apiClient.get('/app/detalhes-tcc/'+ id +'/').then((response) => response.data);
 }
 
-async function getConvitesPendentes() {
+async function getListarTccsPendente() {
     return apiClient.get('/app/listar-tccs-pendente').then((response) => response.data);
 }
 
-async function aceitarConvite(tccId) {
-    return apiClient.post(`/app/atualizar-tcc-status/${tccId}`, {status:"PROPOSTA_ANALISE_COORDENADOR"}).then((response) => response.data);
+async function responderProposta(tccId, data) {
+    return apiClient.post(`/app/responder-proposta/${tccId}`, data).then((response) => response.data);
 }
 
-async function recusarConvite(tccId, data) {
-    return apiClient.post(`/app/atualizar-tcc-status/${tccId}`, {status:"PROPOSTA_RECUSADA_ORIENTADOR", justificativa:data.justificativa}).then((response) => response.data);
-}
 
 export default {
-    submeterProposta, propostaSubmetida, getTccs, getConvitesPendentes, aceitarConvite, recusarConvite, getDetalhesTCC
+    submeterProposta, propostaSubmetida, getTccs, getDetalhesTCC, responderProposta, getListarTccsPendente
 }

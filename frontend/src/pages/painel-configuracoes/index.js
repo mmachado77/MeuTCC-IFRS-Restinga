@@ -8,7 +8,7 @@ import { TabView, TabPanel } from 'primereact/tabview';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { locale, addLocale, updateLocaleOption, updateLocaleOptions, localeOption, localeOptions } from 'primereact/api';
 import toast from 'react-hot-toast';
-import { Guards } from 'meutcc/core/constants';
+import { GUARDS } from 'meutcc/core/constants';
 import AtualizarCoordenador from 'meutcc/pages/painel-configuracoes/selecionar-coordenador'
 
 addLocale('ptbr', {
@@ -92,6 +92,6 @@ const ConfiguracoesPage = () => {
     );
 };
 
-ConfiguracoesPage.guards = [Guards.Auth, Guards.Coordenador];
+ConfiguracoesPage.guards = [GUARDS.COORDENADOR];
 
 export default ConfiguracoesPage;

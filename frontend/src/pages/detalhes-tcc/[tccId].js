@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Button } from 'primereact/button';
-import TccService from '../../../../../2024-1-TCC-atual/frontend/src/services/TccService';
+import TccService from 'meutcc/services/TccService';
 import { Tag } from 'primereact/tag';
 import { SpeedDial } from 'primereact/speeddial';
 import { Toast } from 'primereact/toast';
@@ -108,14 +108,14 @@ const SessoesComponent = ({ prazoPrevia, prazoFinal, estudante, orientador, sess
 
 const getClassForStatus = (status) => {
   switch (status) {
-    case 'PROPOSTA_ANALISE_ORIENTADOR':
+    case 'PROPOSTA_ANALISE_PROFESSOR':
     case 'PROPOSTA_ANALISE_COORDENADOR':
     case 'DESENVOLVIMENTO':
     case 'PREVIA':
     case 'FINAL':
     case 'AJUSTE':
       return '#FFBF00';
-    case 'PROPOSTA_RECUSADA_ORIENTADOR':
+    case 'PROPOSTA_RECUSADA_PROFESSOR':
     case 'PROPOSTA_RECUSADA_COORDENADOR':
     case 'REPROVADO_PREVIA':
     case 'REPROVADO_FINAL':
@@ -187,6 +187,5 @@ const DetalhesTCC = () => {
   );
 };
 
-DetalhesTCC.logged = true;
-DetalhesTCC.showMenu = true;
+DetalhesTCC.guards = [GUARDS.ESTUDANTE, GUARDS.PROFESSOR_INTERNO, GUARDS.PROFESSOR_EXTERNO, GUARDS.COORDENADOR]
 export default DetalhesTCC;

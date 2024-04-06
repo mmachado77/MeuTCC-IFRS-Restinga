@@ -1,7 +1,7 @@
 import { Menubar } from "primereact/menubar";
 import NavBar from "../ui/NavBar";
 import { Toaster } from "react-hot-toast";
-import { Guards } from "meutcc/core/constants";
+import { GUARDS } from "meutcc/core/constants";
 import { useAuth } from "meutcc/core/context/AuthContext";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -27,15 +27,16 @@ export const AppLayout = ({ children, guards }) => {
         ],
         Coordenador: [
             { label: 'Atualizar Permissões', icon: 'pi pi-fw pi-users', url: '/atualizar-permissoes' },    
-            { label: 'Propostas', icon: 'pi pi-fw pi-book', url: '/listar-propostas' },
+            { label: 'Proposta Pendente', icon: 'pi pi-fw pi-thumbs-up', url: '/proposta-pendente' },    
             { label: 'Configurações', icon: 'pi pi-fw pi-cog', url: '/painel-configuracoes' },
         ],
-        ProfessorInterno: [
-            { label: 'Convites Orientar', icon: 'pi pi-fw pi-thumbs-up', url: '/convites-orientar' },    
-        ]
-        
-    }
-    const items = typesMenu.Todos.concat(typesMenu[user?.resourcetype] || []).map((item) => ({ ...item, template: menuItemTemplate }));
+        Professor: [
+            { label: 'Proposta Pendente', icon: 'pi pi-fw pi-thumbs-up', url: '/proposta-pendente' },    
+        ],
+        ProfessorInterno: [],
+        ProfessorExterno: [],
+    };
+    const items = typesMenu.Todos.concat(['ProfessorInterno', 'ProfessorExterno'].includes(user?.resourcetype) ? typesMenu.Professor : []).concat(typesMenu[user?.resourcetype] || []).map((item) => ({ ...item, template: menuItemTemplate }));
 
     const isUserAuth = !!user || false;
 
