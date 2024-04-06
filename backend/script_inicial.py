@@ -120,7 +120,7 @@ tcc = Tcc.objects.create(
     )
 
 tcc_status = TccStatus.objects.create(
-                        status= "PROPOSTA_ANALISE_ORIENTADOR",
+                        status= "PROPOSTA_ANALISE_PROFESSOR",
                         dataStatus= datetime.today(),
                         tcc= tcc                                
 
