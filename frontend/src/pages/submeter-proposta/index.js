@@ -8,6 +8,7 @@ import TccService from 'meutcc/services/TccService';
 import ProfessorService from 'meutcc/services/ProfessorService';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
+import { Guards } from 'meutcc/core/constants';
 
 const SubmeterPropostaPage = () => {
 
@@ -162,7 +163,6 @@ const SubmeterPropostaPage = () => {
 
 }
 
-SubmeterPropostaPage.logged = true;
-SubmeterPropostaPage.showMenu = true;
+SubmeterPropostaPage.guards = [Guards.Auth, Guards.Estudante];
 
 export default SubmeterPropostaPage;
