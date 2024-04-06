@@ -93,5 +93,6 @@ const ConfiguracoesPage = () => {
 };
 
 ConfiguracoesPage.guards = [GUARDS.COORDENADOR];
+ConfiguracoesPage.title = 'Configurações';
 
 export default ConfiguracoesPage;

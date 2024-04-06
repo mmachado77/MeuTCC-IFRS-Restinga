@@ -60,4 +60,6 @@ const AuthPage = () => {
     </div>;
 }
 
+AuthPage.title = 'Autenticação';
+
 export default AuthPage;

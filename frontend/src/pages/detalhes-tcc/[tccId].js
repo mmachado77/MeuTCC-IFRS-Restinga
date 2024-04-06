@@ -188,4 +188,6 @@ const DetalhesTCC = () => {
 };
 
 DetalhesTCC.guards = [GUARDS.ESTUDANTE, GUARDS.PROFESSOR_INTERNO, GUARDS.PROFESSOR_EXTERNO, GUARDS.COORDENADOR]
+DetalhesTCC.title = 'Detalhes do TCC';
+
 export default DetalhesTCC;

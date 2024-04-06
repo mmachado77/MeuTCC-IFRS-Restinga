@@ -91,5 +91,6 @@ const SubmeterPropostaPage = () => {
 }
 
 SubmeterPropostaPage.guards = [GUARDS.ESTUDANTE];
+SubmeterPropostaPage.title = 'Proposta Submetida';
 
 export default SubmeterPropostaPage;

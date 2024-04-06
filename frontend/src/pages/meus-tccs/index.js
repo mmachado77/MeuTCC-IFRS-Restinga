@@ -81,4 +81,7 @@ const MeusTccsPage = () => {
 
 }
 
+MeusTccsPage.guards = [GUARDS.ESTUDANTE, GUARDS.PROFESSOR_INTERNO, GUARDS.PROFESSOR_EXTERNO, GUARDS.COORDENADOR];
+MeusTccsPage.title = 'Meus TCCs';
+
 export default MeusTccsPage;
