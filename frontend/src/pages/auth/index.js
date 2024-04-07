@@ -44,7 +44,7 @@ const AuthPage = () => {
     };
 
     React.useEffect(() => {
-        fetchGoogleCallback();
+        // fetchGoogleCallback();
         fetchUsuarios();
     }, []);
 
@@ -64,7 +64,7 @@ const AuthPage = () => {
 
                 <Button onClick={handleLoginClick} label="Entrar com o Google" icon="pi pi-google" className="p-button-raised p-button-rounded p-button-lg p-m-2" />
                 
-                <a href="http://localhost:8000/app/google-auth" label="Entrar com o Google (verdadeiro)" icon="pi pi-google" className="p-button-raised p-button-rounded p-button-lg p-m-2">Entrar com o Google</a>
+                {/* <a href="http://localhost:8000/app/google-auth" label="Entrar com o Google (verdadeiro)" icon="pi pi-google" className="p-button-raised p-button-rounded p-button-lg p-m-2">Entrar com o Google</a> */}
             </div>
         </div>
     </div>;
