@@ -5,11 +5,8 @@ import { InputText } from 'primereact/inputtext';
 import { FilterMatchMode } from 'primereact/api';
 import TccService from 'meutcc/services/TccService';
 import { Button } from 'primereact/button';
-<<<<<<< HEAD
 import Link from 'next/link';
-=======
 import { GUARDS } from 'meutcc/core/constants';
->>>>>>> 7fd6c5cb4867277dd79e1fbc33630a7860066496
 
 
 const MeusTccsPage = () => {
