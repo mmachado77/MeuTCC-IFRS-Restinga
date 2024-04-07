@@ -88,10 +88,10 @@ export const AppLayout = ({ children, guards }) => {
                             <b>Desenvolvido por:</b>
                         </p>
                         <p>
-                            Alunos: Bruno Padilha, Carlos Eduardo, Cid Monza, Matheus Machado, Matheus Costa Krenn
+                            Alunos: Bruno Padilha, Carlos Eduardo, Cid Monza, Matheus Machado e Matheus Costa Krenn
                         </p>
                         <p>
-                            Professores: Ricardo dos Santos, Eliana Pereira
+                            Professores: Ricardo dos Santos e Eliana Pereira
                         </p>
                     </div>
                     <div className='py-10 px-10'>
