@@ -8,7 +8,12 @@ async function alterarCoordenador(data) {
     return apiClient.put('/app/alterar-coordenador', data).then((response) => response.data);
 }
 
+async function getCoordenador() {
+    return apiClient.get('/app/coordenador').then((response) => response.data);
+}
+
 export default {
     atualizaDataProposta,
-    alterarCoordenador
+    alterarCoordenador,
+    getCoordenador
 }

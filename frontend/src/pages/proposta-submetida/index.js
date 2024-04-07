@@ -7,7 +7,7 @@ import { Checkbox } from 'primereact/checkbox';
 import TccService from 'meutcc/services/TccService';
 import ProfessorService from 'meutcc/services/ProfessorService';
 import toast from 'react-hot-toast';
-import { Guards } from 'meutcc/core/constants';
+import { GUARDS } from 'meutcc/core/constants';
 
 const SubmeterPropostaPage = () => {
 
@@ -90,6 +90,7 @@ const SubmeterPropostaPage = () => {
     </div>;
 }
 
-SubmeterPropostaPage.guards = [Guards.Auth, Guards.Estudante];
+SubmeterPropostaPage.guards = [GUARDS.ESTUDANTE];
+SubmeterPropostaPage.title = 'Proposta Submetida';
 
 export default SubmeterPropostaPage;

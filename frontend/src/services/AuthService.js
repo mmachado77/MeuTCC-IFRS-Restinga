@@ -8,7 +8,12 @@ async function detalhesUsuario() {
     return apiClient.get('/app/detalhes-usuario').then((response) => response.data);
 }
 
+async function googleCallback(params) {
+    return apiClient.get('/app/callback' + params).then((response) => response.data); 
+}
+
 export default {
     autenticar,
     detalhesUsuario,
+    googleCallback
 }

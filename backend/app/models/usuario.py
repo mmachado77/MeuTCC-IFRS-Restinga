@@ -2,14 +2,7 @@ from .base import BaseModel
 from django.db import models
 from django.contrib.auth.models import User
 from polymorphic.models import PolymorphicModel
-
-tipos_usuario = {
-    'Estudante': 'Estudante',
-    'Professor': 'Professor',
-    'ProfessorInterno': 'Professor Interno',
-    'ProfessorExterno': 'Professor Externo',
-    'Coordenador': 'Coordenador'
-}
+from app.enums import UsuarioTipoEnum
 
 class Usuario(PolymorphicModel):
     user = models.OneToOneField(User, related_name="perfil", on_delete=models.CASCADE)
@@ -19,10 +12,15 @@ class Usuario(PolymorphicModel):
     dataCadastro = models.DateTimeField(auto_now_add=True)
 
     @property
-    def get_tipo(self):
-        if self.__class__.__name__ not in tipos_usuario:
-            return self.__class__.__name__
-        return tipos_usuario[self.__class__.__name__]
+    def tipo(self):
+        return UsuarioTipoEnum(self.__class__.__name__)
+
+    @property
+    def tipoString(self):
+        return self.tipo.getTipoString()
+    
+    def isProfessor(self):
+        return self.tipo == UsuarioTipoEnum.PROFESSOR_INTERNO or self.tipo == UsuarioTipoEnum.PROFESSOR_EXTERNO
     
     class Meta:
         abstract = False
