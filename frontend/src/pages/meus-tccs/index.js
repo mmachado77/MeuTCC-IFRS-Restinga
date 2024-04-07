@@ -63,6 +63,10 @@ const MeusTccsPage = () => {
         );
     }
 
+    const coorientadorTemplate = (rowData) => {
+        return rowData.coorientador && rowData.coorientador.nome || 'Sem coorientador';
+    }
+
     return <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
         <div className='py-3 border-0 border-b border-dashed border-gray-200'>
             <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
@@ -72,9 +76,7 @@ const MeusTccsPage = () => {
             <DataTable value={tccs} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }}>
                 <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
                 <Column field="orientador.nome" header="Orientador" style={{ width: '20%' }}></Column>
-
-                <Column field="coorientador.nome" header="Coorientador" style={{ width: '20%' }}></Column>
-                
+                <Column body={coorientadorTemplate} header="Coorientador" style={{ width: '20%' }}></Column>
                 <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
             </DataTable>
         </div>
