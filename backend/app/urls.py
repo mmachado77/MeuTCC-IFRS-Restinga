@@ -21,9 +21,5 @@ urlpatterns = [
     path('listar-tccs-pendente', views.ListarTccPendente.as_view(), name='listar-tccs'),
     path('tccs', views.MeusTCCs.as_view(), name='tccs'),
     path('responder-proposta/<int:tccId>', views.TccStatusResponderPropostaView.as_view(), name='responder-proposta'),
-
-    path('google-auth', views.GoogleAuthRedirect.as_view(), name='google-auth'),
-    path('callback', views.GoogleRedirectURIView.as_view(), name='google-callback'),
-    
 ]
 
