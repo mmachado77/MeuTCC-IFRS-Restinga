@@ -68,7 +68,7 @@ export default function listaTccsPendentes() {
 
     const actionBodyTemplate = (rowData) => {
         return (
-                <Button label="Analisar" icon='pi pi-book' severity="secondary" onClick={() => detalhesConvite(rowData)} />
+                <Button label="Analisar" icon='pi pi-book' severity="success" outlined onClick={() => detalhesConvite(rowData)} />
         );
     };
 
@@ -94,7 +94,7 @@ export default function listaTccsPendentes() {
                 </DataTable>
             </div>
 
-            <Dialog visible={TccDialog} style={{ width: '32rem' }} header="Detalhes do TCC" modal className="p-fluid" onHide={hideDialog}>
+            <Dialog visible={TccDialog} style={{ width: '32rem' }} header="Analisar" modal className="p-fluid" onHide={hideDialog}>
                 <div style={{ marginBottom: '1rem' }}>
                     <label htmlFor="tema" className="font-bold">Tema: </label>
                     <span>{tcc.tema}</span>

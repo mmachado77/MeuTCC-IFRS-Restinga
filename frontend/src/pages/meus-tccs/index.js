@@ -61,7 +61,7 @@ const MeusTccsPage = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <div className="flex justify-center">
-                <Link label="Detalhes" href=""> <Button label="Detalhes" icon='pi pi-search-plus' severity="secondary"/> </Link>
+                <Link label="Detalhes" href=""> <Button label="Detalhes" icon='pi pi-search-plus' severity="success" outlined/> </Link>
             </div>
         );
     }
