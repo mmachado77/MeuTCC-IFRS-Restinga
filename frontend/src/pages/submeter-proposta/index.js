@@ -35,6 +35,7 @@ const SubmeterPropostaPage = () => {
                 console.error('Erro ao buscar proposta de TCC', error);
             }
         }
+
         fetchTcc();
 
         const fetchProfessores = async () => {
@@ -51,8 +52,8 @@ const SubmeterPropostaPage = () => {
         };
 
         fetchProfessores();
-    }, []);
 
+    }, []);
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -103,6 +104,12 @@ const SubmeterPropostaPage = () => {
             return;
         }
 
+        if (selectedOrientador === selectedCoorientador) {
+            setCoorientadorMensagemErro('O orientador e coorientador não podem ser a mesma pessoa');
+            setLoading(false);
+            return;
+        }
+
         const response = await TccService.submeterProposta(jsonData);
 
         if (response) {
@@ -113,6 +120,11 @@ const SubmeterPropostaPage = () => {
 
         setLoading(false);
 
+    }
+
+    const handleTemCoorientadorChange = (e) => {
+        setTemCoorientador(!temCoorientador);
+        setSelectedCoorientador(null);
     }
 
     return <div className='max-w-screen-md mx-auto bg-white m-3 mt-6 flex flex-col'>
@@ -142,7 +154,7 @@ const SubmeterPropostaPage = () => {
                             <Dropdown value={selectedCoorientador} name='coorientador' disabled={!temCoorientador} onChange={(e) => setSelectedCoorientador(e.value)} options={coorientadores} optionLabel="name" placeholder="Selecione o coorientador" className={"w-full md:w-14rem" + (coorientadorMensagemErro ? 'p-invalid' : '')} />
                             { coorientadorMensagemErro && <small id='tema-help' className='text-red-500 py-1 px-2'>{coorientadorMensagemErro}</small> }
                             <div className="flex align-items-center py-3">
-                                <Checkbox inputId="temCoorientador" onChange={(e) => setTemCoorientador(!temCoorientador)} checked={temCoorientador} />
+                                <Checkbox inputId="temCoorientador" onChange={handleTemCoorientadorChange} checked={temCoorientador} />
                                 <label htmlFor="temCoorientador" className="ml-2">Tem coorientador</label>
                             </div>
                         </div>
