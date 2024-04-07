@@ -30,11 +30,11 @@ export const AppLayout = ({ children, guards }) => {
         ],
         Coordenador: [
             { label: 'Atualizar Permissões', icon: 'pi pi-fw pi-users', url: '/atualizar-permissoes' },    
-            { label: 'Proposta Pendente', icon: 'pi pi-fw pi-thumbs-up', url: '/proposta-pendente' },    
+            { label: 'Proposta Pendentes', icon: 'pi pi-fw pi-thumbs-up', url: '/proposta-pendente' },    
             { label: 'Configurações', icon: 'pi pi-fw pi-cog', url: '/painel-configuracoes' },
         ],
         Professor: [
-            { label: 'Proposta Pendente', icon: 'pi pi-fw pi-thumbs-up', url: '/proposta-pendente' },    
+            { label: 'Propostas Pendente', icon: 'pi pi-fw pi-thumbs-up', url: '/proposta-pendente' },    
         ],
         ProfessorInterno: [],
         ProfessorExterno: [],
