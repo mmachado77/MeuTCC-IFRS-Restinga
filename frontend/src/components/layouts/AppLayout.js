@@ -81,8 +81,8 @@ export const AppLayout = ({ children, guards }) => {
             </div>
 
             <footer className='bg-green-900 text-white' style={{background: 'rgb(0 49 21)'}}>                
-                <div className="max-w-screen-lg mx-auto flex flex-row items-center justify-between">
-                    <div style={{fontSize: '0.9rem', maxWidth: '330px', background: '#0000003b', padding: '40px 30px', borderRight: '2px dotted #0000003b', color: '#b0b0b0'}}>
+                <div className="max-w-screen-lg mx-auto flex flex-col-reverse md:flex-row items-center justify-between">
+                    <div className="md:max-w-80 p-10 text-sm border-0 border-r-2 border-dashed text-gray-300 bg-black/20 border-black/20">
                         <Image src="/if.png" width={70} height={95} />
                         <p>
                             <b>Desenvolvido por:</b>
@@ -94,7 +94,7 @@ export const AppLayout = ({ children, guards }) => {
                             Professores: Ricardo dos Santos, Eliana Pereira
                         </p>
                     </div>
-                    <div>
+                    <div className='py-10 px-10'>
                         <p>
                             <b>Instituto Federal do Rio Grande do Sul – Campus Restinga</b>
                         </p>
