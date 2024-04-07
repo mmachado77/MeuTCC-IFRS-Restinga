@@ -5,7 +5,7 @@ from rest_framework import status
 from django.db.models import Max, F, Q
 from app.enums import StatusTccEnum, UsuarioTipoEnum
 from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre
-from app.serializers import TccSerializer, TccStatusAlterarSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer
+from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer
 from app.services.proposta import PropostaService
 
 class ListarTccPendente(APIView):
@@ -40,26 +40,6 @@ class MeusTCCs(APIView):
         
         serializer = TccSerializer(tccs, many=True)
         return Response(serializer.data)
-    
-class AtualizarTccStatus(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, tccId):
-        usuario = Usuario.objects.get(user=request.user)
-        serializer = TccStatusAlterarSerializer(data=request.data)
-
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=400)
- 
-        if usuario.isProfessor(): 
-            if serializer.validated_data['status'] not in [StatusTccEnum.PROPOSTA_ANALISE_COORDENADOR, StatusTccEnum.PROPOSTA_RECUSADA_PROFESSOR]:
-                return Response({'message': 'Você não tem permissão para atualizar o status para este valor!'}, status=403)
-        elif usuario.tipo == UsuarioTipoEnum.COORDENADOR:
-            return Response({'message': 'Você não tem permissão para atualizar o status do TCC!'}, status=403)
-        
-        TccStatus.objects.create(tcc_id=tccId, **serializer.validated_data)
-
-        return Response({'message': 'Status atualizado com sucesso!'})
         
 class CriarTCCView(APIView):
     permission_classes = [IsAuthenticated]
