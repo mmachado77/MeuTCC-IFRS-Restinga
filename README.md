@@ -16,7 +16,7 @@ npm run dev
 ### Back-end
 Para iniciar o back-end é preciso ter instalado em seu computador o python e o pip. Com eles instalado, rode o comando para instalar as dependencias
 ```sh
-pip install Django==4.2.6 django-cors-headers==4.3.1 djangorestframework==3.15.1
+pip install -r requirements.txt
 ```
 
 Em seguida rode o comando para atualizar as migrations
@@ -24,6 +24,8 @@ Em seguida rode o comando para atualizar as migrations
 py manage.py makemigrations
 py manage.py migrate
 ```
+
+Duplique o arquivo .env.example, criando um novo arquivo .env, configurando as variaveis de ambiente do projeto.
 
 Na primeira vez que estiver rodando, execute o script inicial para popular as tabelas.
 ```sh
