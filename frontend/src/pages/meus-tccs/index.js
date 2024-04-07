@@ -5,6 +5,7 @@ import { InputText } from 'primereact/inputtext';
 import { FilterMatchMode } from 'primereact/api';
 import TccService from 'meutcc/services/TccService';
 import { Button } from 'primereact/button';
+import Link from 'next/link';
 
 
 const MeusTccsPage = () => {
@@ -56,7 +57,7 @@ const MeusTccsPage = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <div className="flex justify-center">
-                <Button type="button" icon="pi pi-cog" rounded></Button>
+                <Link label="Detalhes" href=""> <Button label="Detalhes" icon='pi pi-search-plus' severity="secondary"/> </Link>
             </div>
         );
     }
@@ -71,10 +72,9 @@ const MeusTccsPage = () => {
                 <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
                 <Column field="orientador.nome" header="Orientador" style={{ width: '20%' }}></Column>
 
-                {tccs.some(tcc => tcc.coorientador) && <Column field="coorientador.nome" header="Coorientador" style={{ width: '20%' }}></Column>}
+                <Column field="coorientador.nome" header="Coorientador" style={{ width: '20%' }}></Column>
                 
-                <Column field="tema" header="Detalhes" style={{ width: '20%' }}></Column>
-                <Column headerStyle={{ width: '5rem', textAlign: 'center' }} bodyStyle={{ textAlign: 'center', overflow: 'visible' }} body={actionBodyTemplate} />
+                <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
             </DataTable>
         </div>
     </div>;
