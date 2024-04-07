@@ -4,4 +4,3 @@ from .listar_usuarios import *
 from .professoresPendentes import *
 from .detalhesTcc import *
 from .tcc import *
-from .google import *
