@@ -68,7 +68,7 @@ export default function listaTccsPendentes() {
 
     const actionBodyTemplate = (rowData) => {
         return (
-                <Button label="Detalhes" icon='pi pi-search-plus' severity="secondary" onClick={() => detalhesConvite(rowData)} />
+                <Button label="Analisar" icon='pi pi-book' severity="secondary" onClick={() => detalhesConvite(rowData)} />
         );
     };
 
@@ -76,15 +76,21 @@ export default function listaTccsPendentes() {
         return format(rowDate.dataSubmissaoProposta, 'dd/MM/yyyy')
     }
 
+    const coorientadorTemplate = (data) => {
+        return data.coorientador && data.coorientador.nome || 'Sem coorientador';
+    }
+
     return (
         <div>
             <Toast ref={toastJanela} />
             <div className="card">
-                <DataTable value={tccs} selection={selectedTcc} onSelectionChange={(e) => setSelectedTcc(e.value)} dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]} currentPageReportTemplate="Showing {first} to {last} of {totalRecords} tccs">
+                <DataTable value={tccs} selection={selectedTcc} onSelectionChange={(e) => setSelectedTcc(e.value)} dataKey="id" paginator rows={5} currentPageReportTemplate="Showing {first} to {last} of {totalRecords} tccs">
                     <Column field="tema" header="Tema" sortable style={{ width: '40%' }}></Column>
                     <Column field="autor.nome" header="Autor" sortable style={{ width: '25%' }}></Column>
+                    <Column field="orientador.nome" header="Orientador" sortable style={{ width: '25%' }}></Column>
+                    <Column body={coorientadorTemplate} header="Coorientador" sortable style={{ width: '25%' }}></Column>
                     <Column body={dataSubmissaoBodyTemplate} field="dataSubmissaoProposta" header="Data de Submissão" sortable style={{ width: '25%' }}></Column>
-                    <Column body={actionBodyTemplate} exportable={false} style={{ width: '10%' }}></Column>
+                    <Column body={actionBodyTemplate} align='center' header="Ações" exportable={false} style={{ width: '10%' }}></Column>
                 </DataTable>
             </div>
 

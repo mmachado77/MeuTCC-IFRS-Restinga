@@ -13,7 +13,7 @@ const PropostaPendentePage = () => {
         <div>
             
 
-            <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6'>
+            <div className='max-w-screen-xl mx-auto bg-white m-3 mt-6'>
                 <div className='py-3 border-0 border-b border-dashed border-gray-200'>
                     <h1 className='heading-1 text-center text-gray-700'>{
                         user.resourcetype === 'Coordenador' ? 'Propostas Pendentes' : 'Propostas Pendentes de Orientação'
