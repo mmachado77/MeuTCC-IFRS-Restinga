@@ -27,17 +27,25 @@ const AuthPage = () => {
         }
     }
 
-    React.useEffect(() => {
-        const fetchUsuarios = async () => {
-            try {
-                const { data } = await UsuarioService.listarUsuarios();
-                setUsuarios(data.map((usuario) => ({ name: `${usuario.nome} (${usuario.resourcetype})`, code: usuario.email })));
-            } catch (error) {
-                console.error(error);
-            }
-        };
+    const fetchGoogleCallback = async () => {
+        const urlParams = window.location.search;
+        const data = await AuthService.googleCallback(urlParams);
+        localStorage.setItem('token', data.token);
+        window.location.pathname = ('/submeter-proposta');
+    }
 
-        fetchUsuarios()
+    const fetchUsuarios = async () => {
+        try {
+            const { data } = await UsuarioService.listarUsuarios();
+            setUsuarios(data.map((usuario) => ({ name: `${usuario.nome} (${usuario.resourcetype})`, code: usuario.email })));
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    React.useEffect(() => {
+        fetchGoogleCallback();
+        fetchUsuarios();
     }, []);
 
     return <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>

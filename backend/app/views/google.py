@@ -16,7 +16,7 @@ class GoogleAuthRedirect(View):
     
     def get(self, request):
         scope = ' '.join(settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE)
-        redirect_url = f"https://accounts.google.com/o/oauth2/v2/auth?client_id={settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}&response_type=code&scope={scope}&access_type=offline&redirect_uri={settings.SOCIAL_AUTH_GOOGLE_REDIRECT_URI}"
+        redirect_url = f"https://accounts.google.com/o/oauth2/v2/auth?client_id={settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}&response_type=code&scope={scope}&access_type=offline&redirect_uri={settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI}"
         return redirect(redirect_url)
 
 
@@ -32,7 +32,7 @@ class GoogleRedirectURIView(APIView):
                 'code': code,
                 'client_id': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
                 'client_secret': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
-                'redirect_uri': settings.SOCIAL_AUTH_GOOGLE_REDIRECT_URI,
+                'redirect_uri': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI,
                 'grant_type': 'authorization_code',
             }
             
