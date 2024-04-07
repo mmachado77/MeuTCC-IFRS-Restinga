@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import ConfiguracoesService from "meutcc/services/ConfiguracoesService";
 import React, { useState } from "react";
+import Image from "next/image";
 
 export const AppLayout = ({ children, guards }) => {
 
@@ -79,13 +80,30 @@ export const AppLayout = ({ children, guards }) => {
                 {children}
             </div>
 
-            <footer className='bg-green-900 text-white text-center py-9 mt-10'>
-                <p>Instituto Federal do Rio Grande do Sul – Campus Restinga</p>
-                <p>Rua Alberto Hoffmann, 285 | Bairro Restinga | CEP: 91791-508 | Porto Alegre/RS</p>
-                <p>Créditos do site:</p>
-                <p>Alunos: Bruno Padilha, Carlos Eduardo, Cid Monza, Matheus Machado, Matheus Costa Krenn</p>
-                <p>Professores: Ricardo dos Santos, Eliana Pereira</p>
-                <p>Coordenador: { coordenadorNome } - ads@restinga.ifrs.edu.br</p>
+            <footer className='bg-green-900 text-white' style={{background: 'rgb(0 49 21)'}}>                
+                <div className="max-w-screen-lg mx-auto flex flex-row items-center justify-between">
+                    <div style={{fontSize: '0.9rem', maxWidth: '330px', background: '#0000003b', padding: '40px 30px', borderRight: '2px dotted #0000003b', color: '#b0b0b0'}}>
+                        <Image src="/if.png" width={70} height={95} />
+                        <p>
+                            <b>Desenvolvido por:</b>
+                        </p>
+                        <p>
+                            Alunos: Bruno Padilha, Carlos Eduardo, Cid Monza, Matheus Machado, Matheus Costa Krenn
+                        </p>
+                        <p>
+                            Professores: Ricardo dos Santos, Eliana Pereira
+                        </p>
+                    </div>
+                    <div>
+                        <p>
+                            <b>Instituto Federal do Rio Grande do Sul – Campus Restinga</b>
+                        </p>
+                        <p>Rua Alberto Hoffmann, 285 | Bairro Restinga | CEP: 91791-508 | Porto Alegre/RS</p>
+                        <p>
+                            Coordenador: { coordenadorNome } - <a href="mailto:ads@restinga.ifrs.edu.br" className="anchor-link">ads@restinga.ifrs.edu.br</a>
+                        </p>
+                    </div>
+                </div>
             </footer>
         </div>
     );
