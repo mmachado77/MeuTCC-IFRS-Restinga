@@ -74,7 +74,7 @@ export default function listaProfessores() {
 
     const actionBodyTemplate = (rowData) => {
         return (
-                <Button label="Detalhes" icon='pi pi-search-plus' severity="secondary" onClick={() => detalhesProfessor(rowData)} />
+                <Button label="Analisar" icon='pi pi-search-plus' severity="success" outlined onClick={() => detalhesProfessor(rowData)} />
         );
     };
 
