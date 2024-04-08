@@ -1,14 +1,17 @@
-import React from 'react';
+
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import { FilterMatchMode } from 'primereact/api';
-import TccService from 'meutcc/services/TccService';
 import { Button } from 'primereact/button';
-import Link from 'next/link';
 import { GUARDS } from 'meutcc/core/constants';
 import { set } from 'date-fns';
+
+import React from 'react';
+import TccService from 'meutcc/services/TccService';
+import Link from 'next/link';
 import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
+
 
 const MeusTccsPage = () => {
 
@@ -16,7 +19,8 @@ const MeusTccsPage = () => {
     const [possuiProposta, setPossuiProposta] = React.useState(false);
     const [filters, setFilters] = React.useState({});
     const [tableSearchValue, setTableSearchValue] = React.useState('');
-
+    const [expandedRows, setExpandedRows] = React.useState({});
+    
     const [tccs, setTccs] = React.useState([]);
 
     const fetchJaPossuiProposta = async () => {
@@ -79,13 +83,36 @@ const MeusTccsPage = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <div className="flex justify-center">
-                <Link label="Detalhes" href=""> <Button label="Analisar" icon='pi pi-search-plus' severity="success" outlined/> </Link>
+                <Link label="Detalhes" href=""> <Button label="Detalhes" icon='pi pi-search-plus' severity="success" outlined/> </Link>
             </div>
         );
     }
 
     const coorientadorTemplate = (rowData) => {
         return rowData.coorientador && rowData.coorientador.nome || 'Sem coorientador';
+    }
+
+    const onRowToggle = (e) => {
+        setExpandedRows(e.data);
+    }
+    
+    const onRowExpand = (e) => {
+        console.log('Row Expanded', e.data);
+    }
+    
+    const onRowCollapse = (e) => {
+        console.log('Row Collapsed', e.data);
+    }
+
+    const allowExpansion = true;
+
+    const rowExpansionTemplate = (data) => {
+        return (
+            <div>
+                <h4>Resumo:</h4>
+                <p>{data.resumo}</p>
+            </div>
+        );
     }
 
    if(loading){
@@ -99,11 +126,17 @@ const MeusTccsPage = () => {
             </div>
 
             <div className='py-6 px-2'>
-                <DataTable value={tccs} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }}>
+
+                {/*<DataTable value={tccs} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }}>*/}
+                <DataTable value={tccs} expandedRows={expandedRows} onRowToggle={(e) => setExpandedRows(e.data)}
+                onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} rowExpansionTemplate={rowExpansionTemplate}
+                dataKey="id" header={renderHeader} tableStyle={{ minWidth: '60rem' }}>
+                    
                     <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
                     <Column field="orientador.nome" header="Orientador" style={{ width: '20%' }}></Column>
                     <Column body={coorientadorTemplate} header="Coorientador" style={{ width: '20%' }}></Column>
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
+                    <Column expander={allowExpansion} style={{ width: '5rem' }} />
                 </DataTable>
             </div>
         </div>;
