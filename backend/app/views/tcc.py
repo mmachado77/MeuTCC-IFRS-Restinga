@@ -7,6 +7,8 @@ from app.enums import StatusTccEnum, UsuarioTipoEnum
 from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre
 from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer
 from app.services.proposta import PropostaService
+from backend.app.models.convite import Convite
+from backend.app.services.tcc import TccService
 
 class ListarTccPendente(APIView):
     permission_classes = [IsAuthenticated]
@@ -43,23 +45,19 @@ class MeusTCCs(APIView):
         
 class CriarTCCView(APIView):
     permission_classes = [IsAuthenticated]
+    tccService = TccService()
 
     def post(self, request):
         try:
             usuario = Estudante.objects.get(user=request.user)
             serializer = TccCreateSerializer(data=request.data)
 
-            # Pega o ultimo semestre cadastrado
-            semestreAtual = Semestre.objects.latest('id')
-
             if not serializer.is_valid():
                 print (serializer.errors)
-                return Response(serializer.errors, status=400)
+                return Response(serializer.errors, status=400)  
                 
-            tcc = Tcc.objects.create(autor = usuario, semestre = semestreAtual, **serializer.validated_data)
-
-            tccstatus = TccStatus.objects.create(tcc_id=tcc.id, status=StatusTccEnum.PROPOSTA_ANALISE_PROFESSOR)
-
+            self.tccService.criarTcc(usuario, serializer)
+            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         except Estudante.DoesNotExist:
@@ -81,5 +79,16 @@ class TccStatusResponderPropostaView(APIView):
         self.propostaService.responderProposta(tccId, usuario, serializer)
         
         return Response({'message': 'Status atualizado com sucesso!'})
+    
+class PropostaSubmetidaView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        estudante = Estudante.objects.get(user=request.user)
+        proposta = Tcc.objects.get(autor=estudante)
+
+        
+     
+    
 
     
