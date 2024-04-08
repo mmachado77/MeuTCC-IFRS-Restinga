@@ -9,7 +9,7 @@ import ProfessorService from 'meutcc/services/ProfessorService';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 import { GUARDS } from 'meutcc/core/constants';
-import { ProgressSpinner } from 'primereact/progressspinner';
+import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
 import { set } from 'date-fns';
 
 const SubmeterPropostaPage = () => {
@@ -36,7 +36,7 @@ const SubmeterPropostaPage = () => {
                 const data = await TccService.getPossuiTcc();
                 console.log(data.value);
 
-                if (data.possuiTcc = true) {
+                if (data.possuiProposta == true) {
                     router.push('/meus-tccs');
                 }else{
                     setLoading(false);
@@ -69,11 +69,7 @@ const SubmeterPropostaPage = () => {
     }, []);   
 
     if(loading){
-        return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <ProgressSpinner style={{width: '50px', height: '50px'}} strokeWidth="8" fill="green-500" animationDuration=".5s" />
-            </div>
-        );
+        return <LoadingSpinner />;
     }
 
     const onSubmit = async (event) => {
