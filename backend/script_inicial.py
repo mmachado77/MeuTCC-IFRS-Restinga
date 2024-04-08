@@ -2,7 +2,7 @@
 # >>> exec(open('script_inicial.py').read())
 
 from django.contrib.auth.models import User
-from app.models import TccStatus, Tcc, Semestre, Configuracoes, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno
+from app.models import TccStatus, Tcc, Semestre, Configuracoes, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno, Convite
 from datetime import datetime
 from oauth2_provider.models import Application
 from meutcc.settings import SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI, SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET, SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
@@ -113,19 +113,42 @@ semestre = Semestre.objects.create(
         coordenador=andre
     )
 
+semestre2 = Semestre.objects.create(
+        periodo='2024/7',
+        dataAberturaSemestre=datetime.today(),
+        dataFechamentoSemestre=datetime.today(),
+        configuracoes=configMaster,
+        coordenador=andre
+    )
+
 
 tcc = Tcc.objects.create(
         autor= estudante,
         orientador= cleitin,
         semestre= semestre,
+        tema='Pesquisa sobre o porquê o Tiririca é tão bom deputado',
+        resumo='Este trabalho apresenta uma pesquisa sobre o porquê o Tiririca é tão bom deputado.'
+    )
+
+tcc2 = Tcc.objects.create(
+        autor= estudante,
+        orientador= cleitin,
+        semestre= semestre2,
         tema='Desenvolvimento de um Sistema de Gerenciamento de Tarefas',
         resumo='Este trabalho apresenta o desenvolvimento de um sistema web para gerenciamento de tarefas, utilizando Django como framework.'
     )
 
 tcc_status = TccStatus.objects.create(
-                        status= "PROPOSTA_ANALISE_PROFESSOR",
+                        status= "REPROVADO_PREVIA",
                         dataStatus= datetime.today(),
                         tcc= tcc                                
+
+)
+
+tcc_status = TccStatus.objects.create(
+                        status= "PROPOSTA_ANALISE_PROFESSOR",
+                        dataStatus= datetime.today(),
+                        tcc= tcc2                                
 
 )
 
