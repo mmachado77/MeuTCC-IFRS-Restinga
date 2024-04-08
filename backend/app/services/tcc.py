@@ -1,5 +1,8 @@
 from app.models import TccStatus
 from app.enums import StatusTccEnum
+from backend.app.models.convite import Convite
+from backend.app.models.semestre import Semestre
+from backend.app.models.tcc import Tcc
 
 class TccService:
 
@@ -12,4 +15,17 @@ class TccService:
         TccStatus.objects.create(tcc_id=tccId, status=status, justificativa=justificativa)
 
         return True
+    
+    def criarTcc(self, usuario, serializer):
+        semestreAtual = Semestre.objects.latest('id')
+        tcc = Tcc.objects.create(autor = usuario, semestre = semestreAtual, **serializer.validated_data)
+
+        Convite.objects.create(tcc=tcc, professor=tcc.orientador)
+            
+        if tcc.coorientador:
+            Convite.objects.create(tcc=tcc, professor=tcc.coorientador)
+
+        TccStatus.objects.create(tcc=tcc, status=StatusTccEnum.PROPOSTA_ANALISE_PROFESSOR)
+    
+
 
