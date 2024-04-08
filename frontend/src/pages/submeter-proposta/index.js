@@ -9,6 +9,8 @@ import ProfessorService from 'meutcc/services/ProfessorService';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 import { GUARDS } from 'meutcc/core/constants';
+import { ProgressSpinner } from 'primereact/progressspinner';
+import { set } from 'date-fns';
 
 const SubmeterPropostaPage = () => {
 
@@ -24,21 +26,32 @@ const SubmeterPropostaPage = () => {
     const [orientadorMensagemErro, setOrientadorMensagemErro] = React.useState('');
     const [coorientadorMensagemErro, setCoorientadorMensagemErro] = React.useState('');
 
+    const router = useRouter();
+    
     React.useEffect(() => {
-        const fetchTcc = async () => {
+        const fetchJaPossuiProposta = async () => {
+            
+            setLoading(true);
             try {
-                const data = await TccService.propostaSubmetida();
-                if (data) {
-                    router.push('/proposta-submetida');
+                const data = await TccService.getPossuiTcc();
+                console.log(data.value);
+
+                if (data.possuiTcc = true) {
+                    router.push('/meus-tccs');
+                }else{
+                    setLoading(false);
                 }
             } catch (error) {
-                console.error('Erro ao buscar proposta de TCC', error);
+                console.error('Erro ao buscar propostas existentes', error);
+                setLoading(false);
             }
         }
 
-        fetchTcc();
+        fetchJaPossuiProposta();
 
         const fetchProfessores = async () => {
+
+            setLoading(true);
             try {
                 const data = await ProfessorService.getProfessores();
                 const professores = data.map((professor) => ({ name: professor.nome, value: professor.id }));
@@ -53,7 +66,15 @@ const SubmeterPropostaPage = () => {
 
         fetchProfessores();
 
-    }, []);
+    }, []);   
+
+    if(loading){
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <ProgressSpinner style={{width: '50px', height: '50px'}} strokeWidth="8" fill="green-500" animationDuration=".5s" />
+            </div>
+        );
+    }
 
     const onSubmit = async (event) => {
         event.preventDefault();
