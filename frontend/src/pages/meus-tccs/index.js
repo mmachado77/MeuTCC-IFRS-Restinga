@@ -92,6 +92,7 @@ const MeusTccsPage = () => {
         return rowData.coorientador && rowData.coorientador.nome || 'Sem coorientador';
     }
 
+    // Place holder para eventos de expansão de linhas
     const onRowToggle = (e) => {
         setExpandedRows(e.data);
     }
