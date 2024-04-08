@@ -16,6 +16,14 @@ class StatusTccEnum(models.TextChoices):
     def justificativa_obrigatoria(self):
         return self in [StatusTccEnum.PROPOSTA_RECUSADA_PROFESSOR, StatusTccEnum.PROPOSTA_RECUSADA_COORDENADOR, StatusTccEnum.REPROVADO_PREVIA, StatusTccEnum.REPROVADO_FINAL]
     
+    @staticmethod
+    def statusTccCancelado():
+        return [StatusTccEnum.PROPOSTA_RECUSADA_PROFESSOR, 
+                StatusTccEnum.PROPOSTA_RECUSADA_COORDENADOR, 
+                StatusTccEnum.REPROVADO_PREVIA, 
+                StatusTccEnum.REPROVADO_FINAL]
+        
+    
     def __str__(self):
         if self == StatusTccEnum.PROPOSTA_ANALISE_PROFESSOR:
             return "Proposta em Análise pelo Orientador"
