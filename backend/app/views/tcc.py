@@ -7,8 +7,8 @@ from app.enums import StatusTccEnum, UsuarioTipoEnum
 from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre
 from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer
 from app.services.proposta import PropostaService
-from backend.app.models.convite import Convite
-from backend.app.services.tcc import TccService
+from app.models.convite import Convite
+from app.services.tcc import TccService
 
 class ListarTccPendente(APIView):
     permission_classes = [IsAuthenticated]
@@ -42,6 +42,15 @@ class MeusTCCs(APIView):
         
         serializer = TccSerializer(tccs, many=True)
         return Response(serializer.data)
+    
+class PossuiProposta(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        usuario = Estudante.objects.get(user=request.user)
+        possuiProposta = TccService().possuiProposta(usuario)
+        
+        return Response({'possuiProposta': possuiProposta})
         
 class CriarTCCView(APIView):
     permission_classes = [IsAuthenticated]
@@ -57,7 +66,7 @@ class CriarTCCView(APIView):
                 return Response(serializer.errors, status=400)  
                 
             self.tccService.criarTcc(usuario, serializer)
-            
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         except Estudante.DoesNotExist:
@@ -79,13 +88,6 @@ class TccStatusResponderPropostaView(APIView):
         self.propostaService.responderProposta(tccId, usuario, serializer)
         
         return Response({'message': 'Status atualizado com sucesso!'})
-    
-class PropostaSubmetidaView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, format=None):
-        estudante = Estudante.objects.get(user=request.user)
-        proposta = Tcc.objects.get(autor=estudante)
 
         
      

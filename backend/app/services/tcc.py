@@ -36,11 +36,11 @@ class TccService:
             tccstatus__status__in=StatusTccEnum.statusTccCancelado())
            
             if tccsCancelados.count() == tccs.count():
-                return True
-            else:
                 return False
+            else:
+                return True
             
-        return True 
+        return False 
 
     
 
