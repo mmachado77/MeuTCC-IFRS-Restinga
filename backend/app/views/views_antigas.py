@@ -90,21 +90,3 @@ class AtualizarDatasPropostasView(APIView):
         except Exception as e:
             print(e)
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-
-    
-class PropostaSubmetidaView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, format=None):
-        estudante = Estudante.objects.get(user=request.user)
-        proposta = Tcc.objects.get(autor=estudante)
-     
-        #data = {
-        #    'titulo': proposta.titulo,
-        #    'autor': proposta.autor.nome,
-        #    'orientador': proposta.orientador.nome,
-        #    'data_submissao': proposta.dataSubmissao,
-        #    'status': proposta.status,
-        #}
-  
-       # return Response(data)
