@@ -7,14 +7,34 @@ import TccService from 'meutcc/services/TccService';
 import { Button } from 'primereact/button';
 import Link from 'next/link';
 import { GUARDS } from 'meutcc/core/constants';
-
+import { set } from 'date-fns';
+import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
 
 const MeusTccsPage = () => {
 
+    const [loading, setLoading] = React.useState(false);
+    const [possuiProposta, setPossuiProposta] = React.useState(false);
     const [filters, setFilters] = React.useState({});
     const [tableSearchValue, setTableSearchValue] = React.useState('');
 
     const [tccs, setTccs] = React.useState([]);
+
+    const fetchJaPossuiProposta = async () => {
+
+        setLoading(true);
+        try {
+            const data = await TccService.getPossuiTcc();
+            console.log(data.value);
+    
+            if (data.possuiProposta == true) {
+                setPossuiProposta(true);
+            }
+            setLoading(false);
+
+        } catch (error) {
+            console.error('Erro ao buscar propostas existentes', error);
+        }
+    }
 
     const initFilters = () => {
         setFilters({
@@ -33,6 +53,7 @@ const MeusTccsPage = () => {
     };
 
     React.useEffect(() => {
+        fetchJaPossuiProposta();
         fetchTccs();
         initFilters();
     }, []);
@@ -67,20 +88,40 @@ const MeusTccsPage = () => {
         return rowData.coorientador && rowData.coorientador.nome || 'Sem coorientador';
     }
 
-    return <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
-        <div className='py-3 border-0 border-b border-dashed border-gray-200'>
-            <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
-        </div>
+   if(loading){
+        return <LoadingSpinner />;
+    }
 
-        <div className='py-6 px-2'>
-            <DataTable value={tccs} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }}>
-                <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
-                <Column field="orientador.nome" header="Orientador" style={{ width: '20%' }}></Column>
-                <Column body={coorientadorTemplate} header="Coorientador" style={{ width: '20%' }}></Column>
-                <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
-            </DataTable>
-        </div>
-    </div>;
+    if(possuiProposta){
+        return <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
+            <div className='py-3 border-0 border-b border-dashed border-gray-200'>
+                <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
+            </div>
+
+            <div className='py-6 px-2'>
+                <DataTable value={tccs} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }}>
+                    <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
+                    <Column field="orientador.nome" header="Orientador" style={{ width: '20%' }}></Column>
+                    <Column body={coorientadorTemplate} header="Coorientador" style={{ width: '20%' }}></Column>
+                    <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
+                </DataTable>
+            </div>
+        </div>;
+    }else{
+        return <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
+            <div className='py-3 border-0 border-b border-dashed border-gray-200'>
+                <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
+            </div>
+            <div className='py-6 px-2'>
+                <h2 className='heading-1 px-6 text-gray-700 text-center'>Você ainda não submeteu uma proposta de TCC</h2>
+            </div>
+            <div className='flex justify-center pb-10'>
+                <Link href="/submeter-proposta">
+                    <Button label="Submeter Proposta" icon='pi pi-plus' className='w-full' />
+                </Link>
+            </div>
+        </div>;
+    }
 
 }
 
