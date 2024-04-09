@@ -19,18 +19,18 @@ const ConfiguracoesPage = () => {
     const [endDate, setEndDate] = useState(null);
     const [semestreAtual, setSemestreAtual] = useState(null);
 
-    useEffect(() => {
-        async function fetchSemestreAtual() {
-            try {
-                const response = await ConfiguracoesService.getSemestreAtual();
-                setSemestreAtual(response); 
-                setStartDate(parseISO(semestreAtual.dataAberturaPrazoPropostas))
-                setEndDate(parseISO(semestreAtual.dataFechamentoPrazoPropostas))
-            } catch (error) {
-                console.error('Erro ao buscar o semestre atual:', error);
-            }
+    async function fetchSemestreAtual() {
+        try {
+            const response = await ConfiguracoesService.getSemestreAtual();
+            setSemestreAtual(response); 
+            setStartDate(parseISO(response.dataAberturaPrazoPropostas))
+            setEndDate(parseISO(response.dataFechamentoPrazoPropostas))
+        } catch (error) {
+            console.error('Erro ao buscar o semestre atual:', error);
         }
+    }
 
+    useEffect(() => {
         fetchSemestreAtual();
     }, []);
 
@@ -51,117 +51,92 @@ const ConfiguracoesPage = () => {
     return (
         <div>
             <div className='max-w-screen-md mx-auto bg-white m-3 mt-6'>
-                <div className='py-3 border-0 border-b border-dashed border-gray-200'>
-                    <h1 className='heading-1 text-center text-gray-700'>Configurações do Sistema</h1>
-                </div>
                 <div className="card">
-                    <TabView>
-                        <TabPanel header="Prazo Envio de Propostas" leftIcon="pi pi-calendar mr-2" >
-                            <div className="flex justify-between mb-5">
-                                <div>
-                                    <label>Data de Abertura do Prazo:</label>
-                                    <Calendar
-                                        value={startDate}
-                                        onChange={(e) => setStartDate(e.value)}
-                                        dateFormat='dd/mm/yy'
-                                        readOnlyInput
-                                        showButtonBar
-                                        locale='ptbr'
-                                    />
-                                </div>
-                                <div>
-                                    <label>Data de Fechamento do Prazo:</label>
-                                    <Calendar
-                                        value={endDate}
-                                        onChange={(e) => setEndDate(e.value)}
-                                        dateFormat='dd/mm/yy'
-                                        readOnlyInput
-                                        showButtonBar
-                                        locale='ptbr'
-                                    />
-                                </div>
-                            </div>
-                            <div className='text-right'>
-                                <Button label="Salvar Alterações" severity="success" onClick={handleSaveDates} />
-                            </div>
-                        </TabPanel>
-                        <TabPanel header="Coordenador de Curso" leftIcon="pi pi-user-edit mr-2" >
-                            <div className="mb-5">
-                                <AtualizarCoordenador />
-                            </div>
-                        </TabPanel>
-                        <TabPanel header="Calendário" leftIcon="pi pi-calendar mr-2">
                             {semestreAtual && (
                                 <div>
-a                                    <h1 className='heading-1 m-0 text-center text-gray-700'>Semestre Atual: {semestreAtual.periodo}</h1>
-                                    <div className="flex justify-around mb-5 mt-5">
+                                    <div className='py-3 border-0 border-b border-dashed border-gray-200'>
+                                        <h1 className='text-center text-gray-700 mb-2'>Semestre Atual: {semestreAtual.periodo}</h1>
+                                        <div className='flex justify-center'>
                                         <div>
-                                            <label className='block'>Início:</label>
-                                            <Calendar
-                                                placeholder={semestreAtual.dataAberturaSemestre && format(parseISO(semestreAtual.dataAberturaSemestre), 'dd/MM/yyyy')}
-                                                dateFormat='dd/mm/yy'
-                                                locale='ptbr'
-                                                disabled
-                                            />
+                                            <label htmlFor="inicio" className="font-bold text-gray-700">Início: </label>
+                                            <span className='text-gray-700'>{semestreAtual.dataAberturaSemestre && format(parseISO(semestreAtual.dataAberturaSemestre), 'dd/MM/yyyy')}</span>
                                         </div>
+                                        <div className='py-3 border-0 border-r border-dashed border-gray-200 mr-12 ml-12'></div>
                                         <div>
-                                            <label className='block'>Final:</label>
-                                            <Calendar
-                                                placeholder={semestreAtual.dataFechamentoSemestre && format(parseISO(semestreAtual.dataFechamentoSemestre), 'dd/MM/yyyy')}
-                                                dateFormat='dd/mm/yy'
-                                                locale='ptbr'
-                                                disabled
-                                            />
+                                            <label htmlFor="final" className="font-bold text-gray-700">Final: </label>
+                                            <span className='text-gray-700'>{semestreAtual.dataFechamentoSemestre && format(parseISO(semestreAtual.dataFechamentoSemestre), 'dd/MM/yyyy')}</span>
                                         </div>
-                                    </div>
-                                    <div className="flex justify-around mb-5 mt-5">
-                                        <div>
-                                            <label>Data de Abertura do Prazo:</label>
-                                            <Calendar
-                                                value={startDate}
-                                                onChange={(e) => setStartDate(e.value)}
-                                                dateFormat='dd/mm/yy'
-                                                readOnlyInput
-                                                showButtonBar
-                                                locale='ptbr'
-                                                showIcon
-                                            />
                                         </div>
-                                        <div>
-                                            <label>Data de Fechamento do Prazo:</label>
-                                            <Calendar
-                                                value={endDate}
-                                                onChange={(e) => setEndDate(e.value)}
-                                                dateFormat='dd/mm/yy'
-                                                readOnlyInput
-                                                showButtonBar
-                                                locale='ptbr'
-                                                showIcon
-                                            />
-                                        </div>
-                                        <div className='text-right'>
-                                            <Button label="Salvar Alterações" severity="success" onClick={handleSaveDates} />
-                                        </div>
-                                </div> 
-                                    
-                                    {semestreAtual.semestreCoordenador && (
-                                        <div className="card">
-                                        <Card title="Coordenador: ">
-                                            <p className="m-0">
-                                            Coordenador: {semestreAtual.semestreCoordenador.coordenador_nome}
-                                            </p>
-                                            <p className="m-0">
-                                            Data de Alteração: {semestreAtual.semestreCoordenador.dataAlteracao && format(parseISO(semestreAtual.semestreCoordenador.dataAlteracao), 'dd/MM/yyyy')}
-                                            </p>
-                                        </Card>
-                                    </div>
-                                        
-                                            
-                                    )}
+                                     </div>
+                                    <div className="flex justify-around mb-5 mt-0">
+                                        <TabView >
+                                            <TabPanel header="Coordenador de Curso" leftIcon="pi pi-user-edit mr-2" >
+                                            <div>
+                                            <h2 className='text-center text-gray-700 mb-2 mt-0'>Coordenador do Curso</h2>
+                                                <div className='flex justify-between items-center mt-5 p-2 border border-dashed border-gray-200 rounded-lg'>
+                                                    <div>
+                                                    <div className='block'>
+                                                    <label htmlFor="coordenador" className="font-bold text-gray-700 text-lg">Coordenador Atual: </label>
+                                                    <span className='text-gray-700'>{semestreAtual.semestreCoordenador.coordenador_nome}</span>
+                                                    </div>
+                                                    <div className='block'>
+                                                    <label htmlFor="dataCoordenador" className="font-bold text-gray-700 text-lg">Data de Alteração: </label>
+                                                    <span className='text-gray-700'>{semestreAtual.semestreCoordenador.dataAlteracao && format(parseISO(semestreAtual.semestreCoordenador.dataAlteracao), 'dd/MM/yyyy')}</span>
+                                                    </div>
+                                                    </div>
+                                                    <div>
+                                                    <Button label="Ver Histórico" severity="warning" className="" icon='pi pi-history' iconPos='right' outlined/>
+                                                    </div>
+                                                    </div>
+                                                    <div>
+                                                    <AtualizarCoordenador />
+                                                    </div>
+                                                </div>
+                                            </TabPanel>
+                                            <TabPanel header="Prazo Envio de Propostas" leftIcon="pi pi-calendar mr-2" >
+                                            <div className="flex justify-around mb-5">
+                                                <div>
+                                                    <div className=''>
+                                                    <label>Data de Abertura do Prazo:</label>
+                                                    <Calendar
+                                                        value={startDate}
+                                                        onChange={(e) => setStartDate(e.value)}
+                                                        dateFormat='dd/mm/yy'
+                                                        readOnlyInput
+                                                        showButtonBar
+                                                        locale='ptbr'
+                                                        showIcon
+                                                    />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div className=''>
+                                                    <label>Data de Fechamento do Prazo:</label>
+                                                    <Calendar
+                                                        value={endDate}
+                                                        onChange={(e) => setEndDate(e.value)}
+                                                        dateFormat='dd/mm/yy'
+                                                        readOnlyInput
+                                                        showButtonBar
+                                                        locale='ptbr'
+                                                        showIcon
+                                                    />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className=''>
+                                                    <Button label="Salvar Alterações" severity="success" className='w-full' onClick={handleSaveDates} />
+                                            </div>
+                                            </TabPanel>
+                                            <TabPanel header="Semestres" leftIcon="pi pi-calendar-plus mr-2" >
+                                                <div className='w-full'>
+                                                    <p>oi</p>
+                                                </div>
+                                            </TabPanel>
+                                        </TabView>
+                                    </div> 
                                 </div>
                             )}
-                        </TabPanel>
-                    </TabView>
                 </div>
             </div>
         </div>

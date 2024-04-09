@@ -32,7 +32,7 @@ export const AppLayout = ({ children, guards }) => {
         Coordenador: [
             { label: 'Atualizar Permissões', icon: 'pi pi-fw pi-users', url: '/atualizar-permissoes' },    
             { label: 'Propostas Pendentes', icon: 'pi pi-fw pi-thumbs-up', url: '/proposta-pendente' },    
-            { label: 'Configurações', icon: 'pi pi-fw pi-cog', url: '/painel-configuracoes' },
+            { label: 'Semestres', icon: 'pi pi-fw pi-calendar', url: '/painel-configuracoes' },
         ],
         Professor: [
             { label: 'Propostas Pendentes', icon: 'pi pi-fw pi-thumbs-up', url: '/proposta-pendente' },    

@@ -33,9 +33,10 @@ export default function ProfessoresDropdown() {
     };
 
     return (
-            <div className="flex flex-row justify-between">
+        <div className="">
+            <div className="flex justify-around items-center">
                 <div>
-                    <p>Escolha o novo Coordenador:</p>
+                    <p className="font-bold text-gray-700 text-lg">Alterar Coordenador:</p>
                 </div>
                 <div>
                     <Dropdown 
@@ -47,9 +48,11 @@ export default function ProfessoresDropdown() {
                         optionLabel="name" 
                     />
                 </div>
-                <div>
-                <Button label="Confirmar" severity="success" icon='pi pi-check' iconPos='right' onClick={handleAlternarCoordenador}/>
-                </div>
+                
+            </div>
+            <div>
+            <Button label="Confirmar" severity="success" className="w-full" icon='pi pi-check' iconPos='right' onClick={handleAlternarCoordenador}/>
+            </div>
             </div>
     )
 }
