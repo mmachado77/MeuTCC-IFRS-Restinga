@@ -17,3 +17,4 @@ from .coordenador import *
 from .tccStatus import *
 from .tema import *
 from .convite import *
+from .semestreCoordenador import *

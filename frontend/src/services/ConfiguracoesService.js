@@ -12,8 +12,13 @@ async function getCoordenador() {
     return apiClient.get('/app/coordenador').then((response) => response.data);
 }
 
+async function getSemestreAtual() {
+    return apiClient.get('/app/semestre-atual').then((response) => response.data);
+}
+
 export default {
     atualizaDataProposta,
     alterarCoordenador,
-    getCoordenador
+    getCoordenador,
+    getSemestreAtual
 }

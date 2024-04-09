@@ -1,5 +1,6 @@
 from django.urls import path, include
 from . import views
+from .views.semestre import *
 
 
 urlpatterns = [
@@ -8,6 +9,7 @@ urlpatterns = [
     path('criar-tcc', views.CriarTCCView.as_view(), name='criar-tcc'),
     path('criar-usuario', views.CriarUsuarioView.as_view(), name='criar-usuario'),
     path('autenticar', views.ObterTokenView.as_view(), name='autenticar-usuario'),
+    path('semestre-atual', SemestreAtualView.as_view(), name='semestre_atual'),
     path('atualizar-datas-propostas', views.AtualizarDatasPropostasView.as_view(), name='atualizar-datas-propostas'),
     path('alterar-coordenador', views.AlterarCoordenador.as_view(), name='alterar-coordenador'),
     path('coordenador', views.GetCoordenador.as_view(), name='coordenador'),

@@ -7,3 +7,5 @@ from .avaliacao import *
 from .banca import *
 from .sessoes import *
 from .tcc import *
+from .semestre import *
+from .semestreCoordenador import *
