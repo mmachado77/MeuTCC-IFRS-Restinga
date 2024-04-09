@@ -93,7 +93,7 @@ const ConfiguracoesPage = () => {
                         <TabPanel header="Calendário" leftIcon="pi pi-calendar mr-2">
                             {semestreAtual && (
                                 <div>
-                                    <h2 className='heading-1 m-0 text-center text-gray-700'>Semestre Atual: {semestreAtual.periodo}</h2>
+a                                    <h1 className='heading-1 m-0 text-center text-gray-700'>Semestre Atual: {semestreAtual.periodo}</h1>
                                     <div className="flex justify-around mb-5 mt-5">
                                         <div>
                                             <label className='block'>Início:</label>
@@ -139,18 +139,21 @@ const ConfiguracoesPage = () => {
                                                 showIcon
                                             />
                                         </div>
+                                        <div className='text-right'>
+                                            <Button label="Salvar Alterações" severity="success" onClick={handleSaveDates} />
+                                        </div>
                                 </div> 
                                     
                                     {semestreAtual.semestreCoordenador && (
                                         <div className="card">
                                         <Card title="Coordenador: ">
                                             <p className="m-0">
-                                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error repudiandae 
-                                                numquam deserunt quisquam repellat libero asperiores earum nam nobis, culpa ratione quam perferendis esse, cupiditate neque quas!
+                                            Coordenador: {semestreAtual.semestreCoordenador.coordenador_nome}
+                                            </p>
+                                            <p className="m-0">
+                                            Data de Alteração: {semestreAtual.semestreCoordenador.dataAlteracao && format(parseISO(semestreAtual.semestreCoordenador.dataAlteracao), 'dd/MM/yyyy')}
                                             </p>
                                         </Card>
-                                        <p>Coordenador: {semestreAtual.semestreCoordenador.coordenador_nome}</p>
-                                            <p>Data de Alteração: {semestreAtual.semestreCoordenador.dataAlteracao && format(parseISO(semestreAtual.semestreCoordenador.dataAlteracao), 'dd/MM/yyyy')}</p>
                                     </div>
                                         
                                             
