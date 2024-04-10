@@ -8,7 +8,9 @@ import toast from 'react-hot-toast';
 import { locale, addLocale, updateLocaleOption, updateLocaleOptions, localeOption, localeOptions } from 'primereact/api';
 import { GUARDS } from 'meutcc/core/constants';
 import AtualizarCoordenador from 'meutcc/pages/painel-configuracoes/selecionar-coordenador';
-import { Card } from 'primereact/card';
+import { Dialog } from 'primereact/dialog';
+import { Timeline } from 'primereact/timeline';
+import { getHistoricoCoordenadores } from 'meutcc/services/ConfiguracoesService'; // Importe a função getHistoricoCoordenadores
 
 addLocale('ptbr', {
     today: 'Hoje', clear: 'Limpar', monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'], monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'], dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'], dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'], weekHeader: 'Semana', firstDay: 0, isRTL: false, showMonthAfterYear: false, yearSuffix: '', timeOnlyTitle: 'Só Horas', timeText: 'Tempo', hourText: 'Hora', minuteText: 'Minuto', secondText: 'Segundo', ampm: false, month: 'Mês', week: 'Semana', day: 'Dia', allDayText: 'Todo o Dia'
@@ -18,6 +20,8 @@ const ConfiguracoesPage = () => {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [semestreAtual, setSemestreAtual] = useState(null);
+    const [historicoCoordenadores, setHistoricoCoordenadores] = useState([]); // Estado para armazenar os dados recebidos
+    const [visible, setVisible] = useState(false); // Estado para controlar a visibilidade do Dialog
 
     async function fetchSemestreAtual() {
         try {
@@ -30,8 +34,18 @@ const ConfiguracoesPage = () => {
         }
     }
 
+    async function fetchHistoricoCoordenadores() { // Função para buscar o histórico de coordenadores
+        try {
+            const historico = await ConfiguracoesService.getHistoricoCoordenadores(); // Chame a função getHistoricoCoordenadores
+            setHistoricoCoordenadores(historico);
+        } catch (error) {
+            console.error('Erro ao buscar o histórico de coordenadores:', error);
+        }
+    }
+
     useEffect(() => {
         fetchSemestreAtual();
+        fetchHistoricoCoordenadores(); // Chame a função para buscar o histórico de coordenadores
     }, []);
 
     const handleSaveDates = async () => {
@@ -85,7 +99,15 @@ const ConfiguracoesPage = () => {
                                                     </div>
                                                     </div>
                                                     <div>
-                                                    <Button label="Ver Histórico" severity="warning" className="" icon='pi pi-history' iconPos='right' outlined/>
+                                                    <Button label="Ver Histórico" severity="warning" className="" icon='pi pi-history' iconPos='right' outlined onClick={() => setVisible(true)} /> {/* Altere aqui */}
+                                                    <Dialog header="Histórico de Alterações" visible={visible} style={{ width: '50vw' }} onHide={() => setVisible(false)}>
+                                                        <Timeline
+                                                            value={historicoCoordenadores}
+                                                            opposite={(item) => item.coordenador_nome}
+                                                            content={(item) => <small className="text-color-secondary">{format(parseISO(item.dataAlteracao), 'dd/MM/yyyy')}</small>}
+                                                            
+                                                        />
+                                                    </Dialog>
                                                     </div>
                                                     </div>
                                                     <div>
