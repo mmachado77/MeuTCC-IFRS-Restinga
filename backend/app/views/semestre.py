@@ -29,7 +29,7 @@ class SemestreAtualCoordenadoresView(APIView):
         semestre_atual = Semestre.semestre_atual()
         
         if semestre_atual:
-            semestre_coordenadores = SemestreCoordenador.objects.filter(semestre=semestre_atual).order_by('-dataAlteracao')
+            semestre_coordenadores = SemestreCoordenador.objects.filter(semestre=semestre_atual).order_by('-dataAlteracao', '-id')
             if semestre_coordenadores:
                 semestre_coordenadores_serialized = SemestreCoordenadorSerializer(semestre_coordenadores, many=True).data
                 return Response(semestre_coordenadores_serialized, status=status.HTTP_200_OK)

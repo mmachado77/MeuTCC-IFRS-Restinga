@@ -38,3 +38,12 @@ class Semestre(BaseModel):
             return resposta
         else:
             return resposta
+        
+    def consulta_envio_propostas(self):
+        data_hoje = datetime.today().date()
+        resposta = False
+        if((self.dataAberturaPrazoPropostas<=data_hoje) and (self.dataFechamentoPrazoPropostas>=data_hoje)):
+            resposta = True
+            return resposta
+        else:
+            return resposta

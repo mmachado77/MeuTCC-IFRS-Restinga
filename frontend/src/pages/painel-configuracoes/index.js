@@ -10,11 +10,10 @@ import { GUARDS } from 'meutcc/core/constants';
 import AtualizarCoordenador from 'meutcc/pages/painel-configuracoes/selecionar-coordenador';
 import { Dialog } from 'primereact/dialog';
 import { Timeline } from 'primereact/timeline';
-import { getHistoricoCoordenadores } from 'meutcc/services/ConfiguracoesService'; // Importe a função getHistoricoCoordenadores
-import { Avatar } from 'primereact/avatar';
 import { Card } from 'primereact/card';
 import { Fieldset } from 'primereact/fieldset';
 import { InputSwitch } from 'primereact/inputswitch';
+import { Message } from 'primereact/message';
 
 addLocale('ptbr', {
     today: 'Hoje', clear: 'Limpar', monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'], monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'], dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'], dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'], weekHeader: 'Semana', firstDay: 0, isRTL: false, showMonthAfterYear: false, yearSuffix: '', timeOnlyTitle: 'Só Horas', timeText: 'Tempo', hourText: 'Hora', minuteText: 'Minuto', secondText: 'Segundo', ampm: false, month: 'Mês', week: 'Semana', day: 'Dia', allDayText: 'Todo o Dia'
@@ -54,7 +53,7 @@ const ConfiguracoesPage = () => {
 
     useEffect(() => {
         fetchSemestreAtual();
-        fetchHistoricoCoordenadores(); // Chame a função para buscar o histórico de coordenadores
+        fetchHistoricoCoordenadores();
     }, []);
 
     const handleSaveDates = async () => {
@@ -69,6 +68,7 @@ const ConfiguracoesPage = () => {
             success: 'Prazo Alterado com Sucesso!',
             error: 'Erro ao Atualizar',
         });
+        fetchSemestreAtual()
     };
 
     return (
@@ -111,7 +111,7 @@ const ConfiguracoesPage = () => {
                                                     </div>
                                                     </div>
                                                     <div>
-                                                    <Button label="Ver Histórico" severity="warning" className="" icon='pi pi-history' iconPos='right' outlined onClick={() => setVisible(true)} /> {/* Altere aqui */}
+                                                    <Button label="Ver Histórico" severity="warning" className="" icon='pi pi-history' iconPos='right' outlined onClick={() => setVisible(true)} />
                                                     <Dialog header="Histórico de Alterações" visible={visible} style={{ width: '50vw' }} onHide={() => setVisible(false)}>
                                                         <Timeline
                                                             value={historicoCoordenadores}
@@ -129,15 +129,45 @@ const ConfiguracoesPage = () => {
                                                 </div>
                                             </TabPanel>
                                             <TabPanel header="Prazo Envio de Propostas" leftIcon="pi pi-calendar mr-2" >
-                                            <div className="mb-5">
-                                                <div className="flex justify-center items-center mb-5">
-                                                    <div>
-                                                    <h3>Período de Submissão de Propostas:</h3>
+                                            <Card title='Prazo para Submissão de Propostas' className='text-gray-700 shadow-md shadow-gray-300 border border-solid border-gray-200 rounded-lg'>
+                                                
+                                                {semestreAtual.statusPrazo && 
+                                                <Message severity="info" text="O sistema está aceitando propostas para o Semestre Atual." className="border-primary w-full justify-center p-6 pl-3" />
+                                                ||
+                                                <Message severity="warn" text="O sistema não está aceitando propostas para o Semestre Atual." className="border-primary w-full justify-center p-6 pl-3" />
+                                                }
+                                                
+                                                <div className='flex justify-evenly pt-9'>
+                                                    <div className='pb-3 text-center'>
+                                                    <label htmlFor="inicioPrazo" className="block font-bold text-gray-700">Abertura do Prazo: </label>
+                                                    <Calendar
+                                                        value={parseISO(semestreAtual.dataAberturaPrazoPropostas)}
+                                                        dateFormat='dd/mm/yy'
+                                                        disabled
+                                                        inputClassName='text-2xl text-center'
+                                                        className='max-w-40'
+                                                        locale='ptbr'
+                                                    />
                                                     </div>
-                                                    <div>
-                                                    <InputSwitch checked disabled className='ml-5' />
+                                                    <div className='py-3 border-0 border-r-2 border-dashed border-gray-200 mr-12 ml-12'></div>
+                                                    <div className='text-center'>
+                                                    <label htmlFor="finalPrazo" className="block font-bold text-gray-700">Fechamento do Prazo: </label>
+                                                    <Calendar
+                                                        value={parseISO(semestreAtual.dataFechamentoPrazoPropostas)}
+                                                        dateFormat='dd/mm/yy'
+                                                        disabled
+                                                        inputClassName='text-2xl text-center'
+                                                        className='max-w-40 '
+                                                        locale='ptbr'
+                                                    />
                                                     </div>
                                                 </div>
+                                                
+                                                
+                                            
+                                            </Card>
+                                            <Fieldset legend='Alterar Prazo para Submissão de Propostas' collapsed toggleable   className='text-gray-700 shadow-md shadow-gray-300 border border-solid border-gray-200 rounded-lg mt-5 p-3'>
+                                            <div className="mb-5">
                                                 <div className='flex justify-around'>
                                                 <div className='mb-5'>
                                                     <div className=''>
@@ -172,6 +202,7 @@ const ConfiguracoesPage = () => {
                                             <div className=''>
                                                     <Button label="Salvar Alterações" severity="success" className='w-full' onClick={handleSaveDates} />
                                             </div>
+                                            </Fieldset>
                                             </TabPanel>
                                             <TabPanel header="Semestres" leftIcon="pi pi-calendar-plus mr-2" >
                                                 <div className='w-full'>

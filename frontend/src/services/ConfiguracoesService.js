@@ -20,10 +20,15 @@ async function getHistoricoCoordenadores() {
     return apiClient.get('/app/historico-coordenadores').then((response) => response.data);
 }
 
+async function consultaPrazo() {
+    return apiClient.get('/app/consulta-prazo-propostas').then((response) => response.data);
+}
+
 export default {
     atualizaDataProposta,
     alterarCoordenador,
     getCoordenador,
     getSemestreAtual,
-    getHistoricoCoordenadores
+    getHistoricoCoordenadores,
+    consultaPrazo
 }
