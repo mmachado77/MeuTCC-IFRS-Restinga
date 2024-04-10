@@ -11,6 +11,9 @@ import AtualizarCoordenador from 'meutcc/pages/painel-configuracoes/selecionar-c
 import { Dialog } from 'primereact/dialog';
 import { Timeline } from 'primereact/timeline';
 import { getHistoricoCoordenadores } from 'meutcc/services/ConfiguracoesService'; // Importe a função getHistoricoCoordenadores
+import { Avatar } from 'primereact/avatar';
+import { Card } from 'primereact/card';
+import { Fieldset } from 'primereact/fieldset';
 
 addLocale('ptbr', {
     today: 'Hoje', clear: 'Limpar', monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'], monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'], dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'], dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'], weekHeader: 'Semana', firstDay: 0, isRTL: false, showMonthAfterYear: false, yearSuffix: '', timeOnlyTitle: 'Só Horas', timeText: 'Tempo', hourText: 'Hora', minuteText: 'Minuto', secondText: 'Segundo', ampm: false, month: 'Mês', week: 'Semana', day: 'Dia', allDayText: 'Todo o Dia'
@@ -86,16 +89,19 @@ const ConfiguracoesPage = () => {
                                         <TabView >
                                             <TabPanel header="Coordenador de Curso" leftIcon="pi pi-user-edit mr-2" >
                                             <div>
-                                            <h2 className='text-center text-gray-700 mb-2 mt-0'>Coordenador do Curso</h2>
-                                                <div className='flex justify-between items-center mt-5 p-2 border border-dashed border-gray-200 rounded-lg'>
-                                                    <div>
-                                                    <div className='block'>
-                                                    <label htmlFor="coordenador" className="font-bold text-gray-700 text-lg">Coordenador Atual: </label>
-                                                    <span className='text-gray-700'>{semestreAtual.semestreCoordenador.coordenador_nome}</span>
-                                                    </div>
-                                                    <div className='block'>
-                                                    <label htmlFor="dataCoordenador" className="font-bold text-gray-700 text-lg">Data de Alteração: </label>
-                                                    <span className='text-gray-700'>{semestreAtual.semestreCoordenador.dataAlteracao && format(parseISO(semestreAtual.semestreCoordenador.dataAlteracao), 'dd/MM/yyyy')}</span>
+                                            <Card className='shadow-md shadow-gray-300 border border-solid border-gray-200 rounded-lg text-gray-700' title="Coordenador Atual">
+                                                <div className='flex justify-between items-center'>
+                                                    <div className='flex items-start items-center'>
+                                                        <div className="p-avatar p-component p-avatar-image p-avatar-circle ml-3" style={{height: "80px", width: "80px"}} >
+                                                            <img alt="avatar" className="hover:brightness-90" height="80" width="80" src="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" data-pc-section="image" element-id="348" />
+                                                        </div>
+                                                        <div className='ml-5'>
+                                                            <div className=''>
+                                                            <label htmlFor="coordenador" className="font-bold text-gray-700 text-lg">{semestreAtual.semestreCoordenador.coordenador_nome} </label>
+                                                            </div>
+                                                            <div className='block'>
+                                                            <span className='text-gray-700 text-sm'>Data de Alteração: {semestreAtual.semestreCoordenador.dataAlteracao && format(parseISO(semestreAtual.semestreCoordenador.dataAlteracao), 'dd/MM/yyyy')}</span>
+                                                        </div>
                                                     </div>
                                                     </div>
                                                     <div>
@@ -110,9 +116,10 @@ const ConfiguracoesPage = () => {
                                                     </Dialog>
                                                     </div>
                                                     </div>
-                                                    <div>
+                                                    </Card>
+                                                    <Fieldset legend='Alterar Coordenador' collapsed toggleable   className='text-gray-700 shadow-md shadow-gray-300 border border-solid border-gray-200 rounded-lg mt-5 p-3'>
                                                     <AtualizarCoordenador />
-                                                    </div>
+                                                    </Fieldset>
                                                 </div>
                                             </TabPanel>
                                             <TabPanel header="Prazo Envio de Propostas" leftIcon="pi pi-calendar mr-2" >

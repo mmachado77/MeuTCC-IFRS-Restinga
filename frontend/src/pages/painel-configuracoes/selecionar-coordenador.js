@@ -33,25 +33,23 @@ export default function ProfessoresDropdown() {
     };
 
     return (
-        <div className="">
-            <div className="flex justify-around items-center">
-                <div>
-                    <p className="font-bold text-gray-700 text-lg">Alterar Coordenador:</p>
-                </div>
-                <div>
+        <div className=''>
+            <div className="">
+                <div className="">
                     <Dropdown 
                         inputId="dd-professor" 
                         value={selectedProfessor} 
                         onChange={(e) => setSelectedProfessor(e.value)} 
                         options={professores} 
-                        placeholder="Selecione o novo Professor"
+                        placeholder="Selecione o novo Coordenador"
                         optionLabel="name" 
+                        className="w-full"
                     />
                 </div>
                 
             </div>
             <div>
-            <Button label="Confirmar" severity="success" className="w-full" icon='pi pi-check' iconPos='right' onClick={handleAlternarCoordenador}/>
+            <Button label="Salvar Alteração" severity="success" className="mt-5 w-full" icon='pi pi-check' iconPos='right' onClick={handleAlternarCoordenador}/>
             </div>
             </div>
     )
