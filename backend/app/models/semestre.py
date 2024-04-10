@@ -28,3 +28,13 @@ class Semestre(BaseModel):
             return semestres.first()
         else:
             return None
+        
+    def consulta_envio_propostas():
+        data_hoje = datetime.today().date()
+        resposta = False
+        if(Q(dataAberturaPrazoPropostas__lte=data_hoje) &
+            Q(dataFechamentoPrazoPropostas__gte=data_hoje)):
+            resposta = True
+            return resposta
+        else:
+            return resposta

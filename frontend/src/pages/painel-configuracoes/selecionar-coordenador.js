@@ -5,7 +5,7 @@ import AlternarCoordenadorService from 'meutcc/services/ConfiguracoesService';
 import { Button } from "primereact/button";
 import toast from "react-hot-toast";
 
-export default function ProfessoresDropdown() {
+export default function ProfessoresDropdown({onPosAlterar}) {
     const [selectedProfessor, setSelectedProfessor] = useState(null);
     const [professores, setProfessores] = useState([]);
 
@@ -29,7 +29,9 @@ export default function ProfessoresDropdown() {
             loading: 'Alterando Coordenador...',
             success: 'Coordenador Atualizado com Sucesso!',
             error: 'Erro ao Alterar',
-        });
+        }
+    );
+    onPosAlterar()
     };
 
     return (

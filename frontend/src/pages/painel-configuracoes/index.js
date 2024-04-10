@@ -14,6 +14,7 @@ import { getHistoricoCoordenadores } from 'meutcc/services/ConfiguracoesService'
 import { Avatar } from 'primereact/avatar';
 import { Card } from 'primereact/card';
 import { Fieldset } from 'primereact/fieldset';
+import { InputSwitch } from 'primereact/inputswitch';
 
 addLocale('ptbr', {
     today: 'Hoje', clear: 'Limpar', monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'], monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'], dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'], dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'], weekHeader: 'Semana', firstDay: 0, isRTL: false, showMonthAfterYear: false, yearSuffix: '', timeOnlyTitle: 'Só Horas', timeText: 'Tempo', hourText: 'Hora', minuteText: 'Minuto', secondText: 'Segundo', ampm: false, month: 'Mês', week: 'Semana', day: 'Dia', allDayText: 'Todo o Dia'
@@ -44,6 +45,11 @@ const ConfiguracoesPage = () => {
         } catch (error) {
             console.error('Erro ao buscar o histórico de coordenadores:', error);
         }
+    }
+
+    async function atualizaCoordenadoresAposTroca(){
+        fetchSemestreAtual()
+        fetchHistoricoCoordenadores()
     }
 
     useEffect(() => {
@@ -118,15 +124,24 @@ const ConfiguracoesPage = () => {
                                                     </div>
                                                     </Card>
                                                     <Fieldset legend='Alterar Coordenador' collapsed toggleable   className='text-gray-700 shadow-md shadow-gray-300 border border-solid border-gray-200 rounded-lg mt-5 p-3'>
-                                                    <AtualizarCoordenador />
+                                                    <AtualizarCoordenador onPosAlterar={atualizaCoordenadoresAposTroca}/>
                                                     </Fieldset>
                                                 </div>
                                             </TabPanel>
                                             <TabPanel header="Prazo Envio de Propostas" leftIcon="pi pi-calendar mr-2" >
-                                            <div className="flex justify-around mb-5">
-                                                <div>
+                                            <div className="mb-5">
+                                                <div className="flex justify-center items-center mb-5">
+                                                    <div>
+                                                    <h3>Período de Submissão de Propostas:</h3>
+                                                    </div>
+                                                    <div>
+                                                    <InputSwitch checked disabled className='ml-5' />
+                                                    </div>
+                                                </div>
+                                                <div className='flex justify-around'>
+                                                <div className='mb-5'>
                                                     <div className=''>
-                                                    <label>Data de Abertura do Prazo:</label>
+                                                    <label className='block'>Data de Abertura do Prazo:</label>
                                                     <Calendar
                                                         value={startDate}
                                                         onChange={(e) => setStartDate(e.value)}
@@ -140,7 +155,7 @@ const ConfiguracoesPage = () => {
                                                 </div>
                                                 <div>
                                                     <div className=''>
-                                                    <label>Data de Fechamento do Prazo:</label>
+                                                    <label className='block'>Data de Fechamento do Prazo:</label>
                                                     <Calendar
                                                         value={endDate}
                                                         onChange={(e) => setEndDate(e.value)}
@@ -151,6 +166,7 @@ const ConfiguracoesPage = () => {
                                                         showIcon
                                                     />
                                                     </div>
+                                                </div>
                                                 </div>
                                             </div>
                                             <div className=''>
