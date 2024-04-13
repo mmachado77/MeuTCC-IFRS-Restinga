@@ -12,8 +12,28 @@ async function getCoordenador() {
     return apiClient.get('/app/coordenador').then((response) => response.data);
 }
 
+async function getSemestreAtual() {
+    return apiClient.get('/app/semestre-atual').then((response) => response.data);
+}
+
+async function getHistoricoCoordenadores() {
+    return apiClient.get('/app/historico-coordenadores').then((response) => response.data);
+}
+
+async function consultaPrazo() {
+    return apiClient.get('/app/consulta-prazo-propostas').then((response) => response.data);
+}
+
+async function getSemestres() {
+    return apiClient.get('/app/semestres').then((response) => response.data);
+}
+
 export default {
     atualizaDataProposta,
     alterarCoordenador,
-    getCoordenador
+    getCoordenador,
+    getSemestreAtual,
+    getHistoricoCoordenadores,
+    consultaPrazo,
+    getSemestres
 }

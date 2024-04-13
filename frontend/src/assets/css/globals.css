@@ -18,6 +18,15 @@ body {
     size-adjust: 80%;
 }
 
+.p-tabview-nav {
+    display: flex;
+    justify-content: space-around;
+}
+
+.p-tabview.p-component{
+    width: 100%;
+}
+
 @tailwind components;
 /* @tailwind base; */
 

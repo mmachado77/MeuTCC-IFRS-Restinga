@@ -5,7 +5,7 @@ import AlternarCoordenadorService from 'meutcc/services/ConfiguracoesService';
 import { Button } from "primereact/button";
 import toast from "react-hot-toast";
 
-export default function ProfessoresDropdown() {
+export default function ProfessoresDropdown({onPosAlterar}) {
     const [selectedProfessor, setSelectedProfessor] = useState(null);
     const [professores, setProfessores] = useState([]);
 
@@ -29,27 +29,30 @@ export default function ProfessoresDropdown() {
             loading: 'Alterando Coordenador...',
             success: 'Coordenador Atualizado com Sucesso!',
             error: 'Erro ao Alterar',
-        });
+        }
+    );
+    onPosAlterar()
     };
 
     return (
-            <div className="flex flex-row justify-between">
-                <div>
-                    <p>Escolha o novo Coordenador:</p>
-                </div>
-                <div>
+        <div className=''>
+            <div className="">
+                <div className="">
                     <Dropdown 
                         inputId="dd-professor" 
                         value={selectedProfessor} 
                         onChange={(e) => setSelectedProfessor(e.value)} 
                         options={professores} 
-                        placeholder="Selecione o novo Professor"
+                        placeholder="Selecione o novo Coordenador"
                         optionLabel="name" 
+                        className="w-full"
                     />
                 </div>
-                <div>
-                <Button label="Confirmar" severity="success" icon='pi pi-check' iconPos='right' onClick={handleAlternarCoordenador}/>
-                </div>
+                
+            </div>
+            <div>
+            <Button label="Salvar Alteração" severity="success" className="mt-5 w-full" icon='pi pi-check' iconPos='right' onClick={handleAlternarCoordenador}/>
+            </div>
             </div>
     )
 }
