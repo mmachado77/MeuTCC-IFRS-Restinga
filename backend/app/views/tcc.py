@@ -57,6 +57,8 @@ class CriarTCCView(APIView):
     tccService = TccService()
 
     def post(self, request):
+        
+        # Validar "afirmo que conversei com o orientador e coorientador sobre o tema do TCC."
         try:
             usuario = Estudante.objects.get(user=request.user)
             serializer = TccCreateSerializer(data=request.data)
@@ -71,6 +73,8 @@ class CriarTCCView(APIView):
         
         except Estudante.DoesNotExist:
             return Response({'message': 'Usuário não é um estudante!'}, status=403)
+        except Exception as e:
+            return Response({'message': str(e)}, status=400)
         
 
 class TccStatusResponderPropostaView(APIView):
