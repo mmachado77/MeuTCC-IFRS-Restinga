@@ -10,6 +10,7 @@ urlpatterns = [
     path('criar-usuario', views.CriarUsuarioView.as_view(), name='criar-usuario'),
     path('autenticar', views.ObterTokenView.as_view(), name='autenticar-usuario'),
     path('semestre-atual', SemestreAtualView.as_view(), name='semestre_atual'),
+    path('semestres', SemestresView.as_view(), name='semestres'),
     path('historico-coordenadores', SemestreAtualCoordenadoresView.as_view(), name='historico-coordenadores'),
     path('atualizar-datas-propostas', views.AtualizarDatasPropostasView.as_view(), name='atualizar-datas-propostas'),
     path('alterar-coordenador', views.AlterarCoordenadorSemestre.as_view(), name='alterar-coordenador'),

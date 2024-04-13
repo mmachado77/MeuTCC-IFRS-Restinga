@@ -2,7 +2,7 @@ from .base import BaseModel
 from django.db import models
 from django.db.models import Q
 from . import Configuracoes
-from . import ProfessorInterno
+#from .semestreCoordenador import SemestreCoordenador
 from datetime import datetime  
 
 class Semestre(BaseModel):
@@ -12,7 +12,7 @@ class Semestre(BaseModel):
     dataAberturaPrazoPropostas = models.DateField(default=datetime.today)
     dataFechamentoPrazoPropostas = models.DateField(default=datetime.today)
     configuracoes = models.ForeignKey(Configuracoes, on_delete=models.PROTECT)
-    
+
     class Meta:
         abstract = False
 
@@ -29,21 +29,6 @@ class Semestre(BaseModel):
         else:
             return None
         
-    def consulta_envio_propostas():
-        data_hoje = datetime.today().date()
-        resposta = False
-        if(Q(dataAberturaPrazoPropostas__lte=data_hoje) &
-            Q(dataFechamentoPrazoPropostas__gte=data_hoje)):
-            resposta = True
-            return resposta
-        else:
-            return resposta
-        
     def consulta_envio_propostas(self):
         data_hoje = datetime.today().date()
-        resposta = False
-        if((self.dataAberturaPrazoPropostas<=data_hoje) and (self.dataFechamentoPrazoPropostas>=data_hoje)):
-            resposta = True
-            return resposta
-        else:
-            return resposta
+        return ((self.dataAberturaPrazoPropostas<=data_hoje) and (self.dataFechamentoPrazoPropostas>=data_hoje))

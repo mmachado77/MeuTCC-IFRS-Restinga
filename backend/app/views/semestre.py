@@ -12,7 +12,6 @@ class SemestreAtualView(APIView):
         
         if semestre_atual:
             semestre_serializer = SemestreSerializer(semestre_atual).data
-            
             semestre_coordenador = SemestreCoordenador.objects.filter(semestre=semestre_atual).order_by('-dataAlteracao', '-id').first()
             if semestre_coordenador:
                 semestre_coordenador_serializer = SemestreCoordenadorSerializer(semestre_coordenador).data
@@ -76,3 +75,12 @@ class AtualizarDatasPropostasView(APIView):
         except Exception as e:
             print(e)
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
+class SemestresView(APIView):
+    def get(self, request):
+        semestres = Semestre.objects.order_by('-dataAberturaSemestre').all()
+        serializer = SemestreSerializer(semestres, many=True)
+        if semestres:
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Semestres não encontrados."}, status=status.HTTP_404_NOT_FOUND)

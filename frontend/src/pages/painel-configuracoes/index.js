@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
 import ConfiguracoesService from 'meutcc/services/ConfiguracoesService';
@@ -14,6 +14,8 @@ import { Card } from 'primereact/card';
 import { Fieldset } from 'primereact/fieldset';
 import { InputSwitch } from 'primereact/inputswitch';
 import { Message } from 'primereact/message';
+import { Paginator } from 'primereact/paginator';
+import { InputText } from 'primereact/inputtext';
 
 addLocale('ptbr', {
     today: 'Hoje', clear: 'Limpar', monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'], monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'], dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'], dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'], weekHeader: 'Semana', firstDay: 0, isRTL: false, showMonthAfterYear: false, yearSuffix: '', timeOnlyTitle: 'Só Horas', timeText: 'Tempo', hourText: 'Hora', minuteText: 'Minuto', secondText: 'Segundo', ampm: false, month: 'Mês', week: 'Semana', day: 'Dia', allDayText: 'Todo o Dia'
@@ -23,8 +25,30 @@ const ConfiguracoesPage = () => {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [semestreAtual, setSemestreAtual] = useState(null);
+    const [semestres, setSemestres] = useState([]);
     const [historicoCoordenadores, setHistoricoCoordenadores] = useState([]); // Estado para armazenar os dados recebidos
     const [visible, setVisible] = useState(false); // Estado para controlar a visibilidade do Dialog
+    const [visibleForm, setVisibleForm] = useState(false);
+    const [first, setFirst] = useState(0);
+    const [isHovered, setIsHovered] = useState(false);
+    const [rows, setRows] = useState(6); // Alterado para 6
+
+    async function fetchSemestres(){
+        try {
+            const response = await ConfiguracoesService.getSemestres();
+            const semestres = []
+            semestres.push({
+                id: 0
+            })
+            response.push(...response)
+            response.push(...response)
+            semestres.push(...response)
+            setSemestres(semestres);
+        }
+        catch (error){
+            console.error('Erro ao carregar semestres'. error);
+        }
+    }
 
     async function fetchSemestreAtual() {
         try {
@@ -46,15 +70,92 @@ const ConfiguracoesPage = () => {
         }
     }
 
+    const openForm = () => {
+        setVisibleForm(true);
+    };
+
+    const closeForm = () => {
+        setVisibleForm(false);
+    };
+
+
     async function atualizaCoordenadoresAposTroca(){
         fetchSemestreAtual()
         fetchHistoricoCoordenadores()
     }
 
     useEffect(() => {
+        fetchSemestres();
         fetchSemestreAtual();
         fetchHistoricoCoordenadores();
     }, []);
+
+    const totalSemestres = semestres.length;
+    const onPageChange = (event) => {
+        setFirst(event.first);
+        setRows(event.rows);
+    };
+    
+    const renderSemestres = () => {
+        const semestresPaginados = semestres.slice(first, first + rows);
+        return semestresPaginados.map((semestre, index) => (
+            semestre.id==0?
+            <div key={index} className=' flex justify-center items-center py-2 text-gray-700 shadow-md shadow-gray-300 border border-solid border-gray-200 rounded-lg text-center'>
+            <Button
+            className='font-bold'
+            icon={isHovered ? '':'pi pi-plus'}
+            iconPos='right'
+            rounded 
+            size='large' 
+            severity="secondary" 
+            label={isHovered ? "" : ""}
+            outlined={isHovered}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            onClick={() => setVisibleForm(true)}
+        >
+                 {isHovered ? "Novo Semestre" : ""}
+            </Button>
+            <Dialog header="Criar Semestre" visible={visibleForm} onHide={() => setVisibleForm(false)} style={{ width: '50vw' }}>
+                <div className="p-fluid">
+                    <div className="p-field">
+                        <AtualizarCoordenador/>
+                    </div>
+                    <div className="p-field">
+                        <label htmlFor="dataAberturaPrazoPropostas">Data de Abertura do Prazo de Propostas:</label>
+                        <Calendar id="dataAberturaPrazoPropostas" />
+                    </div>
+                    <div className="p-field">
+                        <label htmlFor="dataFechamentoPrazoPropostas">Data de Fechamento do Prazo de Propostas:</label>
+                        <Calendar id="dataFechamentoPrazoPropostas" />
+                    </div>
+                    <div className="p-field">
+                        <label htmlFor="dataAberturaSemestre">Data de Abertura do Semestre:</label>
+                        <Calendar id="dataAberturaSemestre" />
+                    </div>
+                    <div className="p-field">
+                        <label htmlFor="dataFechamentoSemestre">Data de Fechamento do Semestre:</label>
+                        <Calendar id="dataFechamentoSemestre" />
+                    </div>
+                    <div className="p-field">
+                        <label htmlFor="periodo">Período:</label>
+                        <InputText id="periodo" />
+                    </div>
+                </div>
+            </Dialog>
+            </div>:
+            <div key={index} className='hover:border-green-500 cursor-pointer py-2 text-gray-700 shadow-md shadow-gray-300 border border-solid border-gray-200 rounded-lg text-center' onClick={handleSaveDates}>
+                <h2 className='m-0'>{semestre.periodo}</h2>
+                <div className='w-full my-2 mt-2 border-0 border-t border-dashed border-gray-200'></div>
+                <h4 className='m-0 mx-5'>Coordenador:</h4>
+                <h4 className='m-0 mx-5 font-light'>{semestre.coordenador || 'Sem Coordenador'}</h4>
+                <div className='w-full my-2 mt-2 border-0 border-t border-dashed border-gray-200'></div>                                                 
+                <h4 className='my-2 mx-5'>Início: {format(parseISO(semestre.dataAberturaSemestre), 'dd/MM/yyyy')}</h4>
+                <h4 className='my-2 mx-5'>Fim: {format(parseISO(semestre.dataFechamentoSemestre), 'dd/MM/yyyy')}</h4>
+            </div>
+        ));
+    };
+
 
     const handleSaveDates = async () => {
         console.log('Data de Início:', startDate);
@@ -199,15 +300,17 @@ const ConfiguracoesPage = () => {
                                                 </div>
                                                 </div>
                                             </div>
+                                            
                                             <div className=''>
                                                     <Button label="Salvar Alterações" severity="success" className='w-full' onClick={handleSaveDates} />
                                             </div>
                                             </Fieldset>
                                             </TabPanel>
                                             <TabPanel header="Semestres" leftIcon="pi pi-calendar-plus mr-2" >
-                                                <div className='w-full'>
-                                                    <p>oi</p>
-                                                </div>
+                                            <div className='grid grid-cols-3 gap-4'>
+                                            {renderSemestres()}
+                                            </div>
+                                            <Paginator first={first} rows={rows} totalRecords={totalSemestres} rowsPerPageOptions={[3, 6, 12, 18]} onPageChange={onPageChange} /> 
                                             </TabPanel>
                                         </TabView>
                                     </div> 

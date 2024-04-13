@@ -24,11 +24,16 @@ async function consultaPrazo() {
     return apiClient.get('/app/consulta-prazo-propostas').then((response) => response.data);
 }
 
+async function getSemestres() {
+    return apiClient.get('/app/semestres').then((response) => response.data);
+}
+
 export default {
     atualizaDataProposta,
     alterarCoordenador,
     getCoordenador,
     getSemestreAtual,
     getHistoricoCoordenadores,
-    consultaPrazo
+    consultaPrazo,
+    getSemestres
 }
