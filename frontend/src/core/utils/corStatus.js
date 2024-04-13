@@ -6,14 +6,14 @@ const getClassForStatus = (status) => {
       case 'PREVIA':
       case 'FINAL':
       case 'AJUSTE':
-        return '#FFBF00';
+        return {status: 'Análise', cor: '#FFBF00'};
       case 'PROPOSTA_RECUSADA_PROFESSOR':
       case 'PROPOSTA_RECUSADA_COORDENADOR':
       case 'REPROVADO_PREVIA':
       case 'REPROVADO_FINAL':
-        return '#D2222D';
+        return {status: 'Reprovado', cor: '#D2222D'};
       case 'APROVADO':
-        return '#007000';
+        return {status: 'Reprovado', cor: '#007000'};
       default:
     }
 };

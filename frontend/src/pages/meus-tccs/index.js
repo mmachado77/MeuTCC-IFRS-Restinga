@@ -94,7 +94,7 @@ const MeusTccsPage = () => {
     }
 
     const statusBodyTemplate = (rowData) => {
-        return <Tag value={rowData?.status?.[rowData.status.length - 1]?.statusMensagem} style={{ backgroundColor: getClassForStatus(rowData?.status?.[rowData.status.length - 1]?.status)}}></Tag>
+        return <Tag value={getClassForStatus(rowData?.status?.[rowData.status.length - 1]?.status).status} style={{ backgroundColor: getClassForStatus(rowData?.status?.[rowData.status.length - 1]?.status).cor}}></Tag>
     }
 
     // Place holder para eventos de expansão de linhas
