@@ -8,6 +8,7 @@ import { GUARDS } from 'meutcc/core/constants';
 import { set } from 'date-fns';
 import { Tag } from 'primereact/tag';
 
+
 import React from 'react';
 import TccService from 'meutcc/services/TccService';
 import Link from 'next/link';
@@ -82,6 +83,9 @@ const MeusTccsPage = () => {
     </div>);
 
     const actionBodyTemplate = (rowData) => {
+        if(expandedRows[rowData.id]){
+            return null;
+        }
         return (
             <div className="flex justify-center">
                 <Link label="Detalhes" href={`/detalhes-tcc/${rowData.id}`}> <Button label="Detalhes" icon='pi pi-external-link' iconPos='right' severity="success" /> </Link>
@@ -117,8 +121,32 @@ const MeusTccsPage = () => {
             <div>
                 <h4>Resumo:</h4>
                 <p>{data.resumo}</p>
+                <div className="flex justify-center">
+                    <Link label="Detalhes" href={`/detalhes-tcc/${data.id}`}> <Button label="Detalhes" icon='pi pi-external-link' iconPos='right' severity="success" /> </Link>
+                </div>
             </div>
         );
+    }
+
+    const customCollapsedIcon = <i className="pi pi-angle-down"></i>;
+    const customExpandedIcon = <i className="pi pi-angle-up"></i>;
+
+    const DataTableMeusTccs = () => {
+        return (
+            /*<DataTable value={tccs} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }}>*/
+            <DataTable value={tccs} expandedRows={expandedRows} onRowToggle={(e) => setExpandedRows(e.data)}
+            onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} rowExpansionTemplate={rowExpansionTemplate}
+            dataKey="id" header={renderHeader} tableStyle={{ minWidth: '50rem' }} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5}
+            expandedRowIcon={customExpandedIcon} collapsedRowIcon={customCollapsedIcon}>   
+                <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
+                <Column field="orientador.nome" header="Orientador" style={{ width: '20%' }}></Column>
+                <Column body={coorientadorTemplate} header="Coorientador" style={{ width: '20%' }}></Column>
+                <Column body={statusBodyTemplate} header="Status" style={{ width: '10%' }}></Column>
+                <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
+                <Column expander={allowExpansion} style={{ width: '5rem' }} />
+            </DataTable>
+        )
+
     }
 
    if(loading){
@@ -132,35 +160,46 @@ const MeusTccsPage = () => {
             </div>
 
             <div className='py-6 px-2'>
-
-                {/*<DataTable value={tccs} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }}>*/}
-                <DataTable value={tccs} expandedRows={expandedRows} onRowToggle={(e) => setExpandedRows(e.data)}
-                onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} rowExpansionTemplate={rowExpansionTemplate}
-                dataKey="id" header={renderHeader} tableStyle={{ minWidth: '50rem' }} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5}>   
-                    <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
-                    <Column field="orientador.nome" header="Orientador" style={{ width: '20%' }}></Column>
-                    <Column body={coorientadorTemplate} header="Coorientador" style={{ width: '20%' }}></Column>
-                    <Column body={statusBodyTemplate} header="Status" style={{ width: '10%' }}></Column>
-                    <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
-                    <Column expander={allowExpansion} style={{ width: '5rem' }} />
-                </DataTable>
+                <DataTableMeusTccs />
             </div>
         </div>;
         
     }else{
-        return <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
-            <div className='py-3 border-0 border-b border-dashed border-gray-200'>
-                <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
-            </div>
-            <div className='py-6 px-2'>
-                <h2 className='heading-1 px-6 text-gray-700 text-center'>Você ainda não submeteu uma proposta de TCC</h2>
-            </div>
-            <div className='flex justify-center pb-10'>
-                <Link href="/submeter-proposta">
-                    <Button label="Submeter Proposta" icon='pi pi-plus' className='w-full' />
-                </Link>
-            </div>
-        </div>;
+        return(
+            tccs.length > 0 ? (
+                <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
+                    <div className='py-3 border-0 border-b border-dashed border-gray-200'>
+                        <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
+                    </div>
+                    <div className='py-6 px-2'>
+                        <h2 className='heading-1 px-6 text-gray-700 text-center'>Você não possui uma proposta de TCC ativa</h2>
+                    </div>
+                    <div className='flex justify-center pb-10'>
+                        <Link href="/submeter-proposta">
+                            <Button label="Submeter Proposta" icon='pi pi-plus' iconPos='right' className='w-full' severity="success"/>
+                        </Link>
+                    </div>
+                    <div className='py-6 px-2'>
+                        <DataTableMeusTccs />
+                    </div>
+                </div>
+                
+            ) : (
+                <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
+                    <div className='py-3 border-0 border-b border-dashed border-gray-200'>
+                        <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
+                    </div>
+                    <div className='py-6 px-2'>
+                        <h2 className='heading-1 px-6 text-gray-700 text-center'>Você ainda não possui uma proposta de TCC ativa</h2>
+                    </div>
+                    <div className='flex justify-center pb-10'>
+                        <Link href="/submeter-proposta">
+                            <Button label="Submeter Proposta" icon='pi pi-plus' className='w-full' severity="success"/>
+                        </Link>
+                    </div>
+                </div>
+            )
+        )
     }
 }
 
