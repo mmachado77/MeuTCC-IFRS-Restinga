@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-from os import getenv
+from os import getenv, environ
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -47,9 +47,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'polymorphic',
 
-    'oauth2_provider',
-    'social_django',
-    'drf_social_oauth2',    
 ]
 
 MIDDLEWARE = [
@@ -82,8 +79,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
 
-                'social_django.context_processors.backends',
-                'social_django.context_processors.login_redirect',                
             ],
         },
     },
@@ -152,29 +147,15 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
-
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',  # django-oauth-toolkit >= 1.0.0
-        'drf_social_oauth2.authentication.SocialAuthentication',
     ]
 }
 
-AUTHENTICATION_BACKENDS = (
-    # Others auth providers (e.g. Facebook, OpenId, etc)
-    # Google  OAuth2
-    'social_core.backends.google.GoogleOAuth2',
-    # drf-social-oauth2
-    'drf_social_oauth2.backends.DjangoOAuth2',
-    # Django
-    'django.contrib.auth.backends.ModelBackend',
-)
-
 # Google configuration
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = str(getenv("GOOGLE_OAUTH2_KEY"))
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = str(getenv("GOOGLE_OAUTH2_SECRET"))
-SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = str(getenv("GOOGLE_OAUTH2_REDIRECT_URI"))
+GOOGLE_OAUTH2_CLIENT_ID = str(getenv("GOOGLE_OAUTH2_CLIENT_ID"))
+GOOGLE_OAUTH2_CLIENT_SECRET = str(getenv("GOOGLE_OAUTH2_CLIENT_SECRET"))
+GOOGLE_OAUTH2_REDIRECT_URI = str(getenv("GOOGLE_OAUTH2_REDIRECT_URI"))
+GOOGLE_OAUTH2_SCOPE = ['openid', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
+AUTH_FRONTEND_URL = str(getenv("AUTH_FRONTEND_URL"))
 
-# Define SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE to get extra permissions from Google.
-SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile',
-]
+if DEBUG:
+    environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
