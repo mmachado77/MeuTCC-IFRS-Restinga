@@ -12,6 +12,7 @@ import React from 'react';
 import TccService from 'meutcc/services/TccService';
 import Link from 'next/link';
 import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
+import getClassForStatus from 'meutcc/core/utils/corStatus';
 
 const MeusTccsPage = () => {
 
@@ -83,7 +84,7 @@ const MeusTccsPage = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <div className="flex justify-center">
-                <Link label="Detalhes" href={`/detalhes-tcc/${rowData.id}`}> <Button label="Detalhes" icon='pi pi-search-plus' severity="success" outlined/> </Link>
+                <Link label="Detalhes" href={`/detalhes-tcc/${rowData.id}`}> <Button label="Detalhes" icon='pi pi-external-link' iconPos='right' severity="success" /> </Link>
             </div>
         );
     }
@@ -92,28 +93,8 @@ const MeusTccsPage = () => {
         return rowData.coorientador && rowData.coorientador.nome || 'Sem coorientador';
     }
 
-    const getClassForStatus = (status) => {
-        switch (status) {
-          case 'PROPOSTA_ANALISE_PROFESSOR':
-          case 'PROPOSTA_ANALISE_COORDENADOR':
-          case 'DESENVOLVIMENTO':
-          case 'PREVIA':
-          case 'FINAL':
-          case 'AJUSTE':
-            return '#FFBF00';
-          case 'PROPOSTA_RECUSADA_PROFESSOR':
-          case 'PROPOSTA_RECUSADA_COORDENADOR':
-          case 'REPROVADO_PREVIA':
-          case 'REPROVADO_FINAL':
-            return '#D2222D';
-          case 'APROVADO':
-            return '#007000';
-          default:
-        }
-      };
-
     const statusBodyTemplate = (rowData) => {
-        return <Tag value={rowData?.status?.[rowData.status.length - 1]?.statusMensagem} style={{ backgroundColor: getClassForStatus(rowData?.status?.[rowData.status.length - 1]?.status)}}></Tag>
+        return <Tag value={getClassForStatus(rowData?.status?.[rowData.status.length - 1]?.status).status} style={{ backgroundColor: getClassForStatus(rowData?.status?.[rowData.status.length - 1]?.status).cor}}></Tag>
     }
 
     // Place holder para eventos de expansão de linhas
@@ -155,7 +136,7 @@ const MeusTccsPage = () => {
                 {/*<DataTable value={tccs} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }}>*/}
                 <DataTable value={tccs} expandedRows={expandedRows} onRowToggle={(e) => setExpandedRows(e.data)}
                 onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} rowExpansionTemplate={rowExpansionTemplate}
-                dataKey="id" header={renderHeader} tableStyle={{ minWidth: '50rem' }} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5}>
+                dataKey="id" header={renderHeader} tableStyle={{ minWidth: '50rem' }} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5}>   
                     <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
                     <Column field="orientador.nome" header="Orientador" style={{ width: '20%' }}></Column>
                     <Column body={coorientadorTemplate} header="Coorientador" style={{ width: '20%' }}></Column>

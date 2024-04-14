@@ -18,6 +18,10 @@ class TccService:
         return True
     
     def criarTcc(self, usuario, serializer):
+        
+        if(self.possuiProposta(usuario)):
+            raise Exception('Usuário já possui uma proposta de TCC')
+        
         semestreAtual = Semestre.objects.latest('id')
         tcc = Tcc.objects.create(autor = usuario, semestre = semestreAtual, **serializer.validated_data)
 
@@ -25,7 +29,7 @@ class TccService:
             
         if tcc.coorientador:
             Convite.objects.create(tcc=tcc, professor=tcc.coorientador)
-
+ 
         TccStatus.objects.create(tcc=tcc, status=StatusTccEnum.PROPOSTA_ANALISE_PROFESSOR)
 
     def possuiProposta(self, usuario):
