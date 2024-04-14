@@ -14,6 +14,12 @@ class SemestreSerializer(serializers.ModelSerializer):
         if coordenador:
             return coordenador.coordenador.nome    
         return None
+    
+class CriarSemestreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Semestre
+        fields = ['periodo', 'dataAberturaSemestre', 'dataFechamentoSemestre', 'configuracoes']
+
 
 class SemestreDatasSerializer(serializers.ModelSerializer):
     class Meta:
