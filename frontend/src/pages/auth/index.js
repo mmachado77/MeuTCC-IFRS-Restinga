@@ -26,7 +26,7 @@ const AuthPage = () => {
     }
 
     const handleLoginClick2 = () => {
-        window.location.href = 'http://localhost:8000/autenticar';
+        window.location.href = 'http://localhost:8000/auth-google';
     }
 
     const fetchAuthCallback = async () => {
