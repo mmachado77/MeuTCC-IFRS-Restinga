@@ -2,6 +2,7 @@ import React, { useState, useEffect, use } from 'react';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
 import ConfiguracoesService from 'meutcc/services/ConfiguracoesService';
+import ProfessorService from 'meutcc/services/ProfessorService'; 
 import { format, parseISO } from 'date-fns';
 import { TabView, TabPanel } from 'primereact/tabview';
 import toast from 'react-hot-toast';
@@ -16,6 +17,7 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { Message } from 'primereact/message';
 import { Paginator } from 'primereact/paginator';
 import { InputText } from 'primereact/inputtext';
+import { Dropdown } from 'primereact/dropdown';
 
 addLocale('ptbr', {
     today: 'Hoje', clear: 'Limpar', monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'], monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'], dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'], dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'], weekHeader: 'Semana', firstDay: 0, isRTL: false, showMonthAfterYear: false, yearSuffix: '', timeOnlyTitle: 'Só Horas', timeText: 'Tempo', hourText: 'Hora', minuteText: 'Minuto', secondText: 'Segundo', ampm: false, month: 'Mês', week: 'Semana', day: 'Dia', allDayText: 'Todo o Dia'
@@ -24,12 +26,18 @@ addLocale('ptbr', {
 const ConfiguracoesPage = () => {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
+    const [dataInicioNew, setDataInicioNew] = useState(new Date());
+    const [dataFinalNew, setDataFinalNew] = useState(new Date());
     const [semestreAtual, setSemestreAtual] = useState(null);
     const [semestres, setSemestres] = useState([]);
     const [historicoCoordenadores, setHistoricoCoordenadores] = useState([]); // Estado para armazenar os dados recebidos
     const [visible, setVisible] = useState(false); // Estado para controlar a visibilidade do Dialog
     const [visibleForm, setVisibleForm] = useState(false);
     const [first, setFirst] = useState(0);
+    const [semestreDetalhes, setSemestreDetalhes] = useState([]);
+    const [selectedProfessor, setSelectedProfessor] = useState(null);
+    const [professores, setProfessores] = useState([]);
+    const [periodo, setPeriodo] = useState('');
     const [isHovered, setIsHovered] = useState(false);
     const [rows, setRows] = useState(6); // Alterado para 6
 
@@ -40,8 +48,6 @@ const ConfiguracoesPage = () => {
             semestres.push({
                 id: 0
             })
-            response.push(...response)
-            response.push(...response)
             semestres.push(...response)
             setSemestres(semestres);
         }
@@ -61,6 +67,15 @@ const ConfiguracoesPage = () => {
         }
     }
 
+    async function fetchSemestreDetalhes(id) {
+        try {
+            const response = await ConfiguracoesService.getSemestre(id);
+            setSemestreDetalhes(response); 
+        } catch (error) {
+            console.error('Erro ao buscar o semestre:', error);
+        }
+    }
+
     async function fetchHistoricoCoordenadores() { // Função para buscar o histórico de coordenadores
         try {
             const historico = await ConfiguracoesService.getHistoricoCoordenadores(); // Chame a função getHistoricoCoordenadores
@@ -70,6 +85,7 @@ const ConfiguracoesPage = () => {
         }
     }
 
+    
     const openForm = () => {
         setVisibleForm(true);
     };
@@ -84,7 +100,21 @@ const ConfiguracoesPage = () => {
         fetchHistoricoCoordenadores()
     }
 
+    async function fetchProfessores() {
+        try {
+            const data = await ProfessorService.getProfessoresInternos(); // Chama a função que obtém os professores do serviço
+            const professores2 = data.map((professor) => ({
+                name: professor.nome,
+                value: professor.id
+            }));
+            setProfessores(professores2); // Define os dados dos professores no estado local
+        } catch (error) {
+            console.error('Erro ao buscar professores', error);
+        }
+    }
+
     useEffect(() => {
+        fetchProfessores();
         fetchSemestres();
         fetchSemestreAtual();
         fetchHistoricoCoordenadores();
@@ -95,6 +125,45 @@ const ConfiguracoesPage = () => {
         setFirst(event.first);
         setRows(event.rows);
     };
+
+    
+    const handlePeriodoChange = (e) => {
+        // Remove espaços
+        const value = e.target.value.replace(/\s/g, '');
+        // Remove caracteres não numéricos e não "/"
+        const newValue = value.replace(/[^0-9/]/g, '');
+        // Define o novo valor no estado
+        setPeriodo(newValue);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        const dataInicio = format(dataInicioNew, 'yyyy-MM-dd')
+        const dataFinal = format(dataFinalNew, 'yyyy-MM-dd')
+
+        const dados = {
+            semestre: {
+                periodo: periodo,
+                dataAberturaSemestre: dataInicio,
+                dataFechamentoSemestre: dataFinal,
+                configuracoes: 1
+            },
+            coordenador_id: selectedProfessor 
+        };
+
+        criarSemestre(dados);
+    };
+
+    const criarSemestre = async (dados) => {
+        const data = await toast.promise(ConfiguracoesService.criarSemestre(dados), {
+            loading: 'Criando Semestre...',
+            success: 'Semestre Criado com Sucesso!',
+            error: 'Erro ao Criar',
+        })
+        fetchSemestres()
+        setVisibleForm(false)
+    }
     
     const renderSemestres = () => {
         const semestresPaginados = semestres.slice(first, first + rows);
@@ -117,34 +186,57 @@ const ConfiguracoesPage = () => {
                  {isHovered ? "Novo Semestre" : ""}
             </Button>
             <Dialog header="Criar Semestre" visible={visibleForm} onHide={() => setVisibleForm(false)} style={{ width: '50vw' }}>
-                <div className="p-fluid">
-                    <div className="p-field">
-                        <AtualizarCoordenador/>
-                    </div>
-                    <div className="p-field">
-                        <label htmlFor="dataAberturaPrazoPropostas">Data de Abertura do Prazo de Propostas:</label>
-                        <Calendar id="dataAberturaPrazoPropostas" />
-                    </div>
-                    <div className="p-field">
-                        <label htmlFor="dataFechamentoPrazoPropostas">Data de Fechamento do Prazo de Propostas:</label>
-                        <Calendar id="dataFechamentoPrazoPropostas" />
-                    </div>
-                    <div className="p-field">
-                        <label htmlFor="dataAberturaSemestre">Data de Abertura do Semestre:</label>
-                        <Calendar id="dataAberturaSemestre" />
-                    </div>
-                    <div className="p-field">
-                        <label htmlFor="dataFechamentoSemestre">Data de Fechamento do Semestre:</label>
-                        <Calendar id="dataFechamentoSemestre" />
-                    </div>
-                    <div className="p-field">
+                <form onSubmit={handleSubmit}>
+                    <div className="p-fluid font-bold">
+                    <div className="p-field my-2">
                         <label htmlFor="periodo">Período:</label>
-                        <InputText id="periodo" />
+                        <InputText id="periodo" value={periodo} placeholder='Ex: 2024/2' onChange={handlePeriodoChange}/>
                     </div>
-                </div>
+                    <div className="p-field my-2">
+                    <label htmlFor="coordenador">Coordenador:</label>
+                        <Dropdown 
+                            inputId="dd-professor" 
+                            value={selectedProfessor} 
+                            onChange={(e) => setSelectedProfessor(e.value)} 
+                            options={professores} 
+                            placeholder="Selecione o novo Coordenador"
+                            optionLabel="name" 
+                            className="w-full"
+                        />
+                    </div>
+                    <div className='flex justify-between items-end'>
+                        <div className="p-field my-2">
+                            <label htmlFor="dataAberturaSemestre">Início do Semestre:</label>
+                            <Calendar id="criaDataAberturaSemestre"
+                            value={dataInicioNew}
+                            onChange={(e) => setDataInicioNew(e.value)}
+                            dateFormat='dd/mm/yy'
+                            className='max-w-48'
+                            showButtonBar
+                            locale='ptbr'
+                            showIcon />
+                        </div>
+                        <div className="p-field my-2">
+                            <label htmlFor="dataFechamentoSemestre">Final do Semestre:</label>
+                            <Calendar id="criaDataFechamentoSemestre"
+                            value={dataFinalNew}
+                            onChange={(e) => setDataFinalNew(e.value)}
+                            dateFormat='dd/mm/yy'
+                            className='max-w-48'
+                            showButtonBar
+                            locale='ptbr'
+                            showIcon />
+                        </div>
+                    </div>
+                    <div className='w-full my-2 mt-2 border-0 border-t border-dashed border-gray-200'></div>
+                    <div>
+                        <Button type='submit' label='Criar Semestre' className='mt-2' severity='success'></Button>
+                    </div>
+                    </div>
+                </form>
             </Dialog>
             </div>:
-            <div key={index} className='hover:border-green-500 cursor-pointer py-2 text-gray-700 shadow-md shadow-gray-300 border border-solid border-gray-200 rounded-lg text-center' onClick={handleSaveDates}>
+            <div key={index} className='hover:border-green-500 cursor-pointer py-2 text-gray-700 shadow-md shadow-gray-300 border border-solid border-gray-200 rounded-lg text-center' onClick={ () => fetchSemestreDetalhes(semestre.id)}>
                 <h2 className='m-0'>{semestre.periodo}</h2>
                 <div className='w-full my-2 mt-2 border-0 border-t border-dashed border-gray-200'></div>
                 <h4 className='m-0 mx-5'>Coordenador:</h4>

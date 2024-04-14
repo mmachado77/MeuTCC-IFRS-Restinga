@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime, date
 from ..models import Semestre, SemestreCoordenador, ProfessorInterno
-from ..serializers import SemestreSerializer, SemestreCoordenadorSerializer, SemestreDatasSerializer
+from ..serializers import SemestreSerializer, SemestreCoordenadorSerializer, SemestreDatasSerializer, CriarSemestreSerializer
 from rest_framework.permissions import IsAuthenticated
 
 class SemestreAtualView(APIView):
@@ -21,6 +21,20 @@ class SemestreAtualView(APIView):
         else:
             return Response({"detail": "Semestre atual não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
+class SemestreView(APIView):
+    def get(self, request, semestreid):
+        semestre = Semestre.objects.get(pk=semestreid)
+        
+        if semestre:
+            semestre_serializer = SemestreSerializer(semestre).data
+            semestre_coordenador = SemestreCoordenador.objects.filter(semestre=semestre).order_by('-dataAlteracao', '-id').first()
+            if semestre_coordenador:
+                semestre_coordenador_serializer = SemestreCoordenadorSerializer(semestre_coordenador).data
+                semestre_serializer['semestreCoordenador'] = semestre_coordenador_serializer
+            
+            return Response(semestre_serializer, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Semestre atual não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
 class SemestreAtualCoordenadoresView(APIView):
 
@@ -78,9 +92,35 @@ class AtualizarDatasPropostasView(APIView):
 
 class SemestresView(APIView):
     def get(self, request):
-        semestres = Semestre.objects.order_by('-dataAberturaSemestre').all()
+        semestres = Semestre.objects.order_by('-dataAberturaSemestre', ).all()
         serializer = SemestreSerializer(semestres, many=True)
         if semestres:
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"detail": "Semestres não encontrados."}, status=status.HTTP_404_NOT_FOUND)
+
+class CriarSemestreView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, format=None):
+        # Extrair os dados do corpo da solicitação
+        dados_semestre = request.data.get('semestre', {})
+        coordenador_id = request.data.get('coordenador_id', None)
+
+        # Serializar os dados do semestre
+        serializer_semestre = CriarSemestreSerializer(data=dados_semestre)
+        if serializer_semestre.is_valid():
+
+            semestre = serializer_semestre.save()
+
+            # Verificar se o coordenador existe
+            coordenador = ProfessorInterno.objects.filter(id=coordenador_id).first()
+            if coordenador:
+                # Criar e salvar o objeto SemestreCoordenador
+                semestre_coordenador = SemestreCoordenador.objects.create(
+                    coordenador=coordenador,
+                    semestre=semestre
+                )
+                semestre_coordenador.save()
+
+            return Response(serializer_semestre.data, status=status.HTTP_201_CREATED)
+        return Response(serializer_semestre.errors, status=status.HTTP_400_BAD_REQUEST)

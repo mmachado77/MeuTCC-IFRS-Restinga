@@ -28,6 +28,14 @@ async function getSemestres() {
     return apiClient.get('/app/semestres').then((response) => response.data);
 }
 
+async function getSemestre(id) {
+    return apiClient.get('/app/semestre/' + id).then((response) => response.data);
+}
+
+async function criarSemestre(data) {
+    return apiClient.post('/app/criar-semestre', data).then((response) => response.data);
+}
+
 export default {
     atualizaDataProposta,
     alterarCoordenador,
@@ -35,5 +43,7 @@ export default {
     getSemestreAtual,
     getHistoricoCoordenadores,
     consultaPrazo,
-    getSemestres
+    getSemestres,
+    criarSemestre,
+    getSemestre
 }

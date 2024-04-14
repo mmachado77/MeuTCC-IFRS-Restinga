@@ -11,7 +11,7 @@ class Semestre(BaseModel):
     dataFechamentoSemestre = models.DateField(default=datetime.today)
     dataAberturaPrazoPropostas = models.DateField(default=datetime.today)
     dataFechamentoPrazoPropostas = models.DateField(default=datetime.today)
-    configuracoes = models.ForeignKey(Configuracoes, on_delete=models.PROTECT)
+    configuracoes = models.ForeignKey(Configuracoes, on_delete=models.PROTECT )
 
     class Meta:
         abstract = False

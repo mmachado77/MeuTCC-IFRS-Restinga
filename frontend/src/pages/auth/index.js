@@ -8,8 +8,6 @@ import { Dropdown } from 'primereact/dropdown';
 import UsuarioService from 'meutcc/services/UsuarioService';
 
 const AuthPage = () => {
-
-    const router = useRouter();
     const [username, setUsername] = React.useState('');
     const [usuarios, setUsuarios] = React.useState([]);
 
@@ -27,10 +25,18 @@ const AuthPage = () => {
         }
     }
 
-    const fetchGoogleCallback = async () => {
+    const handleLoginClick2 = () => {
+        window.location.href = 'http://localhost:8000/autenticar';
+    }
+
+    const fetchAuthCallback = async () => {
         const urlParams = window.location.search;
-        const data = await AuthService.googleCallback(urlParams);
-        localStorage.setItem('token', data.token);
+        const params = new URLSearchParams(urlParams);
+        const token = params.get('token');
+        if (!token) return;
+        const data = params.get('data');
+        localStorage.setItem('token', token);
+        localStorage.setItem('data', data);
         window.location.pathname = ('/submeter-proposta');
     }
 
@@ -44,7 +50,7 @@ const AuthPage = () => {
     };
 
     React.useEffect(() => {
-        // fetchGoogleCallback();
+        fetchAuthCallback();
         fetchUsuarios();
     }, []);
 
@@ -62,9 +68,10 @@ const AuthPage = () => {
                 <Dropdown value={username} onChange={(e) => setUsername(e.value)} options={usuarios} optionLabel="name" 
                     placeholder="Selecione a conta" className="w-full md:w-14rem" />
 
-                <Button onClick={handleLoginClick} label="Entrar com o Google" icon="pi pi-google" className="p-button-raised p-button-rounded p-button-lg p-m-2" />
+                <Button onClick={handleLoginClick} label="Entrar" icon="pi pi-signup" className="p-button-raised p-button-rounded p-button-lg p-m-2" />
                 
-                {/* <a href="http://localhost:8000/app/google-auth" label="Entrar com o Google (verdadeiro)" icon="pi pi-google" className="p-button-raised p-button-rounded p-button-lg p-m-2">Entrar com o Google</a> */}
+                <Button onClick={handleLoginClick2} label="Entrar com o Google" icon="pi pi-google" className="p-button-raised p-button-rounded p-button-lg p-m-2" />
+                
             </div>
         </div>
     </div>;

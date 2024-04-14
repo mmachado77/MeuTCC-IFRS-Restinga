@@ -6,4 +6,4 @@ class SemestreCoordenadorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SemestreCoordenador
-        fields = ['coordenador_nome', 'dataAlteracao']
+        fields = '__all__'

@@ -4,8 +4,6 @@
 from django.contrib.auth.models import User
 from app.models import TccStatus, Tcc, Semestre, Configuracoes, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno, Convite, SemestreCoordenador
 from datetime import datetime
-from oauth2_provider.models import Application
-from meutcc.settings import SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI, SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET, SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
 
 # Criando usuário admin
 superuser = User.objects.create_superuser("admin", "admin@admin.com", "123")
@@ -154,16 +152,6 @@ tcc_status = TccStatus.objects.create(
                         dataStatus= datetime.today(),
                         tcc= tcc2                                
 
-)
-
-Application.objects.create(
-    client_id=SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
-    client_secret=SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
-    redirect_uris=SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI,
-    client_type="confidential",
-    authorization_grant_type="authorization-code",
-    name="Google",
-    user=superuser,
 )
 
 print("Usuários criados com sucesso!")
