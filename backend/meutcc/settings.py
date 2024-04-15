@@ -156,6 +156,7 @@ GOOGLE_OAUTH2_CLIENT_SECRET = str(getenv("GOOGLE_OAUTH2_CLIENT_SECRET"))
 GOOGLE_OAUTH2_REDIRECT_URI = str(getenv("GOOGLE_OAUTH2_REDIRECT_URI"))
 GOOGLE_OAUTH2_SCOPE = ['openid', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
 AUTH_FRONTEND_URL = str(getenv("AUTH_FRONTEND_URL"))
+AUTH_ERROR_FRONTEND_URL = str(getenv("AUTH_ERROR_FRONTEND_URL"))
 
 if DEBUG:
     environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
