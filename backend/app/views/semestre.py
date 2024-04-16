@@ -50,6 +50,21 @@ class SemestreAtualCoordenadoresView(APIView):
                 return Response({"detail": "Nenhum coordenador encontrado para o semestre atual."}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response({"detail": "Semestre atual não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        
+class SemestreCoordenadoresView(APIView):
+
+    def get(self, request, semestreid):
+        semestre = Semestre.objects.get(pk=semestreid)
+        
+        if semestre:
+            semestre_coordenadores = SemestreCoordenador.objects.filter(semestre=semestre).order_by('-dataAlteracao', '-id')
+            if semestre_coordenadores:
+                semestre_coordenadores_serialized = SemestreCoordenadorSerializer(semestre_coordenadores, many=True).data
+                return Response(semestre_coordenadores_serialized, status=status.HTTP_200_OK)
+            else:
+                return Response({"detail": "Nenhum coordenador encontrado para o semestre."}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"detail": "Semestre não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
 class AlterarCoordenadorSemestre(APIView):
     permission_classes = [IsAuthenticated]

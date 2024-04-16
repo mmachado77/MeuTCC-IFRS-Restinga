@@ -12,6 +12,7 @@ urlpatterns = [
     path('semestre-atual', SemestreAtualView.as_view(), name='semestre_atual'),
     path('semestres', SemestresView.as_view(), name='semestres'),
     path('semestre/<int:semestreid>', SemestreView.as_view(), name='semestre'),
+    path('coordenadores-semestre/<int:semestreid>', SemestreCoordenadoresView.as_view(), name='coordenadores-semestre'),
     path('criar-semestre', CriarSemestreView.as_view(), name='criar-semestre'),
     path('historico-coordenadores', SemestreAtualCoordenadoresView.as_view(), name='historico-coordenadores'),
     path('atualizar-datas-propostas', views.AtualizarDatasPropostasView.as_view(), name='atualizar-datas-propostas'),
