@@ -65,7 +65,10 @@ class CriarTCCView(APIView):
 
             if not serializer.is_valid():
                 print (serializer.errors)
-                return Response(serializer.errors, status=400)  
+                return Response(serializer.errors, status=400) 
+            
+            if not request.data.get('afirmoQueConversei'):
+                return Response({'message': 'Você deve afirmar que conversou com o orientador e coorientador sobre o tema do TCC.'}, status=400) 
                 
             self.tccService.criarTcc(usuario, serializer)
 

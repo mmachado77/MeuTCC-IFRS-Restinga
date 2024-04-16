@@ -24,7 +24,6 @@ class TccSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class TccCreateSerializer(serializers.ModelSerializer):
-    
     class Meta:
         model = Tcc
         fields = "tema", "resumo", "orientador", "coorientador"

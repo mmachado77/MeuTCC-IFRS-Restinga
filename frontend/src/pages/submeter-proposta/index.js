@@ -180,7 +180,7 @@ const SubmeterPropostaPage = () => {
 
 
                     <div className="flex flex-wrap align-items-center mb-3 gap-1 pt-2">
-                        <Checkbox inputId="afirmoQueConversei" onChange={(e) => setAfirmoQueConversei(!afirmoQueConversei)} checked={afirmoQueConversei} />
+                        <Checkbox inputId="afirmoQueConversei" name='afirmoQueConversei' onChange={(e) => setAfirmoQueConversei(!afirmoQueConversei)} checked={afirmoQueConversei} />
                         <label htmlFor="afirmoQueConversei" className="ml-2">Afirmo que conversei presencialmente com o professor sobre minha proposta de TCC</label>
                     </div>
 
