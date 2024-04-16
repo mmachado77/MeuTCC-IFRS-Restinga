@@ -18,6 +18,7 @@ import { Message } from 'primereact/message';
 import { Paginator } from 'primereact/paginator';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
+import { ScrollPanel } from 'primereact/scrollpanel';
 
 addLocale('ptbr', {
     today: 'Hoje', clear: 'Limpar', monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'], monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'], dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'], dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'], weekHeader: 'Semana', firstDay: 0, isRTL: false, showMonthAfterYear: false, yearSuffix: '', timeOnlyTitle: 'Só Horas', timeText: 'Tempo', hourText: 'Hora', minuteText: 'Minuto', secondText: 'Segundo', ampm: false, month: 'Mês', week: 'Semana', day: 'Dia', allDayText: 'Todo o Dia'
@@ -33,8 +34,10 @@ const ConfiguracoesPage = () => {
     const [historicoCoordenadores, setHistoricoCoordenadores] = useState([]); // Estado para armazenar os dados recebidos
     const [visible, setVisible] = useState(false); // Estado para controlar a visibilidade do Dialog
     const [visibleForm, setVisibleForm] = useState(false);
+    const [visibleDetalhes, setVisibleDetalhes] = useState(false);
     const [first, setFirst] = useState(0);
     const [semestreDetalhes, setSemestreDetalhes] = useState([]);
+    const [semestreCoordenadores, setSemestreCoordenadores] = useState([]);
     const [selectedProfessor, setSelectedProfessor] = useState(null);
     const [professores, setProfessores] = useState([]);
     const [periodo, setPeriodo] = useState('');
@@ -70,7 +73,9 @@ const ConfiguracoesPage = () => {
     async function fetchSemestreDetalhes(id) {
         try {
             const response = await ConfiguracoesService.getSemestre(id);
-            setSemestreDetalhes(response); 
+            const response2 = await ConfiguracoesService.getCoordenadoresSemestre(id);
+            setSemestreDetalhes(response);
+            setSemestreCoordenadores(response2)
         } catch (error) {
             console.error('Erro ao buscar o semestre:', error);
         }
@@ -235,8 +240,43 @@ const ConfiguracoesPage = () => {
                     </div>
                 </form>
             </Dialog>
+            <Dialog className='max-w-fit' header={"Detalhes do Semestre " + semestreDetalhes.periodo} visible={visibleDetalhes} onHide={() => setVisibleDetalhes(false)}>
+            <div className='flex justify-evenly'>
+                <div className='content-center'>
+                    <div className=''>
+                    <label htmlFor="coordenador" className="font-bold text-gray-700 text-lg">{"Coordenador: "}</label>
+                    <label htmlFor="coordenador" className="font-bold text-gray-700 text-lg">{semestreDetalhes.coordenador} </label>
+                    </div>
+                    <div className='mt-5'>
+                    {/* <span className='block text-gray-700 text-sm'>Data de Alteração:</span>
+                    <span className='text-gray-700 text-sm'>{semestreAtual.semestreCoordenador.dataAlteracao && format(parseISO(semestreAtual.semestreCoordenador.dataAlteracao), 'dd/MM/yyyy')}</span> */}
+                    </div>
+                    <div>
+                        <label htmlFor="inicio" className="block font-bold text-gray-700">Início: </label>
+                        <span className='text-gray-700'>{semestreDetalhes.dataAberturaSemestre && format(parseISO(semestreDetalhes.dataAberturaSemestre), 'dd/MM/yyyy')}</span>
+                    </div>
+                    <div className='py-3 border-0 border-r border-dashed border-gray-200 mr-12 ml-12'></div>
+                    <div>
+                        <label htmlFor="final" className="block font-bold text-gray-700">Final: </label>
+                        <span className='text-gray-700'>{semestreDetalhes.dataFechamentoSemestre && format(parseISO(semestreDetalhes.dataFechamentoSemestre), 'dd/MM/yyyy')}</span>
+                    </div>
+                </div>
+                <ScrollPanel style={{ height: '200px' }}>
+                {/* <label htmlFor="coordenador" className="font-bold text-gray-700 text-lg ">Histórico de Coordenadores: </label> */}
+                    <Timeline
+                        className='content-center'
+                        value={semestreCoordenadores}
+                        opposite={(item) => item.coordenador_nome}
+                        content={(item) => <small className="text-color-secondary">{format(parseISO(item.dataAlteracao), 'dd/MM/yyyy')}</small>}
+                    />
+                </ScrollPanel>
+                
+                
+
+            </div>
+            </Dialog>
             </div>:
-            <div key={index} className='hover:border-green-500 cursor-pointer py-2 text-gray-700 shadow-md shadow-gray-300 border border-solid border-gray-200 rounded-lg text-center' onClick={ () => fetchSemestreDetalhes(semestre.id)}>
+            <div key={index} className='hover:border-green-500 cursor-pointer py-2 text-gray-700 shadow-md shadow-gray-300 border border-solid border-gray-200 rounded-lg text-center' onClick={ () => {fetchSemestreDetalhes(semestre.id), setVisibleDetalhes(true)}}>
                 <h2 className='m-0'>{semestre.periodo}</h2>
                 <div className='w-full my-2 mt-2 border-0 border-t border-dashed border-gray-200'></div>
                 <h4 className='m-0 mx-5'>Coordenador:</h4>
