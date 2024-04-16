@@ -103,6 +103,7 @@ const ConfiguracoesPage = () => {
     async function atualizaCoordenadoresAposTroca(){
         fetchSemestreAtual()
         fetchHistoricoCoordenadores()
+        fetchSemestres()
     }
 
     async function fetchProfessores() {
@@ -242,9 +243,9 @@ const ConfiguracoesPage = () => {
             </Dialog>
             <Dialog className='max-w-fit' header={"Detalhes do Semestre " + semestreDetalhes.periodo} visible={visibleDetalhes} onHide={() => setVisibleDetalhes(false)}>
             <div className='flex justify-evenly'>
-                <div className='content-center'>
+                <div className='content-center m-2 p-2 border border-1 border-dashed border-gray-200 rounded-lg'>
                     <div className=''>
-                    <label htmlFor="coordenador" className="font-bold text-gray-700 text-lg">{"Coordenador: "}</label>
+                    <label htmlFor="coordenador" className="block font-bold text-gray-700 text-lg">{"Coordenador: "}</label>
                     <label htmlFor="coordenador" className="font-bold text-gray-700 text-lg">{semestreDetalhes.coordenador} </label>
                     </div>
                     <div className='mt-5'>
@@ -261,15 +262,22 @@ const ConfiguracoesPage = () => {
                         <span className='text-gray-700'>{semestreDetalhes.dataFechamentoSemestre && format(parseISO(semestreDetalhes.dataFechamentoSemestre), 'dd/MM/yyyy')}</span>
                     </div>
                 </div>
+                <div  className='m-2 p-2 border border-1 border-dashed border-gray-200 rounded-lg'>
                 <ScrollPanel style={{ height: '200px' }}>
-                {/* <label htmlFor="coordenador" className="font-bold text-gray-700 text-lg ">Histórico de Coordenadores: </label> */}
+                <div className='text-center'>
+                <label htmlFor="historico" className="font-bold text-gray-700 text-lg">Histórico de Coordenadores</label>
+                </div>
+                    <div className=''>
                     <Timeline
                         className='content-center'
                         value={semestreCoordenadores}
                         opposite={(item) => item.coordenador_nome}
                         content={(item) => <small className="text-color-secondary">{format(parseISO(item.dataAlteracao), 'dd/MM/yyyy')}</small>}
                     />
+                    </div>
                 </ScrollPanel>
+                </div>
+                
                 
                 
 
