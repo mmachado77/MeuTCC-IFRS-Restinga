@@ -37,7 +37,6 @@ export const AuthProvider = ({ children, guards }) => {
                 const data = await AuthService.detalhesUsuario();
 
                 if('cadastroIncompleto' in data) {
-                    debugger
                     setLoading(false);
                     if(router.pathname !== '/cadastro') {
                         router.push('/cadastro')

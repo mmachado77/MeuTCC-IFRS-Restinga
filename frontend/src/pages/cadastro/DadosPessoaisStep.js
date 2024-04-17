@@ -3,6 +3,8 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Steps } from 'primereact/steps';
 import { Toast } from 'primereact/toast';
+import { InputMask } from 'primereact/inputmask';
+
 
 const DadosPessoaisStep = ({ userData, setUserData, nome, email, activeIndex, setActiveIndex, nextStep }) => {
     const toast = React.useRef(null);
@@ -86,7 +88,7 @@ const DadosPessoaisStep = ({ userData, setUserData, nome, email, activeIndex, se
                     <h1 className='heading-1 text-center text-gray-700'>Dados do Usuário</h1>
                 </div>
                 <InputText className='w-full mb-2' value={nome} onChange={onNomeChange} />
-                <InputText className='w-full mb-2' value={userData.cpf} placeholder="CPF" onChange={onCPFChange} />
+                <InputMask className='w-full mb-2' unmask={true} value={userData.cpf} onChange={(e) => setUserData({ ...userData, cpf: e.target.value })} mask="999.999.999-99" placeholder="CPF" />
                 <InputText className='w-full mb-2' value={email} readOnly />
                 <Button label="Próximo" onClick={validateAndProceed} />
             </div>
