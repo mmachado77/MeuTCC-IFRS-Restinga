@@ -4,8 +4,16 @@ async function submeterProposta(data) {
     return apiClient.post('/app/criar-tcc', data).then((response) => response.data);
 }
 
-async function getTccs() {
-    return apiClient.get('/app/tccs').then((response) => response.data);
+async function getTccsByAluno() {
+    return apiClient.get('/app/tccs-by-aluno').then((response) => response.data);
+}
+
+async function getTccsByOrientador() {
+    return apiClient.get('/app/tccs-by-orientador').then((response) => response.data);
+}
+
+async function getTccsCoordenacao() {
+    return apiClient.get('/app/tccs-coordenacao').then((response) => response.data);
 }
 
 async function getDetalhesTCC(id) {
@@ -26,5 +34,5 @@ async function getPossuiTcc() {
 
 
 export default {
-    submeterProposta, getTccs, getDetalhesTCC, responderProposta, getListarTccsPendente, getPossuiTcc
+    submeterProposta, getDetalhesTCC, responderProposta, getListarTccsPendente, getPossuiTcc, getTccsByAluno, getTccsByOrientador, getTccsCoordenacao,
 }
