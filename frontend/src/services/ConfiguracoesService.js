@@ -33,7 +33,7 @@ async function getSemestre(id) {
 }
 
 async function criarSemestre(data) {
-    return apiClient.post('/app/criar-semestre', data).then((response) => response.data);
+    return apiClient.post('/app/criar-semestre', data);
 }
 
 async function getCoordenadoresSemestre(id) {

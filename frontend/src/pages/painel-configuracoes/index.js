@@ -165,14 +165,19 @@ const ConfiguracoesPage = () => {
     };
 
     const criarSemestre = async (dados) => {
-        const data = await toast.promise(ConfiguracoesService.criarSemestre(dados), {
-            loading: 'Criando Semestre...',
-            success: 'Semestre Criado com Sucesso!',
-            error: 'Erro ao Criar',
-        })
-        await fetchSemestres()
-        await fetchSemestreAtual()
-        setVisibleForm(false)
+        try{
+            const data = await toast.promise(ConfiguracoesService.criarSemestre(dados), {
+                loading: 'Criando Semestre...',
+                success: 'Semestre Criado com Sucesso!',
+                error: 'Erro ao Criar',
+            })
+            await fetchSemestres()
+            await fetchSemestreAtual()
+            setVisibleForm(false)
+        } catch (e){
+            console.error(e);
+        }
+        
     }
     
     const renderSemestres = () => {

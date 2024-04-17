@@ -112,8 +112,13 @@ class SemestresView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+from django.db.models import Q
+from rest_framework import status
+from rest_framework.response import Response
+
 class CriarSemestreView(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self, request, format=None):
         # Extrair os dados do corpo da solicitação
         dados_semestre = request.data.get('semestre', {})
@@ -122,18 +127,27 @@ class CriarSemestreView(APIView):
         # Serializar os dados do semestre
         serializer_semestre = CriarSemestreSerializer(data=dados_semestre)
         if serializer_semestre.is_valid():
+            novo_semestre = serializer_semestre.validated_data
 
-            semestre = serializer_semestre.save()
+            # Verificar se existem semestres existentes com datas sobrepostas
+            semestres_sobrepostos = Semestre.objects.filter(
+                Q(dataAberturaSemestre__range=[novo_semestre['dataAberturaSemestre'], novo_semestre['dataFechamentoSemestre']]) |
+                Q(dataFechamentoSemestre__range=[novo_semestre['dataAberturaSemestre'], novo_semestre['dataFechamentoSemestre']])
+            )
+            if semestres_sobrepostos.exists():
+                return Response({'error': 'As datas do semestre estão sobrepostas com semestres existentes.'}, status=status.HTTP_400_BAD_REQUEST)
 
             # Verificar se o coordenador existe
             coordenador = ProfessorInterno.objects.filter(id=coordenador_id).first()
             if coordenador:
                 # Criar e salvar o objeto SemestreCoordenador
+                semestre = serializer_semestre.save()
                 semestre_coordenador = SemestreCoordenador.objects.create(
                     coordenador=coordenador,
                     semestre=semestre
                 )
-                semestre_coordenador.save()
-
-            return Response(serializer_semestre.data, status=status.HTTP_201_CREATED)
-        return Response(serializer_semestre.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(serializer_semestre.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response({'error': 'O coordenador especificado não foi encontrado.'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer_semestre.errors, status=status.HTTP_400_BAD_REQUEST)
