@@ -1,7 +1,8 @@
 from django.urls import path, include
 from . import views
 from .views.semestre import *
-
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('professores', views.GetProfessores.as_view(), name='professor-list-create'),
@@ -28,5 +29,7 @@ urlpatterns = [
     path('tccs', views.MeusTCCs.as_view(), name='tccs'),
     path('possui-proposta', views.PossuiProposta.as_view(), name='possui-proposta'),
     path('responder-proposta/<int:tccId>', views.TccStatusResponderPropostaView.as_view(), name='responder-proposta'),
-]
+    path('upload/professor-externo/', views.FileUploadView.as_view(), name='file-upload-externo'),
+
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

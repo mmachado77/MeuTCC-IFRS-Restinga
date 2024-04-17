@@ -19,7 +19,7 @@ const AuthPage = () => {
                 error: 'Erro ao conectar',
             });
             localStorage.setItem('token', data.token);
-            window.location.pathname = ('/submeter-proposta');
+            window.location.href = ('/submeter-proposta');
         } catch (error) {
             console.error(error);
         }
@@ -37,7 +37,7 @@ const AuthPage = () => {
         const data = params.get('data');
         localStorage.setItem('token', token);
         localStorage.setItem('data', data);
-        window.location.pathname = ('/submeter-proposta');
+        window.location.href = ('/submeter-proposta');
     }
 
     const fetchUsuarios = async () => {

@@ -9,3 +9,4 @@ from .sessoes import *
 from .tcc import *
 from .semestre import *
 from .semestreCoordenador import *
+from .usuario import *

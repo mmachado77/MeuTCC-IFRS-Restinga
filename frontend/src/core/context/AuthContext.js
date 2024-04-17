@@ -35,6 +35,15 @@ export const AuthProvider = ({ children, guards }) => {
 
             try {
                 const data = await AuthService.detalhesUsuario();
+
+                if('cadastroIncompleto' in data) {
+                    debugger
+                    setLoading(false);
+                    if(router.pathname !== '/cadastro') {
+                        router.push('/cadastro')
+                    }
+                    return;
+                }
                 setUser(data);
 
                 if (guards && guards.length > 0 && !guards.includes(data.resourcetype)) {
@@ -54,8 +63,9 @@ export const AuthProvider = ({ children, guards }) => {
             setLoading(false);
 
         }
-
+        
         fetchUsuario();
+        
     }, []);
 
     const value = {

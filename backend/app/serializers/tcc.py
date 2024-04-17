@@ -6,8 +6,8 @@ class TccSerializer(serializers.ModelSerializer):
     autor = UsuarioPolymorphicSerializer()
     orientador = UsuarioPolymorphicSerializer()
     coorientador = UsuarioPolymorphicSerializer()
-    documentoTCC = FileSerializer()
-    autorizacaoPublicacao = FileSerializer()
+    #documentoTCC = FileSerializer()
+    #autorizacaoPublicacao = FileSerializer()
     status = serializers.SerializerMethodField(method_name='get_status')
     sessoes = serializers.SerializerMethodField(method_name='get_sessoes')
 

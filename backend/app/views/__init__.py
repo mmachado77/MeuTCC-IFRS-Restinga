@@ -5,3 +5,4 @@ from .professoresPendentes import *
 from .detalhesTcc import *
 from .tcc import *
 from .semestre import *
+from .usuario import *

@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 from os import getenv, environ
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
@@ -160,3 +161,6 @@ AUTH_ERROR_FRONTEND_URL = str(getenv("AUTH_ERROR_FRONTEND_URL"))
 
 if DEBUG:
     environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

@@ -1,4 +1,4 @@
-from app.models import Usuario, TccStatus
+from app.models import Usuario, TccStatus, Convite
 from app.serializers import TccStatusResponderPropostaSerializer
 from app.enums import UsuarioTipoEnum, StatusTccEnum
 from app.services import TccService
@@ -34,20 +34,16 @@ class PropostaService:
 
     # TODO: Implementar model Convite, após implementação do model Convite, descomentar o código abaixo e apagar a linha de retorno
     def responderConvite(self, tccId: int, usuario: Usuario, aprovar: bool, justificativa: str = None):
-        # convite = Convite.objects.get(tcc_id=tccId, professor=usuario)
+        convite = Convite.objects.get(tcc_id=tccId, professor=usuario)
 
-        # if not convite:
-        #     raise Exception('Você não foi convidado para orientar este TCC!')
+        if not convite:
+            raise Exception('Você não foi convidado para orientar este TCC!')
         
-        # convite.aprovado = aprovar
-        # convite.justificativa = justificativa
-        # convite.save()
-
-        return True
+        convite.aceito = aprovar
+        convite.justificativaRecusa = justificativa
+        convite.save()
 
     # TODO: Implementar model Convite, após implementação do model Convite, descomentar o código abaixo e apagar a linha de retorno
     def isTodosConvitesAprovados(self, tccId: int):
-        # convites = Convite.objects.filter(tcc_id=tccId)
-        # return all([convite.aprovado for convite in convites])
-        return True
-
+        convites = Convite.objects.filter(tcc_id=tccId)
+        return all([convite.aceito for convite in convites])
