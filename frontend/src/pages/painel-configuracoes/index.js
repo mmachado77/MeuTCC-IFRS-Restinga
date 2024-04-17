@@ -48,9 +48,11 @@ const ConfiguracoesPage = () => {
         try {
             const response = await ConfiguracoesService.getSemestres();
             const semestres = []
-            semestres.push({
-                id: 0
-            })
+            if (response.length>0) {
+                semestres.push({
+                    id: 0
+                })
+            }
             semestres.push(...response)
             setSemestres(semestres);
         }
@@ -159,6 +161,7 @@ const ConfiguracoesPage = () => {
         };
 
         criarSemestre(dados);
+        
     };
 
     const criarSemestre = async (dados) => {
@@ -167,7 +170,8 @@ const ConfiguracoesPage = () => {
             success: 'Semestre Criado com Sucesso!',
             error: 'Erro ao Criar',
         })
-        fetchSemestres()
+        await fetchSemestres()
+        await fetchSemestreAtual()
         setVisibleForm(false)
     }
     
@@ -455,7 +459,75 @@ const ConfiguracoesPage = () => {
                                         </TabView>
                                     </div> 
                                 </div>
-                            )}
+                            )
+                            || (
+                                                <div className='px-3 pb-3 max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
+                                                <div className='p-3 border-0 border-b border-dashed border-gray-200'>
+                                                <h1 className='text-center text-gray-700 mb-2'>Semestre Atual</h1>
+                                                </div>
+                                                <div className='py-6 px-2'>
+                                                    <h2 className='heading-1 px-6 text-gray-700 text-center'>Não há nenhum Semestre Cadastrado para o Período Atual.</h2>
+                                                </div>
+                                                    <div className='grid grid-cols-3 gap-4'>
+                                                        {renderSemestres()}
+                                                    </div>
+                                                    <div>
+                                                    <div className='p-3 border-0 border-b border-dashed border-gray-200'></div>
+                                                    <Button label="Criar Novo Semestre" icon='pi pi-plus' className='mt-5 w-full' severity="success" onClick={() => setVisibleForm(true)}/>
+                                                        <Dialog header="Criar Semestre" visible={visibleForm} onHide={() => setVisibleForm(false)} style={{ width: '50vw' }}>
+                                                            <form onSubmit={handleSubmit}>
+                                                                <div className="p-fluid font-bold">
+                                                                <div className="p-field my-2">
+                                                                    <label htmlFor="periodo">Período:</label>
+                                                                    <InputText id="periodo" value={periodo} placeholder='Ex: 2024/2' onChange={handlePeriodoChange}/>
+                                                                </div>
+                                                                <div className="p-field my-2">
+                                                                <label htmlFor="coordenador">Coordenador:</label>
+                                                                    <Dropdown 
+                                                                        inputId="dd-professor" 
+                                                                        value={selectedProfessor} 
+                                                                        onChange={(e) => setSelectedProfessor(e.value)} 
+                                                                        options={professores} 
+                                                                        placeholder="Selecione o novo Coordenador"
+                                                                        optionLabel="name" 
+                                                                        className="w-full"
+                                                                    />
+                                                                </div>
+                                                                <div className='flex justify-between items-end'>
+                                                                    <div className="p-field my-2">
+                                                                        <label htmlFor="dataAberturaSemestre">Início do Semestre:</label>
+                                                                        <Calendar id="criaDataAberturaSemestre"
+                                                                        value={dataInicioNew}
+                                                                        onChange={(e) => setDataInicioNew(e.value)}
+                                                                        dateFormat='dd/mm/yy'
+                                                                        className='max-w-48'
+                                                                        showButtonBar
+                                                                        locale='ptbr'
+                                                                        showIcon />
+                                                                    </div>
+                                                                    <div className="p-field my-2">
+                                                                        <label htmlFor="dataFechamentoSemestre">Final do Semestre:</label>
+                                                                        <Calendar id="criaDataFechamentoSemestre"
+                                                                        value={dataFinalNew}
+                                                                        onChange={(e) => setDataFinalNew(e.value)}
+                                                                        dateFormat='dd/mm/yy'
+                                                                        className='max-w-48'
+                                                                        showButtonBar
+                                                                        locale='ptbr'
+                                                                        showIcon />
+                                                                    </div>
+                                                                </div>
+                                                                <div className='w-full my-2 mt-2 border-0 border-t border-dashed border-gray-200'></div>
+                                                                <div>
+                                                                    <Button type='submit' label='Criar Semestre' className='mt-2' severity='success'></Button>
+                                                                </div>
+                                                                </div>
+                                                            </form>
+                                                        </Dialog>
+                                                        </div>
+                                                </div>
+
+                                            )}
                 </div>
             </div>
         </div>

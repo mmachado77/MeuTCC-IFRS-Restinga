@@ -109,10 +109,8 @@ class SemestresView(APIView):
     def get(self, request):
         semestres = Semestre.objects.order_by('-dataAberturaSemestre', ).all()
         serializer = SemestreSerializer(semestres, many=True)
-        if semestres:
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({"detail": "Semestres não encontrados."}, status=status.HTTP_404_NOT_FOUND)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class CriarSemestreView(APIView):
     permission_classes = [IsAuthenticated]
