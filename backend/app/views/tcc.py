@@ -33,12 +33,34 @@ class ListarTccPendente(APIView):
         serializer = TccSerializer(tccs, many=True)
         return Response(serializer.data)
     
-class MeusTCCs(APIView):
+class TCCs(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+     
+        tccs = Tcc.objects.all()
+        serializer = TccSerializer(tccs, many=True)
+        
+        return Response(serializer.data)
+    
+class TCCsByAluno(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         usuario = Usuario.objects.get(user=request.user)
         tccs = Tcc.objects.filter(autor = usuario)
+        
+        serializer = TccSerializer(tccs, many=True)
+        return Response(serializer.data)
+    
+
+class TCCsByOrientador(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        usuario = Usuario.objects.get(user=request.user)
+        
+        tccs = Tcc.objects.filter(Q(orientador=usuario) | Q(coorientador=usuario))
         
         serializer = TccSerializer(tccs, many=True)
         return Response(serializer.data)
