@@ -1,5 +1,5 @@
 from rest_framework import serializers
-class FileSerializer(serializers.Serializer):
+class FileDetailSerializer(serializers.Serializer):
     url = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
     size = serializers.SerializerMethodField()

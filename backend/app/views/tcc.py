@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.db.models import Max, F, Q
 from app.enums import StatusTccEnum, UsuarioTipoEnum
-from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre
+from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre, Professor, Coordenador
 from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer
 from app.services.proposta import PropostaService
 from app.models.convite import Convite
@@ -118,8 +118,55 @@ class TccStatusResponderPropostaView(APIView):
         
         return Response({'message': 'Status atualizado com sucesso!'})
 
-        
-     
+
+class EditarTCCView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, tccid):
+        try:
+            tcc = Tcc.objects.get(id=tccid)
+        except Tcc.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+
+        if user == tcc.autor.user:
+            tcc.tema = request.data.get('tema', tcc.tema)
+            tcc.resumo = request.data.get('resumo', tcc.resumo)
+            tcc.save()
+            return Response({'message': 'TCC atualizado com sucesso.'})
+
+        if user.is_superuser or Coordenador.objects.filter(user=user).exists():
+            tcc.orientador = Professor.objects.get(id=request.data.get('orientador', tcc.orientador))
+            if request.data.get('coorientador', tcc.coorientador) is not None:
+                tcc.coorientador = Professor.objects.get(id=request.data.get('coorientador', tcc.coorientador))
+            tcc.save()
+            return Response({'message': 'TCC atualizado com sucesso.'})
+
+        # Se o usuário não tiver permissão
+        return Response({"error": "Você não tem permissão para editar este TCC."}, status=status.HTTP_403_FORBIDDEN)
+
+
+class DetalhesTCCView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, tccid, format=None):
+        try:
+            tcc = Tcc.objects.get(id=tccid)
+        except Tcc.DoesNotExist:
+            return Response({"error": "TCC não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+        coord = Coordenador.objects.filter(user=user)
+        if (str(user) == 'admin') or (user == tcc.autor.user) or (user == tcc.orientador.user) or (
+                tcc.coorientador and user == tcc.coorientador.user) or (coord.exists()):
+            serializer = TccSerializer(tcc)
+            return Response(serializer.data)
+        else:
+            return Response({"error": "Você não tem permissão para visualizar este TCC."},
+                            status=status.HTTP_403_FORBIDDEN)
+
+
     
 
     
