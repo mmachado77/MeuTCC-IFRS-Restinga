@@ -84,7 +84,7 @@ const DadosPessoaisStep = ({ userData, setUserData, nome, email, activeIndex, se
             <Toast ref={toast} />
             <div className='max-w-screen-md mx-auto bg-white m-3 mt-6 flex flex-col py-6 px-9'>
                 <div className='py-3 border-0 border-b border-dashed border-gray-200'>
-                    <Steps model={steps} activeIndex={activeIndex} onSelect={(e) => setActiveIndex(e.index)} readOnly={false} />
+                    <Steps model={steps} activeIndex={activeIndex} onSelect={(e) => setActiveIndex(e.index)} readOnly={true} />
                     <h1 className='heading-1 text-center text-gray-700'>Dados do Usuário</h1>
                 </div>
                 <InputText className='w-full mb-2' value={nome} onChange={onNomeChange} />
