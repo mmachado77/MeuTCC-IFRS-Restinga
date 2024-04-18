@@ -53,6 +53,20 @@ const MeusTccsPage = () => {
         });
     };
 
+    const statusPriority = {
+        'PROPOSTA_ANALISE_PROFESSOR': 11,
+        'PROPOSTA_ANALISE_COORDENADOR': 10,
+        'DESENVOLVIMENTO': 9,
+        'PREVIA': 8,
+        'FINAL': 7,
+        'AJUSTE': 6,
+        'PROPOSTA_RECUSADA_PROFESSOR': 5,
+        'PROPOSTA_RECUSADA_COORDENADOR': 4,
+        'REPROVADO_PREVIA': 3,
+        'REPROVADO_FINAL': 2,
+        'APROVADO': 1
+    };
+
     const fetchTccs = async () => {
 
         setLoading(true);
@@ -64,37 +78,15 @@ const MeusTccsPage = () => {
                 data = await TccService.getTccsByAluno();
             }else if(user.resourcetype == 'Coordenador'){
                 data = await TccService.getTccsCoordenacao();
+                if (data) {
+                    data.sort((a, b) => statusPriority[a.status] - statusPriority[b.status]);
+                }
             }
             setTccs(data);
             setLoading(false);
         } catch (error) {
             console.error('Erro ao buscar os TCCs', error);
         }
-        /*
-        setLoading(true)
-        try {
-            let response
-            if (session.userType === 'Orientador') {
-                response = await TccService.getTccsByOrientador(session.userId)
-            } else {
-                response = await TccService.getTccsByAluno(session.userId)
-            }
-            setTccs(response.data)
-        } catch (error) {
-            console.error('Failed to fetch TCCs:', error)
-        } finally {
-            setLoading(false)
-        }
-        */
-        /*
-        try {
-            const data = await TccService.getTccs();
-            setTccs(data);
-
-        } catch (error) {
-            console.error('Erro ao buscar os TCCs', error);
-        }
-        */
     };
 
     React.useEffect(() => {
@@ -158,6 +150,21 @@ const MeusTccsPage = () => {
         );
     }
 
+    const AbrirProposta = () => {
+        return(
+            <>
+                <div className='py-6 px-2'>
+                    <h2 className='heading-1 px-6 text-gray-700 text-center'>Você não possui uma proposta de TCC ativa</h2>
+                </div>
+                <div className='flex justify-center pb-10'>
+                    <Link href="/submeter-proposta">
+                        <Button label="Submeter Proposta" icon='pi pi-plus' iconPos='right' className='w-full' severity="success"/>
+                    </Link>
+                </div>
+            </>
+        );
+    }
+
     const customCollapsedIcon = <i className="pi pi-angle-down"></i>;
     const customExpandedIcon = <i className="pi pi-angle-up"></i>;
 
@@ -170,6 +177,9 @@ const MeusTccsPage = () => {
                 dataKey="id" header={renderHeader} tableStyle={{ minWidth: '50rem' }} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5}
                 expandedRowIcon={customExpandedIcon} collapsedRowIcon={customCollapsedIcon}>   
                     <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
+                    {(user.resourcetype === 'Coordenador' || user.resourcetype === 'ProfessorInterno' || user.resourcetype === 'ProfessorExterno') && 
+                        <Column field="autor.nome" header="Aluno" style={{ width: '20%' }}></Column>
+                    }
                     <Column field="orientador.nome" header="Orientador" style={{ width: '20%' }}></Column>
                     <Column body={coorientadorTemplate} header="Coorientador" style={{ width: '20%' }}></Column>
                     <Column body={statusBodyTemplate} header="Status" style={{ width: '10%' }}></Column>
@@ -177,21 +187,6 @@ const MeusTccsPage = () => {
                     <Column expander={allowExpansion} style={{ width: '5rem' }} />
                 </DataTable>
             </div>
-        );
-    }
-
-    const NaoPossuiProposta = () => {
-        return(
-            <>
-                <div className='py-6 px-2'>
-                    <h2 className='heading-1 px-6 text-gray-700 text-center'>Você não possui uma proposta de TCC ativa</h2>
-                </div>
-                <div className='flex justify-center pb-10'>
-                    <Link href="/submeter-proposta">
-                        <Button label="Submeter Proposta" icon='pi pi-plus' iconPos='right' className='w-full' severity="success"/>
-                    </Link>
-                </div>
-            </>
         );
     }
 
@@ -214,7 +209,7 @@ const MeusTccsPage = () => {
                         <div className='py-3 border-0 border-b border-dashed border-gray-200'>
                             <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
                         </div>
-                        <NaoPossuiProposta />
+                        <AbrirProposta />
                         <DataTableMeusTccs />
                     </div>
                     
@@ -223,7 +218,7 @@ const MeusTccsPage = () => {
                         <div className='py-3 border-0 border-b border-dashed border-gray-200'>
                             <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
                         </div>
-                        <NaoPossuiProposta />
+                        <AbrirProposta />
                     </div>
                 )
             )
@@ -241,7 +236,6 @@ const MeusTccsPage = () => {
         );
 
     }
-
 }
 
 MeusTccsPage.guards = [GUARDS.ESTUDANTE, GUARDS.PROFESSOR_INTERNO, GUARDS.PROFESSOR_EXTERNO, GUARDS.COORDENADOR];
