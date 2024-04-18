@@ -8,6 +8,7 @@ import { GUARDS } from 'meutcc/core/constants';
 import { set } from 'date-fns';
 import { Tag } from 'primereact/tag';
 
+import { useAuth } from "meutcc/core/context/AuthContext";
 
 import React from 'react';
 import TccService from 'meutcc/services/TccService';
@@ -15,7 +16,11 @@ import Link from 'next/link';
 import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
 import getClassForStatus from 'meutcc/core/utils/corStatus';
 
+
+
 const MeusTccsPage = () => {
+
+    const { user } = useAuth();
 
     const [loading, setLoading] = React.useState(false);
     const [possuiProposta, setPossuiProposta] = React.useState(false);
@@ -48,18 +53,46 @@ const MeusTccsPage = () => {
         });
     };
 
-    const fetchTccs = async () => {
-        try {
-            const data = await TccService.getTccs();
-            setTccs(data);
+    const statusPriority = {
+        'PROPOSTA_ANALISE_PROFESSOR': 11,
+        'PROPOSTA_ANALISE_COORDENADOR': 10,
+        'DESENVOLVIMENTO': 9,
+        'PREVIA': 8,
+        'FINAL': 7,
+        'AJUSTE': 6,
+        'PROPOSTA_RECUSADA_PROFESSOR': 5,
+        'PROPOSTA_RECUSADA_COORDENADOR': 4,
+        'REPROVADO_PREVIA': 3,
+        'REPROVADO_FINAL': 2,
+        'APROVADO': 1
+    };
 
+    const fetchTccs = async () => {
+
+        setLoading(true);
+        let data;
+        try {
+            if (user.resourcetype == 'ProfessorExterno' || user.resourcetype == 'ProfessorInterno') {
+                data = await TccService.getTccsByOrientador();
+            }else if(user.resourcetype == 'Estudante') {
+                data = await TccService.getTccsByAluno();
+            }else if(user.resourcetype == 'Coordenador'){
+                data = await TccService.getTccsCoordenacao();
+                if (data) {
+                    data.sort((a, b) => statusPriority[a.status] - statusPriority[b.status]);
+                }
+            }
+            setTccs(data);
+            setLoading(false);
         } catch (error) {
             console.error('Erro ao buscar os TCCs', error);
         }
     };
 
     React.useEffect(() => {
-        fetchJaPossuiProposta();
+        if(user.resourcetype == 'Estudante'){
+            fetchJaPossuiProposta();
+        }
         fetchTccs();
         initFilters();
     }, []);
@@ -79,19 +112,7 @@ const MeusTccsPage = () => {
                 <InputText value={tableSearchValue} onChange={onTableSearchChange} placeholder="Buscar tema" />
             </span>
         </div>
-
     </div>);
-
-    const actionBodyTemplate = (rowData) => {
-        if(expandedRows[rowData.id]){
-            return null;
-        }
-        return (
-            <div className="flex justify-center">
-                <Link label="Detalhes" href={`/detalhes-tcc/${rowData.id}`}> <Button label="Detalhes" icon='pi pi-external-link' iconPos='right' severity="success" /> </Link>
-            </div>
-        );
-    }
 
     const coorientadorTemplate = (rowData) => {
         return rowData.coorientador && rowData.coorientador.nome || 'Sem coorientador';
@@ -101,7 +122,10 @@ const MeusTccsPage = () => {
         return <Tag value={getClassForStatus(rowData?.status?.[rowData.status.length - 1]?.status).status} style={{ backgroundColor: getClassForStatus(rowData?.status?.[rowData.status.length - 1]?.status).cor}}></Tag>
     }
 
-    // Place holder para eventos de expansão de linhas
+    // Eventos de expansão de linhas
+
+    const allowExpansion = true;
+
     const onRowToggle = (e) => {
         setExpandedRows(e.data);
     }
@@ -114,17 +138,30 @@ const MeusTccsPage = () => {
         console.log('Row Collapsed', e.data);
     }
 
-    const allowExpansion = true;
-
     const rowExpansionTemplate = (data) => {
         return (
             <div>
                 <h4>Resumo:</h4>
                 <p>{data.resumo}</p>
-                <div className="flex justify-center">
+                <div className="flex justify-content-left">
                     <Link label="Detalhes" href={`/detalhes-tcc/${data.id}`}> <Button label="Detalhes" icon='pi pi-external-link' iconPos='right' severity="success" /> </Link>
                 </div>
             </div>
+        );
+    }
+
+    const AbrirProposta = () => {
+        return(
+            <>
+                <div className='py-6 px-2'>
+                    <h2 className='heading-1 px-6 text-gray-700 text-center'>Você não possui uma proposta de TCC ativa</h2>
+                </div>
+                <div className='flex justify-center pb-10'>
+                    <Link href="/submeter-proposta">
+                        <Button label="Submeter Proposta" icon='pi pi-plus' iconPos='right' className='w-full' severity="success"/>
+                    </Link>
+                </div>
+            </>
         );
     }
 
@@ -133,73 +170,71 @@ const MeusTccsPage = () => {
 
     const DataTableMeusTccs = () => {
         return (
-            /*<DataTable value={tccs} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }}>*/
-            <DataTable value={tccs} expandedRows={expandedRows} onRowToggle={(e) => setExpandedRows(e.data)}
-            onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} rowExpansionTemplate={rowExpansionTemplate}
-            dataKey="id" header={renderHeader} tableStyle={{ minWidth: '50rem' }} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5}
-            expandedRowIcon={customExpandedIcon} collapsedRowIcon={customCollapsedIcon}>   
-                <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
-                <Column field="orientador.nome" header="Orientador" style={{ width: '20%' }}></Column>
-                <Column body={coorientadorTemplate} header="Coorientador" style={{ width: '20%' }}></Column>
-                <Column body={statusBodyTemplate} header="Status" style={{ width: '10%' }}></Column>
-                <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
-                <Column expander={allowExpansion} style={{ width: '5rem' }} />
-            </DataTable>
-        )
-
+            <div className='py-6 px-2'>
+                {/*<DataTable value={tccs} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }}>*/}
+                <DataTable value={tccs} expandedRows={expandedRows} onRowToggle={(e) => setExpandedRows(e.data)}
+                onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} rowExpansionTemplate={rowExpansionTemplate}
+                dataKey="id" header={renderHeader} tableStyle={{ minWidth: '50rem' }} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5}
+                expandedRowIcon={customExpandedIcon} collapsedRowIcon={customCollapsedIcon}>   
+                    <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
+                    {(user.resourcetype === 'Coordenador' || user.resourcetype === 'ProfessorInterno' || user.resourcetype === 'ProfessorExterno') && 
+                        <Column field="autor.nome" header="Aluno" style={{ width: '20%' }}></Column>
+                    }
+                    <Column field="orientador.nome" header="Orientador" style={{ width: '20%' }}></Column>
+                    <Column body={coorientadorTemplate} header="Coorientador" style={{ width: '20%' }}></Column>
+                    <Column body={statusBodyTemplate} header="Status" style={{ width: '10%' }}></Column>
+                    {/*<Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>*/}
+                    <Column expander={allowExpansion} style={{ width: '5rem' }} />
+                </DataTable>
+            </div>
+        );
     }
 
    if(loading){
         return <LoadingSpinner />;
     }
 
-    if(possuiProposta){
-        return <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
+    if(user.resourcetype == 'Estudante'){
+        if(possuiProposta){
+            return <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
+                <div className='py-3 border-0 border-b border-dashed border-gray-200'>
+                    <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
+                </div>
+                    <DataTableMeusTccs />
+            </div>;
+        }else{
+            return(
+                tccs.length > 0 ? (
+                    <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
+                        <div className='py-3 border-0 border-b border-dashed border-gray-200'>
+                            <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
+                        </div>
+                        <AbrirProposta />
+                        <DataTableMeusTccs />
+                    </div>
+                    
+                ) : (
+                    <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
+                        <div className='py-3 border-0 border-b border-dashed border-gray-200'>
+                            <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
+                        </div>
+                        <AbrirProposta />
+                    </div>
+                )
+            )
+        }
+    }
+
+    if(user.resourcetype == 'ProfessorExterno' || user.resourcetype == 'ProfessorInterno' || user.resourcetype == 'Coordenador'){
+        return (
+            <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
             <div className='py-3 border-0 border-b border-dashed border-gray-200'>
                 <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
             </div>
-
-            <div className='py-6 px-2'>
                 <DataTableMeusTccs />
             </div>
-        </div>;
-        
-    }else{
-        return(
-            tccs.length > 0 ? (
-                <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
-                    <div className='py-3 border-0 border-b border-dashed border-gray-200'>
-                        <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
-                    </div>
-                    <div className='py-6 px-2'>
-                        <h2 className='heading-1 px-6 text-gray-700 text-center'>Você não possui uma proposta de TCC ativa</h2>
-                    </div>
-                    <div className='flex justify-center pb-10'>
-                        <Link href="/submeter-proposta">
-                            <Button label="Submeter Proposta" icon='pi pi-plus' iconPos='right' className='w-full' severity="success"/>
-                        </Link>
-                    </div>
-                    <div className='py-6 px-2'>
-                        <DataTableMeusTccs />
-                    </div>
-                </div>
-                
-            ) : (
-                <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
-                    <div className='py-3 border-0 border-b border-dashed border-gray-200'>
-                        <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
-                    </div>
-                    <div className='py-6 px-2'>
-                        <h2 className='heading-1 px-6 text-gray-700 text-center'>Você ainda não possui uma proposta de TCC ativa</h2>
-                    </div>
-                    <div className='flex justify-center pb-10'>
-                        <Link href="/submeter-proposta">
-                            <Button label="Submeter Proposta" icon='pi pi-plus' className='w-full' severity="success"/>
-                        </Link>
-                    </div>
-                </div>
-            )
-        )
+        );
+
     }
 }
 
