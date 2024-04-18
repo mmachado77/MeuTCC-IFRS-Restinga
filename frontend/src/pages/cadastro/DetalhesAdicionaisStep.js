@@ -103,7 +103,7 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
             <Toast ref={toast} />
             <div className='max-w-screen-md mx-auto bg-white m-3 mt-6 flex flex-col py-6 px-9'>
                 <div className='py-3 border-0 border-b border-dashed border-gray-200'>
-                    <Steps model={steps} activeIndex={activeIndex} onSelect={(e) => setActiveIndex(e.index)} readOnly={false} />
+                    <Steps model={steps} activeIndex={activeIndex} onSelect={(e) => setActiveIndex(e.index)} readOnly={true} />
                     <h1 className='heading-1 text-center text-gray-700'>Dados Adicionais</h1>
                 </div>
                 {IsInterno === false ? (
@@ -112,9 +112,9 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
                         <InputText className='w-full mb-2' value={userData.area} onChange={(e) => onFieldChange(e, 'area')} placeholder="Área de Atuação" />
                         <InputText className='w-full mb-2' value={userData.titulo} onChange={(e) => onFieldChange(e, 'titulo')} placeholder="Títulos" />
                         <label htmlFor='identidade' className='font-bold text-gray-700'> Documento de Identidade: </label>
-                        <FileUpload name="identidade" mode="basic" auto={false} accept="application/pdf,image/png,image/jpeg" maxFileSize={5000000} label="Upload Identidade" chooseLabel="Selecionar Identidade" onSelect={(e) => onFileSelect(e, setIdentidade)} className="p-button-sm p-button-outlined"style={{ marginBottom:'10px', marginTop: '5px', border: '1px solid #ccc', padding: '10px', borderRadius: '10px', justifyContent: 'space-between' }} />
+                        <FileUpload name="identidade" mode="basic" auto={false} accept="application/pdf,image/png,image/jpeg" maxFileSize={5000000} label="Upload Identidade" chooseLabel="Selecionar Identidade" onSelect={(e) => onFileSelect(e, setIdentidade)} className="w-full p-button-sm p-button-outlined"style={{ marginBottom:'10px', marginTop: '5px', border: '1px solid #ccc', padding: '10px', borderRadius: '10px', justifyContent: 'space-between' }} />
                         <label htmlFor='diploma' className='font-bold text-gray-700'> Diploma: </label>
-                        <FileUpload name="diploma" mode="basic" auto={false} accept="application/pdf,image/png,image/jpeg" maxFileSize={5000000} label="Upload Diploma" chooseLabel="Selecionar Diploma" onSelect={(e) => onFileSelect(e, setDiploma)} className="p-button-sm p-button-outlined"style={{ marginBottom:'10px', marginTop: '5px', border: '1px solid #ccc', padding: '10px', borderRadius: '10px', justifyContent: 'space-between' }} />                        
+                        <FileUpload name="diploma" mode="basic" auto={false} accept="application/pdf,image/png,image/jpeg" maxFileSize={5000000} label="Upload Diploma" chooseLabel="Selecionar Diploma" onSelect={(e) => onFileSelect(e, setDiploma)} className="w-full p-button-sm p-button-outlined"style={{ marginBottom:'10px', marginTop: '5px', border: '1px solid #ccc', padding: '10px', borderRadius: '10px', justifyContent: 'space-between' }} />                        
                         <Button className='w-full mb-2' label="Concluir Cadastro" onClick={validateAndSubmit} />
                     </>
                 ) : userData.isProfessor === false ? (
