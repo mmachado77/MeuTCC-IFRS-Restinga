@@ -54,17 +54,17 @@ const MeusTccsPage = () => {
     };
 
     const statusPriority = {
-        'PROPOSTA_ANALISE_PROFESSOR': 11,
-        'PROPOSTA_ANALISE_COORDENADOR': 10,
-        'DESENVOLVIMENTO': 9,
-        'PREVIA': 8,
-        'FINAL': 7,
+        'PROPOSTA_ANALISE_PROFESSOR': 1,
+        'PROPOSTA_ANALISE_COORDENADOR': 2,
+        'DESENVOLVIMENTO': 3,
+        'PREVIA': 4,
+        'FINAL': 5,
         'AJUSTE': 6,
-        'PROPOSTA_RECUSADA_PROFESSOR': 5,
-        'PROPOSTA_RECUSADA_COORDENADOR': 4,
-        'REPROVADO_PREVIA': 3,
-        'REPROVADO_FINAL': 2,
-        'APROVADO': 1
+        'PROPOSTA_RECUSADA_PROFESSOR': 7,
+        'PROPOSTA_RECUSADA_COORDENADOR': 8,
+        'REPROVADO_PREVIA': 9,
+        'REPROVADO_FINAL': 10,
+        'APROVADO': 11
     };
 
     const fetchTccs = async () => {
@@ -172,17 +172,19 @@ const MeusTccsPage = () => {
         return (
             <div className='py-6 px-2'>
                 {/*<DataTable value={tccs} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }}>*/}
-                <DataTable value={tccs} expandedRows={expandedRows} onRowToggle={(e) => setExpandedRows(e.data)}
+                <DataTable value={tccs} filters={filters} globalFilter={tableSearchValue} expandedRows={expandedRows} onRowToggle={(e) => setExpandedRows(e.data)}
                 onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} rowExpansionTemplate={rowExpansionTemplate}
-                dataKey="id" header={renderHeader} tableStyle={{ minWidth: '50rem' }} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5}
+                dataKey="id" header={renderHeader} tableStyle={{ minWidth: '50rem' }} emptyMessage="Nenhum tema encontrado" paginator rows={5}
                 expandedRowIcon={customExpandedIcon} collapsedRowIcon={customCollapsedIcon}>   
                     <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
+
                     {(user.resourcetype === 'Coordenador' || user.resourcetype === 'ProfessorInterno' || user.resourcetype === 'ProfessorExterno') && 
                         <Column field="autor.nome" header="Aluno" style={{ width: '20%' }}></Column>
                     }
+
                     <Column field="orientador.nome" header="Orientador" style={{ width: '20%' }}></Column>
                     <Column body={coorientadorTemplate} header="Coorientador" style={{ width: '20%' }}></Column>
-                    <Column body={statusBodyTemplate} header="Status" style={{ width: '10%' }}></Column>
+                    <Column body={statusBodyTemplate} header="Status" style={{ width: '10%' }} filter filterMatchMode='contains'></Column>
                     {/*<Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>*/}
                     <Column expander={allowExpansion} style={{ width: '5rem' }} />
                 </DataTable>
@@ -226,10 +228,22 @@ const MeusTccsPage = () => {
     }
 
     if(user.resourcetype == 'ProfessorExterno' || user.resourcetype == 'ProfessorInterno' || user.resourcetype == 'Coordenador'){
+        if(tccs.length == 0){
+            return (
+                <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
+                    <div className='py-3 border-0 border-b border-dashed border-gray-200'>
+                        <h1 className='heading-1 px-6 text-gray-700'>{user.resourcetype === 'Coordenador' ? 'TCCs' : 'Meus TCCs'}</h1>
+                    </div>
+                    <div className='py-6 px-2'>
+                        <h2 className='heading-1 px-6 text-gray-700 text-center'>Nenhum TCC encontrado</h2>
+                    </div>
+                </div>
+            );
+        }
         return (
             <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
             <div className='py-3 border-0 border-b border-dashed border-gray-200'>
-                <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
+                <h1 className='heading-1 px-6 text-gray-700'>{user.resourcetype === 'Coordenador' ? 'TCCs' : 'Meus TCCs'}</h1>
             </div>
                 <DataTableMeusTccs />
             </div>
