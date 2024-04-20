@@ -5,8 +5,6 @@ from . import ProfessorInterno
 
 class Configuracoes(BaseModel):
     
-    dataAberturaPrazoPropostas = models.DateField(auto_now_add=True)
-    dataFechamentoPrazoPropostas = models.DateField(auto_now_add=False)
     coordenadorAtual = models.ForeignKey(ProfessorInterno, on_delete=models.PROTECT)
 
     class Meta:

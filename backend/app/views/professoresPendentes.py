@@ -5,6 +5,12 @@ from app.models import Professor, ProfessorInterno, StatusCadastro, Configuracoe
 from app.serializers import UsuarioPolymorphicSerializer
 from rest_framework.permissions import IsAuthenticated
 
+class GetCoordenador(APIView):
+
+    def get(self, request, format=None):
+        coordenador = Configuracoes.objects.first().coordenadorAtual
+        return Response({'coordenador': coordenador.nome})
+
 class ProfessoresPendentesListAPIView(APIView):
     permission_classes = [IsAuthenticated]
     

@@ -25,6 +25,8 @@ py manage.py makemigrations
 py manage.py migrate
 ```
 
+Duplique o arquivo .env.example, criando um novo arquivo .env, configurando as variaveis de ambiente do projeto.
+
 Na primeira vez que estiver rodando, execute o script inicial para popular as tabelas.
 ```sh
 py manage.py shell < script_inicial.py

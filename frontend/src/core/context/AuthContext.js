@@ -14,7 +14,7 @@ export const useAuth = () => {
     return context;
 }
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children, guards }) => {
     const [user, setUser] = React.useState(null);
     const [loading, setLoading] = React.useState(true);
 
@@ -24,6 +24,10 @@ export const AuthProvider = ({ children }) => {
         const fetchUsuario = async () => {
             const accessToken = localStorage.getItem('token');
 
+            if (guards && guards.length > 0 && !accessToken) {
+                router.push('/auth');
+            }
+
             if (!accessToken) {
                 setLoading(false);
                 return;
@@ -31,21 +35,36 @@ export const AuthProvider = ({ children }) => {
 
             try {
                 const data = await AuthService.detalhesUsuario();
+
+                if('cadastroIncompleto' in data) {
+                    setLoading(false);
+                    if(router.pathname !== '/cadastro') {
+                        router.push('/cadastro')
+                    }
+                    return;
+                }
                 setUser(data);
+
+                if (guards && guards.length > 0 && !guards.includes(data.resourcetype)) {
+                    router.push('/acesso-proibido');
+                    return;
+                }
+
             } catch (error) {
                 setUser(null);
                 localStorage.removeItem('token');
-                if (router.pathname !== '/auth') {
+                if (guards && guards.length > 0 && router.pathname !== '/auth') {
                     router.push('/auth');
                 }
                 console.error(error);
-            } finally {
-                setLoading(false);
             }
+            
+            setLoading(false);
 
         }
-
+        
         fetchUsuario();
+        
     }, []);
 
     const value = {

@@ -15,8 +15,6 @@ class Tcc(BaseModel):
     autorizacaoPublicacao = models.FileField(upload_to='tcc/autorizacaoPublicacao', null=True, blank=True)
     #TODO - mudar caminho dos arquivos
     dataInicio = models.DateTimeField(default=datetime.now, null=True, blank=True)
-    prazoEntregaPrevia = models.DateTimeField(default=datetime.now, null=True, blank=True)
-    prazoEntregaFinal = models.DateTimeField(default=datetime.now, null=True, blank=True)
 
     class Meta:
         abstract = False

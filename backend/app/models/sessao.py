@@ -1,5 +1,6 @@
 from django.db import models
 from polymorphic.models import PolymorphicModel
+from datetime import datetime
 from . import Tcc
 
 class Sessao(PolymorphicModel):
@@ -11,6 +12,8 @@ class Sessao(PolymorphicModel):
     data_inicio = models.DateTimeField()
     data_termino = models.DateTimeField()
     tcc = models.ForeignKey(Tcc, on_delete=models.PROTECT)
+    documentoTCCSessao = models.FileField(upload_to='sessao/documento', null=True, blank=True)
+    prazoEntregaDocumento = models.DateTimeField(default=datetime.now, null=True, blank=True)
 
     @property
     def get_tipo(self):

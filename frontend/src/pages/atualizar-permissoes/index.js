@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import TabelaProfessores from './listaProfessoresPendentes'
+import { GUARDS } from 'meutcc/core/constants';
 
 const AtualizarPermissoesPage = () => {
 
@@ -25,5 +26,7 @@ const AtualizarPermissoesPage = () => {
     );
 };
 
-AtualizarPermissoesPage.showMenu = true;
+AtualizarPermissoesPage.guards = [GUARDS.COORDENADOR];
+AtualizarPermissoesPage.title = 'Atualizar Permissões';
+
 export default AtualizarPermissoesPage;

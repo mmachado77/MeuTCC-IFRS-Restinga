@@ -80,4 +80,6 @@ const SugestoesTemasTccPage = () => {
 
 }
 
+SugestoesTemasTccPage.title = 'Sugestões de Temas para TCC';
+
 export default SugestoesTemasTccPage;

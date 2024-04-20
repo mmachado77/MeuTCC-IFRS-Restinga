@@ -8,7 +8,9 @@ import TccService from 'meutcc/services/TccService';
 import ProfessorService from 'meutcc/services/ProfessorService';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
-import { Guards } from 'meutcc/core/constants';
+import { GUARDS } from 'meutcc/core/constants';
+import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
+import { set } from 'date-fns';
 
 const SubmeterPropostaPage = () => {
 
@@ -24,20 +26,32 @@ const SubmeterPropostaPage = () => {
     const [orientadorMensagemErro, setOrientadorMensagemErro] = React.useState('');
     const [coorientadorMensagemErro, setCoorientadorMensagemErro] = React.useState('');
 
+    const router = useRouter();
+    
     React.useEffect(() => {
-        const fetchTcc = async () => {
+        const fetchJaPossuiProposta = async () => {
+            
+            setLoading(true);
             try {
-                const data = await TccService.propostaSubmetida();
-                if (data) {
-                    router.push('/proposta-submetida');
+                const data = await TccService.getPossuiTcc();
+                console.log(data.value);
+
+                if (data.possuiProposta == true) {
+                    router.push('/meus-tccs');
+                }else{
+                    setLoading(false);
                 }
             } catch (error) {
-                console.error('Erro ao buscar proposta de TCC', error);
+                console.error('Erro ao buscar propostas existentes', error);
+                setLoading(false);
             }
         }
-        fetchTcc();
+
+        fetchJaPossuiProposta();
 
         const fetchProfessores = async () => {
+
+            setLoading(true);
             try {
                 const data = await ProfessorService.getProfessores();
                 const professores = data.map((professor) => ({ name: professor.nome, value: professor.id }));
@@ -51,8 +65,12 @@ const SubmeterPropostaPage = () => {
         };
 
         fetchProfessores();
-    }, []);
 
+    }, []);   
+
+    if(loading){
+        return <LoadingSpinner />;
+    }
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -103,6 +121,12 @@ const SubmeterPropostaPage = () => {
             return;
         }
 
+        if (selectedOrientador === selectedCoorientador) {
+            setCoorientadorMensagemErro('O orientador e coorientador não podem ser a mesma pessoa');
+            setLoading(false);
+            return;
+        }
+
         const response = await TccService.submeterProposta(jsonData);
 
         if (response) {
@@ -112,7 +136,13 @@ const SubmeterPropostaPage = () => {
         }
 
         setLoading(false);
+        router.push('/meus-tccs');
 
+    }
+
+    const handleTemCoorientadorChange = (e) => {
+        setTemCoorientador(!temCoorientador);
+        setSelectedCoorientador(null);
     }
 
     return <div className='max-w-screen-md mx-auto bg-white m-3 mt-6 flex flex-col'>
@@ -142,7 +172,7 @@ const SubmeterPropostaPage = () => {
                             <Dropdown value={selectedCoorientador} name='coorientador' disabled={!temCoorientador} onChange={(e) => setSelectedCoorientador(e.value)} options={coorientadores} optionLabel="name" placeholder="Selecione o coorientador" className={"w-full md:w-14rem" + (coorientadorMensagemErro ? 'p-invalid' : '')} />
                             { coorientadorMensagemErro && <small id='tema-help' className='text-red-500 py-1 px-2'>{coorientadorMensagemErro}</small> }
                             <div className="flex align-items-center py-3">
-                                <Checkbox inputId="temCoorientador" onChange={(e) => setTemCoorientador(!temCoorientador)} checked={temCoorientador} />
+                                <Checkbox inputId="temCoorientador" onChange={handleTemCoorientadorChange} checked={temCoorientador} />
                                 <label htmlFor="temCoorientador" className="ml-2">Tem coorientador</label>
                             </div>
                         </div>
@@ -150,7 +180,7 @@ const SubmeterPropostaPage = () => {
 
 
                     <div className="flex flex-wrap align-items-center mb-3 gap-1 pt-2">
-                        <Checkbox inputId="afirmoQueConversei" onChange={(e) => setAfirmoQueConversei(!afirmoQueConversei)} checked={afirmoQueConversei} />
+                        <Checkbox inputId="afirmoQueConversei" name='afirmoQueConversei' onChange={(e) => setAfirmoQueConversei(!afirmoQueConversei)} checked={afirmoQueConversei} />
                         <label htmlFor="afirmoQueConversei" className="ml-2">Afirmo que conversei presencialmente com o professor sobre minha proposta de TCC</label>
                     </div>
 
@@ -163,6 +193,7 @@ const SubmeterPropostaPage = () => {
 
 }
 
-SubmeterPropostaPage.guards = [Guards.Auth, Guards.Estudante];
+SubmeterPropostaPage.guards = [GUARDS.ESTUDANTE];
+SubmeterPropostaPage.title = 'Submeter Proposta de TCC';
 
 export default SubmeterPropostaPage;

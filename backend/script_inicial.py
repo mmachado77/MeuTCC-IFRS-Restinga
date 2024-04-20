@@ -2,10 +2,11 @@
 # >>> exec(open('script_inicial.py').read())
 
 from django.contrib.auth.models import User
-from app.models import TccStatus, Tcc, Semestre, Configuracoes, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno
+from app.models import TccStatus, Tcc, Semestre, Configuracoes, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno, Convite, SemestreCoordenador
 from datetime import datetime
+
 # Criando usuário admin
-user = User.objects.create_superuser("admin@admin.com", "admin@admin.com", "12345678911")
+superuser = User.objects.create_superuser("admin", "admin@admin.com", "123")
 
 # Cria Status André
 status = StatusCadastro.objects.create(
@@ -64,8 +65,6 @@ adastolfo = ProfessorInterno.objects.create(nome="Adastolfo",
 
 # Adiciona professor como atual coordenador
 configMaster = Configuracoes.objects.create(
-        dataAberturaPrazoPropostas=datetime.today(),
-        dataFechamentoPrazoPropostas=datetime.today(),
         coordenadorAtual=andre)
 
 # Cria usuario estudante
@@ -102,32 +101,57 @@ ProfExterno = ProfessorExterno.objects.create(
                         user = ProfExterno2User
                         )
 
-semestre = Semestre.objects.create(
+semestre1 = Semestre.objects.create(
         periodo='2024/1',
-        dataAberturaSemestre=datetime.today(),
-        dataFechamentoSemestre=datetime.today(),
+        dataAberturaSemestre='2024-01-01',
+        dataFechamentoSemestre='2024-06-30',
+        dataAberturaPrazoPropostas='2024-03-20',
+        dataFechamentoPrazoPropostas='2024-04-15',
         configuracoes=configMaster,
-        coordenador=andre
     )
 
+semestre2 = Semestre.objects.create(
+        periodo='2023/2',
+        dataAberturaSemestre='2023-07-01',
+        dataFechamentoSemestre='2023-12-31',
+        dataAberturaPrazoPropostas='2023-07-15',
+        dataFechamentoPrazoPropostas='2023-08-22',
+        configuracoes=configMaster,
+    )
+
+coordSemestre = SemestreCoordenador.objects.create(
+    coordenador=andre,
+    semestre = semestre1
+)
 
 tcc = Tcc.objects.create(
         autor= estudante,
         orientador= cleitin,
-        semestre= semestre,
+        semestre= semestre1,
+        tema='Pesquisa sobre o porquê o Tiririca é tão bom deputado',
+        resumo='Este trabalho apresenta uma pesquisa sobre o porquê o Tiririca é tão bom deputado.'
+    )
+
+tcc2 = Tcc.objects.create(
+        autor= estudante,
+        orientador= cleitin,
+        semestre= semestre2,
         tema='Desenvolvimento de um Sistema de Gerenciamento de Tarefas',
         resumo='Este trabalho apresenta o desenvolvimento de um sistema web para gerenciamento de tarefas, utilizando Django como framework.'
     )
 
 tcc_status = TccStatus.objects.create(
-                        status= "PROPOSTA_ANALISE_ORIENTADOR",
+                        status= "REPROVADO_PREVIA",
                         dataStatus= datetime.today(),
                         tcc= tcc                                
 
 )
 
+tcc_status = TccStatus.objects.create(
+                        status= "PROPOSTA_ANALISE_PROFESSOR",
+                        dataStatus= datetime.today(),
+                        tcc= tcc2                                
 
-
-
+)
 
 print("Usuários criados com sucesso!")

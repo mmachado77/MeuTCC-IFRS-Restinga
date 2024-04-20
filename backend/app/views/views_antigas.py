@@ -28,20 +28,20 @@ class GetProfessoresInternos(generics.ListCreateAPIView):
         serializer = UsuarioPolymorphicSerializer(usuario, many=True)
         return Response(serializer.data)
 
-class CriarUsuarioView(APIView):
-    def post(self, request, format=None):
-        serializer = EstudanteSerializer(data=request.data)
-        if serializer.is_valid():
-            # Cria um usuário com base nos dados recebidos
-            usuario_data = serializer.validated_data
-            username = usuario_data['email']
-            password = usuario_data['cpf']
-            user = User.objects.create_user(username=username, password=password)
+# class CriarUsuarioView(APIView):
+#     def post(self, request, format=None):
+#         serializer = EstudanteSerializer(data=request.data)
+#         if serializer.is_valid():
+#             # Cria um usuário com base nos dados recebidos
+#             usuario_data = serializer.validated_data
+#             username = usuario_data['email']
+#             password = usuario_data['cpf']
+#             user = User.objects.create_user(username=username, password=password)
 
-            # Cria o perfil do usuário
-            usuario = Estudante.objects.create(user=user, **usuario_data)
-            return Response({'id': usuario.id}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#             # Cria o perfil do usuário
+#             usuario = Estudante.objects.create(user=user, **usuario_data)
+#             return Response({'id': usuario.id}, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class ObterTokenView(APIView):
     def post(self, request, format=None):
@@ -90,21 +90,3 @@ class AtualizarDatasPropostasView(APIView):
         except Exception as e:
             print(e)
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-
-    
-class PropostaSubmetidaView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, format=None):
-        estudante = Estudante.objects.get(user=request.user)
-        proposta = Tcc.objects.get(autor=estudante)
-     
-        #data = {
-        #    'titulo': proposta.titulo,
-        #    'autor': proposta.autor.nome,
-        #    'orientador': proposta.orientador.nome,
-        #    'data_submissao': proposta.dataSubmissao,
-        #    'status': proposta.status,
-        #}
-  
-       # return Response(data)

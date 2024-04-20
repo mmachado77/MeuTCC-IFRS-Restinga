@@ -1,11 +1,12 @@
 from rest_framework import serializers
 from rest_polymorphic.serializers import PolymorphicSerializer
-from ..serializers import BancaSerializer, AvaliacaoSerializer
+from ..serializers import BancaSerializer, AvaliacaoSerializer, FileDetailSerializer
 from ..models import SessaoPrevia, SessaoFinal, Sessao, Banca
 
 class SessaoSerializer(serializers.ModelSerializer):
     banca = serializers.SerializerMethodField(method_name='get_banca')
     tipo = serializers.CharField(source='get_tipo')
+    documentoTCCSessao = FileDetailSerializer()
 
     class Meta:
         model = Sessao

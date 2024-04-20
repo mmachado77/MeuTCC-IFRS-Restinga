@@ -4,7 +4,7 @@ import { Button } from "primereact/button";
 import toast from "react-hot-toast";
 import TccService from "meutcc/services/TccService";
 
-export default function formularioJustificativa({onSetVisibility, onPosAvaliacao, convite}) {
+export default function formularioJustificativa({onSetVisibility, onPosAvaliacao, tcc}) {
     const [mensagemJustificativa, setMensagemJustificativa] = useState('');
     
     const [mensagemErro, setMensagemErro] = useState('');
@@ -19,7 +19,8 @@ export default function formularioJustificativa({onSetVisibility, onPosAvaliacao
     }
 
     const recusarConvite = async () => {
-        const data = await toast.promise(TccService.recusarConvite(convite.id, {
+        const data = await toast.promise(TccService.responderProposta(tcc.id, {
+            aprovar: false,
             justificativa: mensagemJustificativa
         }), {
             loading: 'Recusando convite de proposta de tcc...',

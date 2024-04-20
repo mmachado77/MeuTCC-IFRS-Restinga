@@ -33,6 +33,8 @@ export default function listaProfessores() {
 
     const [exibeFormulario, setExibeFormulario] = useState(false);
 
+    const baseURL = 'http://localhost:8000';
+
     const fetchProfessors = async () => {
         try {
             const professoresPendentes = await ProfessorService.getProfessoresPendentes();
@@ -74,7 +76,7 @@ export default function listaProfessores() {
 
     const actionBodyTemplate = (rowData) => {
         return (
-                <Button label="Detalhes" icon='pi pi-search-plus' severity="secondary" onClick={() => detalhesProfessor(rowData)} />
+                <Button label="Analisar" icon='pi pi-search-plus' severity="success" outlined onClick={() => detalhesProfessor(rowData)} />
         );
     };
 
@@ -124,13 +126,21 @@ export default function listaProfessores() {
                 {professor.resourcetype === 'ProfessorExterno' && (
                     <>
                         <div style={{ marginBottom: '1rem' }}>
-                            <label htmlFor="identidade" className="font-bold">Identidade: </label>
-                            <span>{professor.identidade || 'Não disponível'}</span>
-                        </div>
-                        <div style={{ marginBottom: '1rem' }}>
-                            <label htmlFor="diploma" className="font-bold">Diploma: </label>
-                            <span>{professor.diploma || 'Não disponível'}</span>
-                        </div>
+                        <label htmlFor="identidade" className="font-bold">Identidade: </label>
+                        {professor.identidade ? (
+                            <a href={`${baseURL}${professor.identidade}`} target="_blank" rel="noopener noreferrer">{professor.identidade.split('/').pop()}</a>
+                        ) : (
+                            <span>Não disponível</span>
+                        )}
+                    </div>
+                    <div style={{ marginBottom: '1rem' }}>
+                        <label htmlFor="diploma" className="font-bold">Diploma: </label>
+                        {professor.diploma ? (
+                            <a href={`${baseURL}${professor.diploma}`} target="_blank" rel="noopener noreferrer">{professor.diploma.split('/').pop()}</a>
+                        ) : (
+                            <span>Não disponível</span>
+                        )}
+                    </div>
                     </>
                 )}
                 <div className='border-0 border-t border-dashed border-gray-200 pt-4'>

@@ -8,6 +8,7 @@ import { Dialog } from 'primereact/dialog';
 import { format } from 'date-fns';
 import FormularioJustificativa from './formularioJustificativa'
 import TccService from 'meutcc/services/TccService';
+import { STATUS_TCC } from 'meutcc/core/constants';
 
 export default function listaTccsPendentes() {
     let emptyTcc = {
@@ -18,19 +19,19 @@ export default function listaTccsPendentes() {
         dataSubmissaoProposta: '',
     };
 
-    const [convits, setConvits] = useState(null);
-    const [ConviteDialog, setConviteDialog] = useState(false);
-    const [convite, setConvite] = useState(emptyTcc);
-    const [selectedConvite, setSelectedConvite] = useState(null);
+    const [tccs, setTccs] = useState(null);
+    const [TccDialog, setTccDialog] = useState(false);
+    const [tcc, setTcc] = useState(emptyTcc);
+    const [selectedTcc, setSelectedTcc] = useState(null);
     const toastJanela = useRef(null);
 
     const [exibeFormulario, setExibeFormulario] = useState(false);
 
-    const fetchConvits = async () => {
+    const fetchTccsPendentes = async () => {
         try {
-            const convitesPendentes = await TccService.getConvitesPendentes();
+            const tccsPendentes = await TccService.getListarTccsPendente();
             
-            setConvits(convitesPendentes);
+            setTccs(tccsPendentes);
         } catch (error) {
             console.error('Erro ao obter convites pendentes:', error);
             // Exiba uma mensagem de erro se necessário
@@ -38,36 +39,36 @@ export default function listaTccsPendentes() {
     }
 
     const atualizaConvitesPosAvaliacao = async () => {
-        fetchConvits()
+        fetchTccsPendentes()
         hideDialog()
     }
 
     const aceitarConvite = async () => {
-        const data = await toast.promise(TccService.aceitarConvite(convite.id), {
-            loading: 'Aprovando convite de proposta tcc...',
-            success: 'convite de proposta tcc aprovado com sucesso!',
-            error: 'Erro ao aprovar convite de proposta tcc.',
+        const data = await toast.promise(TccService.responderProposta(tcc.id, { aprovar: true }), {
+            loading: 'Aprovando tcc de proposta tcc...',
+            success: 'tcc de proposta tcc aprovado com sucesso!',
+            error: 'Erro ao aprovar tcc de proposta tcc.',
         });
         atualizaConvitesPosAvaliacao()
     };
     
 
     useEffect(() => {       
-        fetchConvits();
+        fetchTccsPendentes();
     }, []); // Adicionando [] como dependência para garantir que o useEffect seja executado apenas uma vez
 
     const hideDialog = () => {
-        setConviteDialog(false);
+        setTccDialog(false);
     };
 
-    const detalhesConvite = (convite) => {
-        setConvite({ ...convite });
-        setConviteDialog(true);
+    const detalhesConvite = (tcc) => {
+        setTcc({ ...tcc });
+        setTccDialog(true);
     };
 
     const actionBodyTemplate = (rowData) => {
         return (
-                <Button label="Detalhes" icon='pi pi-search-plus' severity="secondary" onClick={() => detalhesConvite(rowData)} />
+                <Button label="Analisar" icon='pi pi-book' severity="success" outlined onClick={() => detalhesConvite(rowData)} />
         );
     };
 
@@ -75,34 +76,40 @@ export default function listaTccsPendentes() {
         return format(rowDate.dataSubmissaoProposta, 'dd/MM/yyyy')
     }
 
+    const coorientadorTemplate = (data) => {
+        return data.coorientador && data.coorientador.nome || 'Sem coorientador';
+    }
+
     return (
         <div>
             <Toast ref={toastJanela} />
             <div className="card">
-                <DataTable value={convits} selection={selectedConvite} onSelectionChange={(e) => setSelectedConvite(e.value)} dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]} currentPageReportTemplate="Showing {first} to {last} of {totalRecords} convits">
-                    <Column field="tema" header="Tema" sortable></Column>
-                    <Column field="autor.nome" header="Autor" sortable></Column>
-                    <Column body={dataSubmissaoBodyTemplate} field="dataSubmissaoProposta" header="Data de Submissão" sortable style={{ width: '12rem' }}></Column>
-                    <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
+                <DataTable value={tccs} selection={selectedTcc} onSelectionChange={(e) => setSelectedTcc(e.value)} dataKey="id" paginator rows={5} currentPageReportTemplate="Showing {first} to {last} of {totalRecords} tccs">
+                    <Column field="tema" header="Tema" sortable style={{ width: '40%' }}></Column>
+                    <Column field="autor.nome" header="Autor" sortable style={{ width: '25%' }}></Column>
+                    <Column field="orientador.nome" header="Orientador" sortable style={{ width: '25%' }}></Column>
+                    <Column body={coorientadorTemplate} header="Coorientador" sortable style={{ width: '25%' }}></Column>
+                    <Column body={dataSubmissaoBodyTemplate} field="dataSubmissaoProposta" header="Data de Submissão" sortable style={{ width: '25%' }}></Column>
+                    <Column body={actionBodyTemplate} align='center' header="Ações" exportable={false} style={{ width: '10%' }}></Column>
                 </DataTable>
             </div>
 
-            <Dialog visible={ConviteDialog} style={{ width: '32rem' }} header="Detalhes do TCC" modal className="p-fluid" onHide={hideDialog}>
+            <Dialog visible={TccDialog} style={{ width: '32rem' }} header="Analisar" modal className="p-fluid" onHide={hideDialog}>
                 <div style={{ marginBottom: '1rem' }}>
                     <label htmlFor="tema" className="font-bold">Tema: </label>
-                    <span>{convite.tema}</span>
+                    <span>{tcc.tema}</span>
                 </div>
                 <div style={{ marginBottom: '1rem' }}>
                     <label htmlFor="autor.nome" className="font-bold">Autor: </label>
-                    <span>{convite.autor.nome}</span>
+                    <span>{tcc.autor.nome}</span>
                 </div>
                 <div style={{ marginBottom: '1rem' }}>
                     <label htmlFor="resumo" className="font-bold">Resumo: </label>
-                    <span>{convite.resumo}</span>
+                    <span>{tcc.resumo}</span>
                 </div>
                 <div style={{ marginBottom: '1rem' }}>
                     <label htmlFor="dataSubmissao" className="font-bold">Data de Submissão da Proposta: </label>
-                    <span>{convite.dataSubmissaoProposta && format(convite.dataSubmissaoProposta, 'dd/MM/yyyy')}</span>
+                    <span>{tcc.dataSubmissaoProposta && format(tcc.dataSubmissaoProposta, 'dd/MM/yyyy')}</span>
                 </div>
                 <div className='border-0 border-t border-dashed border-gray-200 pt-4'>
                     <div className={'flex justify-around ' + (exibeFormulario ? 'hidden': '')}>
@@ -114,7 +121,7 @@ export default function listaTccsPendentes() {
                         </div>
                     </div>
                     <div className={(!exibeFormulario ? 'hidden': '')} >
-                        <FormularioJustificativa onSetVisibility={setExibeFormulario} onPosAvaliacao={atualizaConvitesPosAvaliacao} convite={convite}/>
+                        <FormularioJustificativa onSetVisibility={setExibeFormulario} onPosAvaliacao={atualizaConvitesPosAvaliacao} tcc={tcc}/>
                     </div>
                 </div>
             </Dialog>
