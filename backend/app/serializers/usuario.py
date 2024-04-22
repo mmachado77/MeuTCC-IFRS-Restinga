@@ -97,6 +97,7 @@ class CriarUsuarioSerializer(serializers.Serializer):
     nome = serializers.CharField()
     cpf = serializers.CharField(validators=[validate_cpf])
     email = serializers.EmailField(validators=[validate_unique_email])
+    avatar = serializers.CharField(required=True)
     isProfessor = serializers.BooleanField()
     IsInterno = serializers.BooleanField(required=False, default=False)
     matricula = serializers.CharField(required=False, allow_blank=True)

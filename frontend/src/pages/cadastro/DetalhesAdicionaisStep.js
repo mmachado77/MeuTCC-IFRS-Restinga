@@ -24,7 +24,7 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
         }
     };
 
-    
+
 
     const validateAndSubmit = () => {
         let error = false;
@@ -53,7 +53,7 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
             toast.current.show({ severity: 'error', summary: 'Erro', detail: 'Matrícula deve ser preenchida para estudantes.', life: 3000 });
             error = true;
         }
-        
+
         if (!error) {
             const formData = new FormData();
             formData.append('nome', userData.nome);
@@ -62,14 +62,12 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
             formData.append('grau', userData.grau);
             formData.append('area', userData.area);
             formData.append('titulo', userData.titulo);
+            formData.append('avatar', userData.avatar);
             if (userData.matricula) formData.append('matricula', userData.matricula);
             if (userData.grau) formData.append('grau', userData.grau);
             if (userData.area) formData.append('area', userData.area);
             if (userData.titulo) formData.append('titulo', userData.titulo);
-            
 
-
-            
             // Certifique-se de que 'identidade' e 'diploma' são realmente arquivos
             if (identidade) {
                 formData.append('identidade', identidade, identidade.name);
@@ -77,7 +75,7 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
             if (diploma) {
                 formData.append('diploma', diploma, diploma.name);
             }
-    
+
             UsuarioService.criarUsuario(formData)
                 .then(response => {
                     console.log('Usuário criado com sucesso:', response);
@@ -88,16 +86,16 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
                 });
         }
     };
-    
-    
+
+
 
 
     const steps = [
         { label: 'Dados Pessoais' },
         { label: 'Escolha o Tipo' },
         { label: 'Detalhes Adicionais' }
-    ];    
-    
+    ];
+
     return (
         <div className='py-6 px-9'>
             <Toast ref={toast} />
@@ -112,9 +110,9 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
                         <InputText className='w-full mb-2' value={userData.area} onChange={(e) => onFieldChange(e, 'area')} placeholder="Área de Atuação" />
                         <InputText className='w-full mb-2' value={userData.titulo} onChange={(e) => onFieldChange(e, 'titulo')} placeholder="Títulos" />
                         <label htmlFor='identidade' className='font-bold text-gray-700'> Documento de Identidade: </label>
-                        <FileUpload name="identidade" mode="basic" auto={false} accept="application/pdf,image/png,image/jpeg" maxFileSize={5000000} label="Upload Identidade" chooseLabel="Selecionar Identidade" onSelect={(e) => onFileSelect(e, setIdentidade)} className="w-full p-button-sm p-button-outlined"style={{ marginBottom:'10px', marginTop: '5px', border: '1px solid #ccc', padding: '10px', borderRadius: '10px', justifyContent: 'space-between' }} />
+                        <FileUpload name="identidade" mode="basic" auto={false} accept="application/pdf,image/png,image/jpeg" maxFileSize={5000000} label="Upload Identidade" chooseLabel="Selecionar Identidade" onSelect={(e) => onFileSelect(e, setIdentidade)} className="w-full p-button-sm p-button-outlined" style={{ marginBottom: '10px', marginTop: '5px', border: '1px solid #ccc', padding: '10px', borderRadius: '10px', justifyContent: 'space-between' }} />
                         <label htmlFor='diploma' className='font-bold text-gray-700'> Diploma: </label>
-                        <FileUpload name="diploma" mode="basic" auto={false} accept="application/pdf,image/png,image/jpeg" maxFileSize={5000000} label="Upload Diploma" chooseLabel="Selecionar Diploma" onSelect={(e) => onFileSelect(e, setDiploma)} className="w-full p-button-sm p-button-outlined"style={{ marginBottom:'10px', marginTop: '5px', border: '1px solid #ccc', padding: '10px', borderRadius: '10px', justifyContent: 'space-between' }} />                        
+                        <FileUpload name="diploma" mode="basic" auto={false} accept="application/pdf,image/png,image/jpeg" maxFileSize={5000000} label="Upload Diploma" chooseLabel="Selecionar Diploma" onSelect={(e) => onFileSelect(e, setDiploma)} className="w-full p-button-sm p-button-outlined" style={{ marginBottom: '10px', marginTop: '5px', border: '1px solid #ccc', padding: '10px', borderRadius: '10px', justifyContent: 'space-between' }} />
                         <Button className='w-full mb-2' label="Concluir Cadastro" onClick={validateAndSubmit} />
                     </>
                 ) : userData.isProfessor === false ? (
@@ -134,7 +132,7 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
             </div>
         </div>
     );
-    
+
 };
 
 
