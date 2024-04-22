@@ -1,15 +1,9 @@
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from app.models import Professor, ProfessorInterno, StatusCadastro, Configuracoes
+from app.models import Professor, ProfessorInterno, StatusCadastro
 from app.serializers import UsuarioPolymorphicSerializer
 from rest_framework.permissions import IsAuthenticated
-
-class GetCoordenador(APIView):
-
-    def get(self, request, format=None):
-        coordenador = Configuracoes.objects.first().coordenadorAtual
-        return Response({'coordenador': coordenador.nome})
 
 class ProfessoresPendentesListAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -33,21 +27,6 @@ class AprovarProfessorAPIView(APIView):
             return Response({'error': 'Professor não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
         except StatusCadastro.DoesNotExist:
             return Response({'error': 'Status de cadastro não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
-
-class AlterarCoordenador(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def put(self, request, format=None):
-        try:
-            idProfessor = request.data.get('coordenador')
-            configuracoes = Configuracoes.objects.first()  
-            professor = ProfessorInterno.objects.get(id=idProfessor)
-            configuracoes.coordenadorAtual = professor
-            configuracoes.save()
-            return Response({'message': 'Coordenador atualizado com sucesso!'}, status=status.HTTP_200_OK)
-        except ProfessorInterno.DoesNotExist:
-            return Response({'error': 'Professor não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
-
 
 class RecusarProfessorAPIView(APIView):
     permission_classes = [IsAuthenticated]

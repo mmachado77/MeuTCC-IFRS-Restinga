@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.db.models import Q
 from rest_framework import status
 from datetime import datetime, date
 from ..models import Semestre, SemestreCoordenador, ProfessorInterno
@@ -20,6 +21,25 @@ class SemestreAtualView(APIView):
             return Response(semestre_serializer, status=status.HTTP_200_OK)
         else:
             return Response({"detail": "Semestre atual não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
+class CoordenadorAtualView(APIView):
+    def get(self, request):
+        semestre_atual = Semestre.semestre_atual()
+
+        if semestre_atual:
+            semestre_coordenador = SemestreCoordenador.objects.filter(semestre=semestre_atual).order_by('-dataAlteracao', '-id').first()
+            if semestre_coordenador:
+                semestre_coordenador_serializer = SemestreCoordenadorSerializer(semestre_coordenador).data
+            return Response(semestre_coordenador_serializer, status=status.HTTP_200_OK)
+        else:
+            semestre = Semestre.objects.order_by('-dataFechamentoSemestre', '-id').first()
+            if semestre:
+                semestre_coordenador = SemestreCoordenador.objects.filter(semestre=semestre).order_by('-dataAlteracao', '-id').first()
+                semestre_coordenador_serializer = SemestreCoordenadorSerializer(semestre_coordenador).data
+                return Response(semestre_coordenador_serializer, status=status.HTTP_200_OK)
+            else:
+                return Response({"detail": "Semestre atual não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        
 
 class SemestreView(APIView):
     def get(self, request, semestreid):
@@ -110,11 +130,6 @@ class SemestresView(APIView):
         semestres = Semestre.objects.order_by('-dataAberturaSemestre', ).all()
         serializer = SemestreSerializer(semestres, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-from django.db.models import Q
-from rest_framework import status
-from rest_framework.response import Response
 
 class CriarSemestreView(APIView):
     permission_classes = [IsAuthenticated]

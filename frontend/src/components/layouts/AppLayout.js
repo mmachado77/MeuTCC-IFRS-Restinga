@@ -47,7 +47,7 @@ export const AppLayout = ({ children, guards }) => {
     const fetchConfigs = async () => {
         try {
             const data = await ConfiguracoesService.getCoordenador();
-            setCoordenadorNome(data.coordenador);
+            setCoordenadorNome(data.coordenador_nome);
         } catch (error) {
             console.error('Erro ao buscar as configurações', error);
         }

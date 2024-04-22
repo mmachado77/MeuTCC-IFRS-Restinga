@@ -154,8 +154,7 @@ const ConfiguracoesPage = () => {
             semestre: {
                 periodo: periodo,
                 dataAberturaSemestre: dataInicio,
-                dataFechamentoSemestre: dataFinal,
-                configuracoes: 1
+                dataFechamentoSemestre: dataFinal
             },
             coordenador_id: selectedProfessor 
         };

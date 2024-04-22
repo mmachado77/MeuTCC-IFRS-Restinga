@@ -3,8 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
-from app.models import Professor, Estudante, Tcc, Configuracoes, ProfessorInterno
-from app.serializers import ProfessorSerializer, UsuarioPolymorphicSerializer, TccSerializer, EstudanteSerializer, ConfiguracoesSerializer
+from app.models import Professor, Estudante, Tcc, ProfessorInterno
+from app.serializers import ProfessorSerializer, UsuarioPolymorphicSerializer, TccSerializer, EstudanteSerializer
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
@@ -70,23 +70,4 @@ class DetalhesEstudanteView(APIView):
         }
         return Response(data)
     
-    
-class AtualizarDatasPropostasView(APIView):
-    def put(self, request):
-        try:
-            data = request.data
 
-            configuracoes = Configuracoes.objects.first()  
-
-            if 'dataAberturaPrazoPropostas' in data:
-                configuracoes.dataAberturaPrazoPropostas = date.fromisoformat(data['dataAberturaPrazoPropostas'])
-            if 'dataFechamentoPrazoPropostas' in data:
-                configuracoes.dataFechamentoPrazoPropostas = date.fromisoformat(data['dataFechamentoPrazoPropostas'])
-
-            configuracoes.save()
-
-            serializer = ConfiguracoesSerializer(configuracoes)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            print(e)
-            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)

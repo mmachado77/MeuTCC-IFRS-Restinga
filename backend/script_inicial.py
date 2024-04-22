@@ -2,7 +2,7 @@
 # >>> exec(open('script_inicial.py').read())
 
 from django.contrib.auth.models import User
-from app.models import TccStatus, Tcc, Semestre, Configuracoes, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno, Convite, SemestreCoordenador
+from app.models import TccStatus, Tcc, Semestre, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno, Convite, SemestreCoordenador
 from datetime import datetime
 
 # Criando usuário admin
@@ -64,9 +64,6 @@ adastolfo = ProfessorInterno.objects.create(nome="Adastolfo",
                         )
 
 # Adiciona professor como atual coordenador
-configMaster = Configuracoes.objects.create(
-        coordenadorAtual=andre)
-
 # Cria usuario estudante
 estudanteUser = User.objects.create_user("estudante@gmail.com", "estudante@gmail.com", "12345678912")
 estudante = Estudante.objects.create(nome="Estudante", 
@@ -107,7 +104,6 @@ semestre1 = Semestre.objects.create(
         dataFechamentoSemestre='2024-06-30',
         dataAberturaPrazoPropostas='2024-03-20',
         dataFechamentoPrazoPropostas='2024-04-15',
-        configuracoes=configMaster,
     )
 
 semestre2 = Semestre.objects.create(
@@ -116,7 +112,6 @@ semestre2 = Semestre.objects.create(
         dataFechamentoSemestre='2023-12-31',
         dataAberturaPrazoPropostas='2023-07-15',
         dataFechamentoPrazoPropostas='2023-08-22',
-        configuracoes=configMaster,
     )
 
 coordSemestre = SemestreCoordenador.objects.create(

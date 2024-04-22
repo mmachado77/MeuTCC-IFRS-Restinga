@@ -4,7 +4,6 @@ from .statusCadastro import *
 from .professor import *
 from .professorInterno import *
 from .professorExterno import *
-from .configuracoes import *
 from .semestre import *
 from .tcc import *
 from .avaliacao import *
