@@ -1,6 +1,7 @@
 from django.urls import path, include
 from . import views
 from .views.semestre import *
+from .views.sessao import *
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -20,6 +21,7 @@ urlpatterns = [
     path('atualizar-datas-propostas', views.AtualizarDatasPropostasView.as_view(), name='atualizar-datas-propostas'),
     path('alterar-coordenador', views.AlterarCoordenadorSemestre.as_view(), name='alterar-coordenador'),
     path('coordenador', views.CoordenadorAtualView.as_view(), name='coordenador'),
+    path('sessoes-futuras', SessoesFuturasView.as_view(), name='sessoes-futuras'),
     path('professores-pendentes', views.ProfessoresPendentesListAPIView.as_view(), name='professores-pendentes'),
     path('aprovar-professor/<int:idProfessor>', views.AprovarProfessorAPIView.as_view(), name='aprovar-professor'),
     path('recusar-professor/<int:idProfessor>', views.RecusarProfessorAPIView.as_view(), name='recusar-professor'),
