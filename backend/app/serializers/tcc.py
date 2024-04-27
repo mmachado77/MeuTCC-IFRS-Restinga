@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from ..models import Tcc,TccStatus, SessaoPrevia, SessaoFinal, Sessao
-from ..serializers import UsuarioPolymorphicSerializer, TccStatusSerializer, SessaoPolymorphicSerializer, FileDetailSerializer
+from ..serializers import UsuarioPolymorphicSerializer, TccStatusSerializer, SessaoPolymorphicSerializer, FileDetailSerializer, EstudanteNomeSerializer, ProfessorNomeSerializer
 
 class TccSerializer(serializers.ModelSerializer):
     autor = UsuarioPolymorphicSerializer()

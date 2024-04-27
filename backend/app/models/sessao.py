@@ -34,6 +34,7 @@ class Sessao(PolymorphicModel):
             return sessoes
         else:
             return None
+
     
 
     class Meta:

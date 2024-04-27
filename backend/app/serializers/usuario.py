@@ -17,10 +17,20 @@ class EstudanteSerializer(UsuarioSerializer):
         model = Estudante
         fields = '__all__'
 
+class EstudanteNomeSerializer(UsuarioSerializer):
+    class Meta:
+        model = Estudante
+        fields = ['id', 'nome']
+
 class ProfessorSerializer(UsuarioSerializer):
     class Meta:
         model = Professor
         fields = '__all__'
+
+class ProfessorNomeSerializer(UsuarioSerializer):
+    class Meta:
+        model = Professor
+        fields = ['id', 'nome']
 
 class ProfessorInternoSerializer(UsuarioSerializer):
     class Meta:

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_polymorphic.serializers import PolymorphicSerializer
-from ..serializers import BancaSerializer, BancaCompletoSerializer, AvaliacaoSerializer, FileDetailSerializer
+from ..serializers import BancaSerializer, BancaCompletoSerializer, AvaliacaoSerializer, FileDetailSerializer, TccNomesSerializer
 from ..models import SessaoPrevia, SessaoFinal, Sessao, Banca
 
 class SessaoSerializer(serializers.ModelSerializer):
@@ -19,14 +19,15 @@ class SessaoSerializer(serializers.ModelSerializer):
 class SessaoFuturaSerializer(serializers.ModelSerializer):
     banca = serializers.SerializerMethodField(method_name='get_banca')
     tipo = serializers.CharField(source='get_tipo')
-
+    tcc = TccNomesSerializer()
     class Meta:
         model = Sessao
-        fields = '__all__'
+        fields = ['tipo', 'banca', 'local', 'presencial', 'data_inicio', 'validacaoCoordenador', 'tcc']
 
     def get_banca(self, obj):
         banca_object = Banca.objects.get(sessao=obj)
         return BancaCompletoSerializer(banca_object).data
+
 
 class SessaoPreviaSerializer(SessaoSerializer):
     class Meta:
