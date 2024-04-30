@@ -9,14 +9,13 @@ import { useRouter } from 'next/router';
 const CadastroPage = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const router = useRouter();
-    const [isUserExists, setIsUserExists] = useState(false);
     const [userData, setUserData] = useState({
         nome: '',
         cpf: '',
         matricula: '',
-        area: '',
-        grau: '',
+        area_atuacao: '',
         titulo: '',
+        area_interesse: '',
         identidade: null,
         diploma: null,
         isProfessor: false,
@@ -70,7 +69,7 @@ const CadastroPage = () => {
                 { label: 'Pós-Graduação', value: 'POSGRADUACAO' },
                 { label: 'Mestrado', value: 'MESTRADO' },
                 { label: 'Doutorado', value: 'DOUTORADO' },
-                { label: 'Pós-Doutorado', value: 'POSD' }
+                { label: 'Pós-Doutorado', value: 'POSDOUTORADO' }               
             ]} submitCadastro={submitCadastro} setActiveIndex={setActiveIndex} activeIndex={activeIndex} />}
         </div>
 
