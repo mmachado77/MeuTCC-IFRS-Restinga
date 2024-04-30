@@ -100,9 +100,9 @@ class CriarUsuarioSerializer(serializers.Serializer):
     isProfessor = serializers.BooleanField()
     IsInterno = serializers.BooleanField(required=False, default=False)
     matricula = serializers.CharField(required=False, allow_blank=True)
-    area = serializers.CharField(required=False, allow_blank=True)
-    grau = serializers.CharField(required=False, allow_blank=True)
+    area_atuacao = serializers.CharField(required=False, allow_blank=True)
     titulo = serializers.CharField(required=False, allow_blank=True)
+    area_interesse = serializers.CharField(required=False, allow_blank=True)
     identidade = serializers.FileField(required=False, validators=[validate_file_extension])
     diploma = serializers.FileField(required=False, validators=[validate_file_extension])
 
