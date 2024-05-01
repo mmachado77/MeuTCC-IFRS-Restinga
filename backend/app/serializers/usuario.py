@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from app.models import Usuario, Estudante, Professor, ProfessorInterno, ProfessorExterno, Coordenador
 from rest_polymorphic.serializers import PolymorphicSerializer
+from app.enums import AreaInteresseEnum
 from django.core.exceptions import ValidationError
 
 
@@ -22,10 +23,22 @@ class EstudanteNomeSerializer(UsuarioSerializer):
         model = Estudante
         fields = ['id', 'nome']
 
-class ProfessorSerializer(UsuarioSerializer):
+class ProfessorSerializer(serializers.ModelSerializer):
+    area_interesse = serializers.JSONField(required=False, allow_null=True)
+
     class Meta:
         model = Professor
         fields = '__all__'
+
+    def validate_area_interesse(self, value):
+        # Verifique se 'value' é uma lista, por exemplo
+        if not isinstance(value, list):
+            raise serializers.ValidationError("A área de interesse deve ser uma lista.")
+        # Verifique se todos os elementos estão nas escolhas permitidas
+        choices = {choice.value for choice in AreaInteresseEnum.choices}
+        if not all(item in choices for item in value):
+            raise serializers.ValidationError("Uma ou mais áreas de interesse são inválidas.")
+        return value
 
 class ProfessorNomeSerializer(UsuarioSerializer):
     class Meta:

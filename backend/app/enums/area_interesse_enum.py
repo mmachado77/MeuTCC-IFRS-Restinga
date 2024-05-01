@@ -27,6 +27,7 @@ class AreaInteresseEnum(models.TextChoices):
     SEGURANCA = "Segurança"
     SISTEMAS_COLABORATIVOS = "Sistemas Colaborativos"
     SISTEMAS_DE_INFORMACAO = "Sistemas de Informação"
+    SISTEMAS_DISTRIBUIDOS = "Sistemas Distribuidos"
     SISTEMAS_MULTIMIDIA_E_HIPERMIDIA = "Sistemas Multimídia e Hipermídia"
     SISTEMAS_TOLERANTES_A_FALHAS = "Sistemas Tolerantes a Falhas"
 
