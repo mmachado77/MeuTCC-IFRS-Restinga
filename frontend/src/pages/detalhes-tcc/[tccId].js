@@ -14,6 +14,8 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Dropdown } from "primereact/dropdown";
 import ProfessorService from "meutcc/services/ProfessorService";
 import toast from "react-hot-toast";
+import { Calendar } from 'primereact/calendar';
+import CustomAvatar from 'meutcc/components/ui/CustomAvatar';
 
 const FileItem = ({ file, prazoEntrega, user }) => {
   const toast = useRef(null);
@@ -55,7 +57,7 @@ const FileItem = ({ file, prazoEntrega, user }) => {
   );
 };
 
-const SessoesComponent = ({ estudante, orientador, sessoes, user }) => {
+const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBancaSessaoPreviaClick, onSugerirBancaSessaoFinalClick }) => {
   return (
     <Accordion multiple activeIndex={[0]}>
       {sessoes.map((sessao, index) => (
@@ -100,12 +102,16 @@ const SessoesComponent = ({ estudante, orientador, sessoes, user }) => {
       ))}
       {sessoes.length == 0 && (
         <AccordionTab key="sessao-previa" header={"Sessão Prévia"}>
-          {user.resourcetype === 'Estudante' || user.resourcetype === 'ProfessorInterno' ? <Button style={{ width: '100%', backgroundColor: '#2F9E41' }} label="Sugerir Banca" onClick={() => console.log("Sugerir sessão prévia")} /> : <Button style={{ width: '100%', backgroundColor: '#2F9E41' }} label="Agendar Sessão Prévia" onClick={() => console.log("Adicionar sessão prévia")} />}
+          {user.resourcetype === 'Estudante' || user.resourcetype === 'ProfessorInterno' ?
+            <Button style={{ width: '100%', backgroundColor: '#2F9E41' }} label="Sugerir Banca" onClick={() => onSugerirBancaSessaoPreviaClick(true)} />
+            : <Button style={{ width: '100%', backgroundColor: '#2F9E41' }} label="Agendar Sessão Prévia" onClick={() => console.log("Adicionar sessão prévia")} />}
         </AccordionTab>
       )}
       {sessoes.some(sessao => sessao.tipo == 'Sessão Prévia') && !sessoes.some(sessao => sessao.tipo == 'Sessão Final') && (
         <AccordionTab key="sessao-final" header={"Sessão Final"}>
-          {user.resourcetype === 'Estudante' || user.resourcetype === 'ProfessorInterno' ? <Button style={{ width: '100%', backgroundColor: '#2F9E41' }} label="Sugerir Banca" onClick={() => console.log("Sugerir sessão final")} /> : <Button style={{ width: '100%', backgroundColor: '#2F9E41' }} label="Agendar Sessão Final" onClick={() => console.log("Adicionar sessão final")} />}
+          {user.resourcetype === 'Estudante' || user.resourcetype === 'ProfessorInterno' ?
+            <Button style={{ width: '100%', backgroundColor: '#2F9E41' }} label="Sugerir Banca" onClick={() => onSugerirBancaSessaoFinalClick(true)} />
+            : <Button style={{ width: '100%', backgroundColor: '#2F9E41' }} label="Agendar Sessão Final" onClick={() => console.log("Adicionar sessão final")} />}
         </AccordionTab>
       )}
     </Accordion>
@@ -149,11 +155,20 @@ const DetalhesTCC = () => {
   const [resumoMensagemErro, setResumoMensagemErro] = useState('');
   const [orientadorMensagemErro, setOrientadorMensagemErro] = useState('');
   const [coorientadorMensagemErro, setCoorientadorMensagemErro] = useState('');
+  const [datetime24h, setDateTime24h] = useState(null);
 
   const handleEditarClick = () => {
     setVisibleFormTCC(true);
     setSelectedOrientador(TCCData?.orientador.id);
     setSelectedCoorientador(TCCData?.coorientador ? TCCData?.coorientador?.id : null);
+  };
+
+  const handleSugerirBancaSessaoPreviaClick = () => {
+    setVisibleSessaoPrevia(true);
+  };
+
+  const handleSugerirBancaSessaoFinalClick = () => {
+    setVisibleSessaoFinal(true);
   };
 
   const carregarDetalhesTCC = async () => {
@@ -174,6 +189,7 @@ const DetalhesTCC = () => {
         const professores = data.map((professor) => ({ name: professor.nome, value: professor.id }));
         setOrientadores(professores);
         setCoorientadores(professores);
+        setAvaliadores(data.map((professor) => ({ ...professor, name: professor.nome, value: professor.id })));
 
       } catch (error) {
         console.error('Erro ao buscar professores', error);
@@ -186,27 +202,23 @@ const DetalhesTCC = () => {
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    let isValid = true;
     setLoading(true);
     const formData = new FormData(event.currentTarget);
     const jsonData = Object.fromEntries(formData);
 
     if (jsonData.tema === '') {
-      isValid = false;
       setTemaMensagemErro('O campo tema é obrigatório');
     } else {
       setTemaMensagemErro('');
     }
 
     if (jsonData.resumo === '') {
-      isValid = false;
       setResumoMensagemErro('O campo resumo é obrigatório');
     } else {
       setResumoMensagemErro('');
     }
 
     if (!selectedOrientador) {
-      isValid = false;
       setOrientadorMensagemErro('O campo orientador é obrigatório');
     } else {
       setOrientadorMensagemErro('');
@@ -229,6 +241,37 @@ const DetalhesTCC = () => {
     setLoading(false);
     carregarDetalhesTCC();
     setVisibleFormTCC(false);
+  };
+
+  const [selectedAvaliador1, setSelectedAvaliador1] = useState(null);
+  const [selectedAvaliador2, setSelectedAvaliador2] = useState(null);
+  const [avaliadores, setAvaliadores] = useState([]);
+  const [optionLocalSessao, setOptionLocalSessao] = useState(null);
+  const optionsLocalSessao = [
+    { label: 'Presencial', value: 'presencial' },
+    { label: 'Conferência', value: 'conferencia' }
+  ];
+
+  const selectedAvaliadorTemplate = (option, props) => {
+    if (option) {
+      return (
+        <div className="flex items-center">
+          <CustomAvatar image={option.avatar} fullname={option.nome} size={30} />
+          <div className='ps-3'>{option.name}</div>
+        </div>
+      );
+    }
+
+    return <span>{props.placeholder}</span>;
+  };
+
+  const avaliadorOptionTemplate = (option) => {
+    return (
+      <div className="flex items-center">
+        <CustomAvatar image={option.avatar} fullname={option.nome} size={30} />
+        <div className='ps-3'>{option.name}</div>
+      </div>
+    );
   };
 
   if (TCCData?.id == null) {
@@ -265,7 +308,8 @@ const DetalhesTCC = () => {
         )}
         <div>
           {TCCData?.sessoes && (
-            <SessoesComponent estudante={TCCData?.autor} orientador={TCCData?.orientador} sessoes={TCCData?.sessoes} user={user} />
+            <SessoesComponent estudante={TCCData?.autor} orientador={TCCData?.orientador} sessoes={TCCData?.sessoes} user={user} onSugerirBancaSessaoPreviaClick={handleSugerirBancaSessaoPreviaClick}
+              onSugerirBancaSessaoFinalClick={handleSugerirBancaSessaoFinalClick} />
           )}
         </div>
       </div>
@@ -311,7 +355,50 @@ const DetalhesTCC = () => {
 
       </Dialog>
       <Dialog header="Editar Sessão Prévia" visible={visibleSessaoPrevia} style={{ width: '50vw' }} onHide={() => setVisibleSessaoPrevia(false)}>
-        <p>A</p>
+        <form onSubmit={onSubmit}>
+          <div className='grid gap-4'>
+            <div className='grid grid-cols-2 gap-4'>
+              <div className="flex flex-wrap align-items-center mb-3 gap-2">
+                <label htmlFor="tema"><b>Data</b></label>
+                <Calendar value={datetime24h} minDate={new Date()} readOnlyInput onChange={(e) => setDateTime24h(e.value)} className='w-full' />
+                {temaMensagemErro && <small id="tema-help" className="text-red-500 py-1 px-2">{temaMensagemErro}</small>}
+              </div>
+              <div className="flex flex-wrap align-items-center mb-3 gap-2">
+                <label htmlFor="tema"><b>Horário</b></label>
+                <Calendar value={datetime24h} readOnlyInput onChange={(e) => setDateTime24h(e.value)} timeOnly className='w-full' />
+                {temaMensagemErro && <small id="tema-help" className="text-red-500 py-1 px-2">{temaMensagemErro}</small>}
+              </div>
+            </div>
+
+            <div className='grid grid-cols-2 gap-4'>
+              <div className="flex flex-wrap align-items-center mb-3 gap-2">
+                <label htmlFor="tema"><b>Local</b></label>
+                <Dropdown value={optionLocalSessao} onChange={(e) => setOptionLocalSessao(e.value)} options={optionsLocalSessao} className='w-full' />
+              </div>
+              <div className="flex flex-wrap align-items-center mb-3 gap-2">
+                <label htmlFor="tema"><b>Local</b></label>
+                <InputText id="tema" name="tema" placeholder="Tema" className={'w-full ' + (temaMensagemErro ? 'p-invalid' : '')} placeholder='Exemplo, Campus Restinga, sala 403' />
+                {temaMensagemErro && <small id="tema-help" className="text-red-500 py-1 px-2">{temaMensagemErro}</small>}
+              </div>
+            </div>
+
+
+            <div className="flex flex-wrap align-items-center mb-3 gap-2">
+              <label htmlFor="tema"><b>Avaliador 1</b></label>
+              <Dropdown value={selectedAvaliador1} onChange={(e) => setSelectedAvaliador1(e.value)} options={avaliadores} optionLabel="name" placeholder="Selecione o nome do avaliador" filter valueTemplate={selectedAvaliadorTemplate} itemTemplate={avaliadorOptionTemplate} className="w-full md:w-14rem" />
+              {temaMensagemErro && <small id="tema-help" className="text-red-500 py-1 px-2">{temaMensagemErro}</small>}
+            </div>
+            <div className="flex flex-wrap align-items-center mb-3 gap-2">
+              <label htmlFor="tema"><b>Avaliador 2</b></label>
+              <Dropdown value={selectedAvaliador2} onChange={(e) => setSelectedAvaliador2(e.value)} options={avaliadores} optionLabel="name" placeholder="Selecione o nome do avaliador" filter valueTemplate={selectedAvaliadorTemplate} itemTemplate={avaliadorOptionTemplate} className="w-full md:w-14rem" />
+              {temaMensagemErro && <small id="tema-help" className="text-red-500 py-1 px-2">{temaMensagemErro}</small>}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap align-items-center mb-3 gap-2">
+            <Button label={loading ? "Editando TCC" : "Editar TCC"} loading={loading} className="w-full" />
+          </div>
+        </form>
       </Dialog>
       <Dialog header="Editar Sessão Final" visible={visibleSessaoFinal} style={{ width: '50vw' }} onHide={() => setVisibleSessaoFinal(false)}>
         <p>A</p>

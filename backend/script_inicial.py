@@ -36,11 +36,12 @@ andre = ProfessorInterno.objects.create(nome="André Schneider",
                          area_interesse="Estrutura",
                          matricula="1994000401",
                          status = status,
-                         user = andreUser
+                         user = andreUser,
+                         avatar="https://primefaces.org/cdn/primereact/images/organization/walter.jpg"
                         )
 
 ProfInterUser = User.objects.create_user("cleitin@restinga.ifrs.edu.br", "cleitin@restinga.ifrs.edu.br", "05156413231")
-cleitin = ProfessorInterno.objects.create(nome="Cleitin", 
+cleitin = ProfessorInterno.objects.create(nome="Cleitin da Silva", 
                          cpf="05156413231", 
                          email="cleitin@restinga.ifrs.edu.br",
                          area_atuacao = "CIENCIA DA COMPUTACAO",

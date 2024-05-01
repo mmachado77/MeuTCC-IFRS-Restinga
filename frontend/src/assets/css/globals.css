@@ -1,30 +1,30 @@
 html,
-body{
-    background-color: #E9ECEF;
+body {
+  background-color: #e9ecef;
 }
 
 body {
-    margin: 0;
+  margin: 0;
 }
 
-.content{
-    display: flex;
-    justify-content: center;
-    background-color: #ffffff;
-    margin: 200px;
-    padding: 100px;
-    border: 1px solid #c9c9c9; 
-    border-radius: 10px;
-    size-adjust: 80%;
+.content {
+  display: flex;
+  justify-content: center;
+  background-color: #ffffff;
+  margin: 200px;
+  padding: 100px;
+  border: 1px solid #c9c9c9;
+  border-radius: 10px;
+  size-adjust: 80%;
 }
 
 .p-tabview-nav {
-    display: flex;
-    justify-content: space-around;
+  display: flex;
+  justify-content: space-around;
 }
 
-.p-tabview.p-component{
-    width: 100%;
+.p-tabview.p-component {
+  width: 100%;
 }
 
 @tailwind components;
@@ -32,7 +32,11 @@ body {
 
 /* cria um apply */
 @layer components {
-    .anchor-link {
-        @apply text-white no-underline hover:text-gray-300 hover:underline;
-    }
+  .anchor-link {
+    @apply text-white no-underline hover:text-gray-300 hover:underline;
+  }
+}
+
+.p-avatar:not(.p-avatar-circle) img {
+  border-radius: 6px;
 }
