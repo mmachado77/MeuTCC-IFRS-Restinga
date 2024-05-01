@@ -37,7 +37,6 @@ export const AppLayout = ({ children, guards }) => {
             { label: 'Validar Sessões', icon: 'pi pi-fw pi-calendar', url: '/sessoes-futuras' },
             ]},
             { label: 'Semestres', icon: 'pi pi-fw pi-calendar', url: '/painel-configuracoes' },
-            
         ],
         Professor: [
             { label: 'Propostas Pendentes', icon: 'pi pi-fw pi-thumbs-up', url: '/proposta-pendente' },    

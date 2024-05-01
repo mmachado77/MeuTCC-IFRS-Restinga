@@ -74,7 +74,7 @@ export default function ListaSessoesFuturas() {
                 {rowData.validacaoCoordenador ? (
                     <Button label="Editar" icon='pi pi-pencil' className="p-button-outlined" onClick={() => abrirDialogo(rowData)} />
                 ) : (
-                    <Button label="Revisar" icon='pi pi-search' severity="success" onClick={() => abrirDialogo(rowData)} />
+                    <Button label="Revisar" icon='pi pi-search' severity="warning" onClick={() => abrirDialogo(rowData)} />
                 )}
             </>
         );
