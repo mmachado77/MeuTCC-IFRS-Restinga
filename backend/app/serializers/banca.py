@@ -16,7 +16,7 @@ class BancaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Banca
-        fields = ['professores', 'professoresSugeridos']
+        fields = ['professores']
 
 class BancaCompletoSerializer(serializers.ModelSerializer):
     professores = ProfessorNomeSerializer(many=True)
