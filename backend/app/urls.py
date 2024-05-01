@@ -22,6 +22,7 @@ urlpatterns = [
     path('alterar-coordenador', views.AlterarCoordenadorSemestre.as_view(), name='alterar-coordenador'),
     path('coordenador', views.CoordenadorAtualView.as_view(), name='coordenador'),
     path('sessoes-futuras', SessoesFuturasView.as_view(), name='sessoes-futuras'),
+    path('editar-sessao', SessaoEditView.as_view(), name='editar-sessao'),
     path('professores-pendentes', views.ProfessoresPendentesListAPIView.as_view(), name='professores-pendentes'),
     path('aprovar-professor/<int:idProfessor>', views.AprovarProfessorAPIView.as_view(), name='aprovar-professor'),
     path('recusar-professor/<int:idProfessor>', views.RecusarProfessorAPIView.as_view(), name='recusar-professor'),

@@ -3,12 +3,18 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
 import { Dialog } from 'primereact/dialog';
+import { locale, addLocale, updateLocaleOption, updateLocaleOptions, localeOption, localeOptions } from 'primereact/api';
 import { format } from 'date-fns';
 import DropdownProfessores from 'meutcc/components/ui/DropdownProfessores';
 import SessoesService from 'meutcc/services/SessoesService';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Card } from 'primereact/card';
+import { Calendar } from 'primereact/calendar';
+
+addLocale('ptbr', {
+    today: 'Hoje', clear: 'Limpar', monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'], monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'], dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'], dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'], weekHeader: 'Semana', firstDay: 0, isRTL: false, showMonthAfterYear: false, yearSuffix: '', timeOnlyTitle: 'Só Horas', timeText: 'Tempo', hourText: 'Hora', minuteText: 'Minuto', secondText: 'Segundo', ampm: false, month: 'Mês', week: 'Semana', day: 'Dia', allDayText: 'Todo o Dia'
+});
 
 export default function ListaSessoesFuturas() {
     const [sessoes, setSessoes] = useState([]);
@@ -16,24 +22,12 @@ export default function ListaSessoesFuturas() {
     const [exibirDialogo, setExibirDialogo] = useState(false);
     const [modoEdicao, setModoEdicao] = useState(false); // Estado para controlar o modo de edição
     const [sessaoMudancas, SetSessaoMudancas] = useState({
+        idSessao: '',
         avaliador1 : '',
         avaliador2 : '',
-        data: '',
+        dataInicio: '',
         local: ''
     });
-
-    const footerContent = (
-        <div className='flex justify-between items-center gap-4'>
-            <div className='w-1/2'>
-                <Button className='w-full' label={modoEdicao ? "Cancelar Edição" : "Editar Sessão"} severity={modoEdicao ? "secondary" : "warning"} icon={modoEdicao ? 'pi pi-times' : 'pi pi-pencil'} iconPos='right' onClick={() => setModoEdicao(!modoEdicao)} /> {/* Alterado para ativar ou desativar o modo de edição */}
-            </div>
-            <div className='w-1/2'>
-                <div>
-                    <Button className='w-full' label="Confirmar Sessão" severity="success" icon='pi pi-check' iconPos='right' onClick='' />
-                </div>
-            </div>
-        </div>
-    );
 
     useEffect(() => {
         fetchSessoesFuturas();
@@ -50,10 +44,12 @@ export default function ListaSessoesFuturas() {
 
     const abrirDialogo = (sessao) => {
         setSessaoSelecionada(sessao);
-        SetSessaoMudancas({...sessaoMudancas, avaliador1:sessao.banca.professores[0].id,
+        SetSessaoMudancas({...sessaoMudancas,
+            idSessao:sessao.id,
+            avaliador1:sessao.banca.professores[0].id,
             avaliador2:sessao.banca.professores[1].id,
             local:sessao.local,
-            data:sessao.data_inicio
+            dataInicio:new Date(sessao.data_inicio)
         })
 
         setExibirDialogo(true);
@@ -63,6 +59,31 @@ export default function ListaSessoesFuturas() {
         setExibirDialogo(false);
         setModoEdicao(false); // Resetando o modo de edição ao fechar o diálogo
     };
+
+    const handleConfirmarSessao = async () => {
+        try {
+            await SessoesService.putEditarSessao(sessaoMudancas);
+
+            fetchSessoesFuturas();
+            fecharDialogo();
+        } catch (error) {
+            console.error('Erro ao editar sessão:', error);
+
+        }
+    };
+
+    const footerContent = (
+        <div className='flex justify-between items-center gap-4'>
+            <div className='w-1/2'>
+                <Button className='w-full' label={modoEdicao ? "Cancelar Edição" : "Editar Sessão"} severity={modoEdicao ? "secondary" : "warning"} icon={modoEdicao ? 'pi pi-times' : 'pi pi-pencil'} iconPos='right' onClick={() => setModoEdicao(!modoEdicao)} /> {/* Alterado para ativar ou desativar o modo de edição */}
+            </div>
+            <div className='w-1/2'>
+                <div>
+                    <Button className='w-full' label="Confirmar Sessão" severity="success" icon='pi pi-check' iconPos='right' onClick={handleConfirmarSessao} />
+                </div>
+            </div>
+        </div>
+    );
 
     const dataInicioTemplate = (rowData) => {
         const data = new Date(rowData.data_inicio);
@@ -140,16 +161,32 @@ export default function ListaSessoesFuturas() {
                         <div className='flex justify-between gap-32'>
                             <div className="p-field my-2">
                                 <label htmlFor="data">Data:</label>
-                                <InputText id="data" value={dataFormatada} onChange={(e) => setSessaoSelecionada({ ...sessaoSelecionada, data_inicio: e.target.value })} readOnly={!modoEdicao} />
+                                <Calendar id="dataSessao"
+                                            value={sessaoMudancas.dataInicio}
+                                            onChange={(e) => SetSessaoMudancas({...sessaoMudancas, dataInicio:e.target.value})}
+                                            dateFormat='dd/mm/yy'
+                                            className=''
+                                            showButtonBar
+                                            locale='ptbr'
+                                            showIcon={modoEdicao}
+                                            disabled={!modoEdicao}
+                                             />
+                                {/* <InputText id="data" value={dataFormatada} onChange={(e) => setSessaoSelecionada({ ...sessaoSelecionada, data_inicio: e.target.value })} readOnly={!modoEdicao} /> */}
                             </div>
                             <div className="p-field my-2">
                                 <label htmlFor="hora">Hora:</label>
-                                <InputText id="hora" value={horaFormatada} onChange={(e) => setSessaoSelecionada({ ...sessaoSelecionada, hora: e.target.value })} readOnly={!modoEdicao} />
+                                <Calendar id="horaSessao"
+                                            value={sessaoMudancas.dataInicio}
+                                            onChange={(e) => SetSessaoMudancas({...sessaoMudancas, dataInicio:e.target.value})}
+                                            timeOnly
+                                            showIcon={modoEdicao}
+                                            disabled={!modoEdicao}/>
+                                {/* <InputText id="hora" value={horaFormatada} onChange={(e) => setSessaoSelecionada({ ...sessaoSelecionada, hora: e.target.value })} readOnly={!modoEdicao} /> */}
                             </div>
                         </div>
                         <div className="p-field my-2">
                             <label htmlFor="local">Local:</label>
-                            <InputText id="local" value={sessaoSelecionada?.local} onChange={(e) => setSessaoSelecionada({ ...sessaoSelecionada, local: e.target.value })} readOnly={!modoEdicao} />
+                            <InputText id="local" value={sessaoMudancas.local} onChange={(e) => sessaoMudancas.local(e.value)} disabled={!modoEdicao} />
                         </div>
                     </div>
                 </div>

@@ -22,7 +22,18 @@ class SessaoFuturaSerializer(serializers.ModelSerializer):
     tcc = TccNomesSerializer()
     class Meta:
         model = Sessao
-        fields = ['tipo', 'banca', 'local', 'presencial', 'data_inicio', 'validacaoCoordenador', 'tcc']
+        fields = ['id', 'tipo', 'banca', 'local', 'presencial', 'data_inicio', 'validacaoCoordenador', 'tcc']
+
+    def get_banca(self, obj):
+        banca_object = Banca.objects.get(sessao=obj)
+        return BancaCompletoSerializer(banca_object).data
+
+class SessaoEditSerializer(serializers.ModelSerializer):
+    banca = serializers.SerializerMethodField(method_name='get_banca')
+    tcc = TccNomesSerializer()
+    class Meta:
+        model = Sessao
+        fields = ['banca', 'local', 'data_inicio', 'validacaoCoordenador']
 
     def get_banca(self, obj):
         banca_object = Banca.objects.get(sessao=obj)
