@@ -248,7 +248,7 @@ const DetalhesTCC = () => {
     <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
       <div className='py-3 border-0 border-b border-dashed border-gray-200' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 className='heading-1 px-6 text-gray-700'>Detalhes do TCC</h1>
-        {(user.resourcetype === 'Estudante' || user.resourcetype === 'Coordenador') && (<div><Button label="Editar" icon="pi pi-pencil" style={{ backgroundColor: '#2F9E41' }} onClick={handleEditarClick} /></div>)}
+        {(user.resourcetype === 'Estudante' || user.resourcetype === 'Coordenador') && (<div className='mr-5'><Button label="Editar" icon="pi pi-pencil" style={{ backgroundColor: '#2F9E41' }} onClick={handleEditarClick} /></div>)}
       </div>
       <div className='py-6 px-2' style={{ padding: '35px' }}>
         <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between' }}>

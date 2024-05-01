@@ -4,6 +4,7 @@ import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
 import { Dialog } from 'primereact/dialog';
 import { format } from 'date-fns';
+import DropdownProfessores from 'meutcc/components/ui/DropdownProfessores';
 import SessoesService from 'meutcc/services/SessoesService';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
@@ -14,18 +15,21 @@ export default function ListaSessoesFuturas() {
     const [sessaoSelecionada, setSessaoSelecionada] = useState(null);
     const [exibirDialogo, setExibirDialogo] = useState(false);
     const [modoEdicao, setModoEdicao] = useState(false); // Estado para controlar o modo de edição
+    const [sessaoMudancas, SetSessaoMudancas] = useState({
+        avaliador1 : '',
+        avaliador2 : '',
+        data: '',
+        local: ''
+    });
 
     const footerContent = (
-        <div>
-            <div>
-                <Button className='w-full' label={modoEdicao ? "Cancelar Edição" : "Editar"} severity={modoEdicao ? "secondary" : "warning"} icon={modoEdicao ? 'pi pi-times' : 'pi pi-pencil'} iconPos='right' onClick={() => setModoEdicao(!modoEdicao)} /> {/* Alterado para ativar ou desativar o modo de edição */}
+        <div className='flex justify-between items-center gap-4'>
+            <div className='w-1/2'>
+                <Button className='w-full' label={modoEdicao ? "Cancelar Edição" : "Editar Sessão"} severity={modoEdicao ? "secondary" : "warning"} icon={modoEdicao ? 'pi pi-times' : 'pi pi-pencil'} iconPos='right' onClick={() => setModoEdicao(!modoEdicao)} /> {/* Alterado para ativar ou desativar o modo de edição */}
             </div>
-            <div className='flex justify-between mt-3'>
+            <div className='w-1/2'>
                 <div>
-                    <Button label="Confirmar Sessão" severity="success" icon='pi pi-check' iconPos='right' onClick='' />
-                </div>
-                <div>
-                    <Button label="Cancelar" severity="secondary" icon='pi pi-times' iconPos='right' onClick={() => setExibirDialogo(false)} />
+                    <Button className='w-full' label="Confirmar Sessão" severity="success" icon='pi pi-check' iconPos='right' onClick='' />
                 </div>
             </div>
         </div>
@@ -46,6 +50,12 @@ export default function ListaSessoesFuturas() {
 
     const abrirDialogo = (sessao) => {
         setSessaoSelecionada(sessao);
+        SetSessaoMudancas({...sessaoMudancas, avaliador1:sessao.banca.professores[0].id,
+            avaliador2:sessao.banca.professores[1].id,
+            local:sessao.local,
+            data:sessao.data_inicio
+        })
+
         setExibirDialogo(true);
     };
 
@@ -80,6 +90,7 @@ export default function ListaSessoesFuturas() {
         );
     };
 
+
     const dataInicio = sessaoSelecionada?.data_inicio ? new Date(sessaoSelecionada.data_inicio) : null;
     const dataFormatada = dataInicio ? format(dataInicio, "dd/MM/yyyy") : '';
     const horaFormatada = sessaoSelecionada?.data_inicio ? format(new Date(sessaoSelecionada.data_inicio), 'HH:mm') : '';
@@ -87,7 +98,7 @@ export default function ListaSessoesFuturas() {
     return (
         <div>
             <div className="card">
-                <DataTable value={sessoes} selection={sessaoSelecionada} onSelectionChange={(e) => setSessaoSelecionada(e.value)} dataKey="id" paginator rows={5} currentPageReportTemplate="Showing {first} to {last} of {totalRecords} sessions">
+                <DataTable value={sessoes} selection={sessaoSelecionada} dataKey="id" paginator rows={5} currentPageReportTemplate="Showing {first} to {last} of {totalRecords} sessions">
                     <Column field="tcc.autor.nome" header="Autor" sortable />
                     <Column field="tipo" header="Tipo" sortable />
                     <Column field="data_inicio" header="Data e Hora" body={dataInicioTemplate} sortable />
@@ -118,12 +129,13 @@ export default function ListaSessoesFuturas() {
                     </div>
                     <div className='mt-5'>
                         <div className="p-field my-2">
-                            <label htmlFor="membroBanca1">Professor 1:</label>
-                            <InputText id="membroBanca1" value={sessaoSelecionada?.banca.professores[0].nome} onChange={(e) => setSessaoSelecionada({ ...sessaoSelecionada, banca: { ...sessaoSelecionada.banca, professores: [e.target.value, sessaoSelecionada.banca.professores[1]] } })} readOnly={!modoEdicao} />
+                            <label htmlFor="membroBanca1">Avaliador 1:</label>
+                            <DropdownProfessores disabled={!modoEdicao} value={sessaoMudancas.avaliador1} onChange={(e) => SetSessaoMudancas({...sessaoMudancas, avaliador1:e.target.value})}/>
+
                         </div>
                         <div className="p-field my-2">
-                            <label htmlFor="membroBanca2">Professor 2:</label>
-                            <InputText id="membroBanca2" value={sessaoSelecionada?.banca.professores[1].nome} onChange={(e) => setSessaoSelecionada({ ...sessaoSelecionada, banca: { ...sessaoSelecionada.banca, professores: [sessaoSelecionada.banca.professores[0], e.target.value] } })} readOnly={!modoEdicao} />
+                            <label htmlFor="membroBanca2">Avaliador 2:</label>
+                            <DropdownProfessores disabled={!modoEdicao} value={sessaoMudancas.avaliador2} onChange={(e) => SetSessaoMudancas({...sessaoMudancas, avaliador2:e.target.value})}/>
                         </div>
                         <div className='flex justify-between gap-32'>
                             <div className="p-field my-2">
