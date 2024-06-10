@@ -5,3 +5,4 @@ from .professoresPendentes import *
 from .tcc import *
 from .semestre import *
 from .usuario import *
+from .notificacoes import *

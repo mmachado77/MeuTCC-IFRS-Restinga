@@ -16,6 +16,7 @@ import ProfessorService from "meutcc/services/ProfessorService";
 import toast from "react-hot-toast";
 import { Calendar } from 'primereact/calendar';
 import CustomAvatar from 'meutcc/components/ui/CustomAvatar';
+import { Toast } from 'primereact/toast';
 
 const FileItem = ({ file, prazoEntrega, user }) => {
   const toast = useRef(null);
@@ -29,6 +30,11 @@ const FileItem = ({ file, prazoEntrega, user }) => {
   };
 
   const prazoExpirado = prazoEntrega && new Date(prazoEntrega) < new Date();
+
+  const erroPrazoExpirado = () => {
+    toast.current.show({ severity: 'error', summary: 'Erro', detail: 'O prazo para entrega do documento está expirado!' });
+  };
+
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', marginBottom: '35px', borderRadius: '10px', border: '1px solid #ccc', padding: '10px', justifyContent: 'space-between' }}>
@@ -45,13 +51,22 @@ const FileItem = ({ file, prazoEntrega, user }) => {
         </div>
       </div>
       <div style={{ display: 'flex' }}>
-        {file?.url && (<Button icon="pi pi-download" rounded severity="success" aria-label="Baixar" style={{ marginRight: '10px' }} />)}
-        {(!prazoExpirado && file && user.resourcetype === 'Estudante') && (
-          <>
-            <Button icon="pi pi-upload" rounded severity="success" aria-label="Anexar" style={{ marginRight: '10px' }} />
-            <Button icon="pi pi-trash" rounded severity="danger" aria-label="Excluir" style={{ marginRight: '10px' }} />
-          </>
-        )}
+        {file?.url && (<Button icon="pi pi-download" rounded severity="success" aria-label="Baixar" style={{ marginRight: '10px' }}/>)}
+              {(file && user.resourcetype === 'Estudante') && (
+                  <>
+                      {prazoExpirado ? (
+                          <>
+                            <Button icon="pi pi-upload" rounded severity="secondary" aria-label="Anexar" style={{ marginRight: '10px' }} onClick={erroPrazoExpirado}/>
+                            <Toast ref={toast} />
+                          </>
+                      ) : (
+                          <>
+                               <Button icon="pi pi-upload" rounded severity="success" aria-label="Anexar" style={{ marginRight: '10px' }}/>
+                              {file?.url && (<Button icon="pi pi-trash" rounded severity="danger" aria-label="Excluir" style={{ marginRight: '10px' }}/>)}
+                          </>
+                      )}
+                  </>
+              )}
       </div>
     </div>
   );
@@ -300,6 +315,7 @@ const DetalhesTCC = () => {
         </div>
         <p style={{ marginBottom: '35px' }}><b>Orientador:</b> {TCCData?.orientador.nome}</p>
         {TCCData?.coorientador && (<p style={{ marginBottom: '35px' }}><b>Coorientador:</b> {TCCData?.coorientador.nome}</p>)}
+        <p style={{ marginBottom: '35px' }}><b>Semestre: </b>{TCCData?.semestre?.periodo}</p>
         <p style={{ marginBottom: '35px' }}><b>Tema:</b> {TCCData?.tema}</p>
         <p style={{ marginBottom: '35px' }}><b>Data de Submissão:</b> {format(TCCData?.dataSubmissaoProposta || new Date(), 'dd/MM/yyyy')}</p>
         <p style={{ marginBottom: '35px' }}><b>Resumo:</b> {TCCData?.resumo}</p>

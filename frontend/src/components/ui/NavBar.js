@@ -1,12 +1,40 @@
 import { useAuth, handleUserLogout } from "meutcc/core/context/AuthContext";
+import React, { useRef, useState, useEffect } from 'react';
 import Image from "next/image";
 import Link from "next/link";
 import { Menu } from "primereact/menu";
-import { useRef } from "react";
+import { Badge } from 'primereact/badge';
+import { formatDistanceToNow } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
+import NotificacoesService from "meutcc/services/NotificacoesService";
 
-const NavBar = ({ auth = false }) => {
+
+const NavBar = ({ auth = false, notifications, unreadCount}) => {
 
     const { user } = useAuth();
+    const menuRight = useRef(null);
+    const menuNotify = useRef(null);
+    const [visibleUnreadBadge, setVisibleUnreadBadge] = useState(true);
+
+    const handleNotificationClick = (notification) => {
+        window.location.href = notification.description;
+      };
+
+    const menuItems = [
+      {
+        label: 'Notificações',
+        items: notifications.slice(0,10).map(notification => ({
+              label: (
+                  <div class="flex ml-4">
+                    <p>{notification.verb}</p>
+                    <p class='text-gray-400'>{formatDistanceToNow(new Date(notification.timestamp), { locale: ptBR })} atrás</p>
+                  </div>
+                ),
+              icon: 'pi pi-info-circle',
+              command: () => handleNotificationClick(notification)
+            }))
+      }
+    ];
 
     const items = [
         {
@@ -25,8 +53,6 @@ const NavBar = ({ auth = false }) => {
         }
     ];
 
-    const menuRight = useRef(null);
-
     const menuAuth = () => (
         <>
             <div className='px-3'>Bem vindo, <b>{user?.nome || 'Usuário'}</b></div>
@@ -40,6 +66,15 @@ const NavBar = ({ auth = false }) => {
                     }
                 </div>
                 <Menu model={items} popup ref={menuRight} className='absolute z-50' popupAlignment="right" />
+            </div>
+            <div style={{ position: 'relative', alignItems: 'center', marginLeft: '10px'}}>
+              <div onClick={async (event) => {menuNotify.current.toggle(event);await NotificacoesService.limparNotificacoes(); setVisibleUnreadBadge(false)}} style={{ cursor: "pointer", height: "20px", width: "45px", position: 'relative'}}>
+                <i className="pi pi-bell" style={{ fontSize: '1.7rem' }}></i>
+                {unreadCount !== 0 && visibleUnreadBadge && (
+                    <Badge value={String(unreadCount)} style={{ position: 'absolute', top: '-10px', right: '8px', backgroundColor:'red'}}></Badge>
+                  )}
+                <Menu model={menuItems} popup ref={menuNotify} popupAlignment="left" style={{ width:'20%'}}/>
+              </div>
             </div>
         </>
     );

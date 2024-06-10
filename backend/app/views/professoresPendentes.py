@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from app.models import Professor, ProfessorInterno, StatusCadastro
 from app.serializers import UsuarioPolymorphicSerializer
 from rest_framework.permissions import IsAuthenticated
+from app.services.notificacoes import notificacaoService
 
 class ProfessoresPendentesListAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -15,6 +16,7 @@ class ProfessoresPendentesListAPIView(APIView):
 
 class AprovarProfessorAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    notificacaoService = notificacaoService()
 
     def put(self, request, idProfessor, format=None):
         try:
@@ -22,6 +24,7 @@ class AprovarProfessorAPIView(APIView):
             status_cadastro = professor.status
             status_cadastro.aprovacao = True
             status_cadastro.save()
+            self.notificacaoService.enviarNotificacaoCadastroExternoAprovado(professor)
             return Response({'message': 'Professor aprovado com sucesso!'}, status=status.HTTP_200_OK)
         except Professor.DoesNotExist:
             return Response({'error': 'Professor não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
@@ -30,6 +33,7 @@ class AprovarProfessorAPIView(APIView):
 
 class RecusarProfessorAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    notificacaoService = notificacaoService()
 
     def put(self, request, idProfessor, format=None):
         try:
@@ -40,6 +44,7 @@ class RecusarProfessorAPIView(APIView):
             status_cadastro = professor.status
             status_cadastro.justificativa = justificativa
             status_cadastro.save()
+            self.notificacaoService.enviarNotificacaoCadastroExternoNegado(professor, justificativa)
             return Response({'message': 'Professor reprovado com sucesso!'}, status=status.HTTP_200_OK)
         except Professor.DoesNotExist:
             return Response({'error': 'Professor não encontrado.'}, status=status.HTTP_404_NOT_FOUND)

@@ -8,10 +8,13 @@ import Link from "next/link";
 import ConfiguracoesService from "meutcc/services/ConfiguracoesService";
 import React, { useState } from "react";
 import Image from "next/image";
+import NotificacoesService from "meutcc/services/NotificacoesService";
 
 export const AppLayout = ({ children, guards }) => {
 
     const { user } = useAuth();
+    const [unreadNotifications, setUnreadNotifications] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
     const [coordenadorNome, setCoordenadorNome] = useState('');
 
     const menuItemTemplate = (item) => {
@@ -50,6 +53,16 @@ export const AppLayout = ({ children, guards }) => {
 
     const isUserAuth = !!user || false;
 
+    const loadNotifications = async () => {
+        try {
+            const data = await NotificacoesService.getNotificacoesNaoLidas();
+            setUnreadNotifications(data.data.notifications);
+            setUnreadCount(data.data.unread_count);
+        } catch (error) {
+            console.error('Erro ao carregar notificações:', error);
+        }
+    };
+
     const fetchConfigs = async () => {
         try {
             const data = await ConfiguracoesService.getCoordenador();
@@ -60,8 +73,12 @@ export const AppLayout = ({ children, guards }) => {
     };
 
     React.useEffect(() => {
+        if (isUserAuth) {
+        loadNotifications();
+        }
         fetchConfigs();
     }, [])
+
 
     return (
         <div className='bg-gray-100 min-h-screen'>
@@ -69,7 +86,7 @@ export const AppLayout = ({ children, guards }) => {
                 position="top-center"
                 reverseOrder={false}
             />
-            <NavBar auth={isUserAuth} />
+            <NavBar auth={isUserAuth} notifications={unreadNotifications} unreadCount={unreadCount}/>
 
             <div style={{ backgroundColor: '#f9fafb' }}>
                 {

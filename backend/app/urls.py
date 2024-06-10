@@ -36,6 +36,8 @@ urlpatterns = [
     path('possui-proposta', views.PossuiProposta.as_view(), name='possui-proposta'),
     path('responder-proposta/<int:tccId>', views.TccStatusResponderPropostaView.as_view(), name='responder-proposta'),
     path('upload/professor-externo/', views.FileUploadView.as_view(), name='file-upload-externo'),
+    path('notificacoes', views.ListarNotificacoesNaoLidas.as_view(), name='notificacoes'),
+    path('limpar-notificacoes', views.MarcarNotificacoesComoLidas.as_view(), name='limpar-notificacoes'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

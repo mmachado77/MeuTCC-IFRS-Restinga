@@ -7,6 +7,7 @@ from .avaliacao import *
 from .tcc_estatico import *
 from .banca import *
 from .sessoes import *
-from .tcc import *
 from .semestre import *
 from .semestreCoordenador import *
+from .tcc import *
+from .notificacoes import *
