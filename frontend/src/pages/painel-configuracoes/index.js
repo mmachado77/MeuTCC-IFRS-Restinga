@@ -19,6 +19,7 @@ import { Paginator } from 'primereact/paginator';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { ScrollPanel } from 'primereact/scrollpanel';
+import CustomAvatar from 'meutcc/components/ui/CustomAvatar';
 
 addLocale('ptbr', {
     today: 'Hoje', clear: 'Limpar', monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'], monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'], dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'], dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'], weekHeader: 'Semana', firstDay: 0, isRTL: false, showMonthAfterYear: false, yearSuffix: '', timeOnlyTitle: 'Só Horas', timeText: 'Tempo', hourText: 'Hora', minuteText: 'Minuto', secondText: 'Segundo', ampm: false, month: 'Mês', week: 'Semana', day: 'Dia', allDayText: 'Todo o Dia'
@@ -347,16 +348,7 @@ const ConfiguracoesPage = () => {
                                             <Card className='shadow-md shadow-gray-300 border border-solid border-gray-200 rounded-lg text-gray-700' title="Coordenador Atual">
                                                 <div className='flex justify-between items-center'>
                                                     <div className='flex items-start items-center'>
-                                                        <div className="p-avatar p-component p-avatar-image p-avatar-circle ml-3" style={{ height: "80px", width: "80px" }} >
-                                                            {semestreAtual.semestreCoordenador.avatar ?
-                                                                <img alt="avatar" className="hover:brightness-90" referrerpolicy="no-referrer" height="80" width="80" src={semestreAtual.semestreCoordenador.avatar} data-pc-section="image" element-id="348" />
-                                                                : <div class="relative inline-flex items-center justify-center w-full overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600" style={{ height: '100%' }}>
-                                                                    <span class="font-medium text-gray-600 dark:text-gray-300">{semestreAtual.semestreCoordenador.coordenador_nome.split(' ').slice(0, 2).map(palavra => palavra[0]).join('')}</span>
-                                                                </div>
-
-                                                            }
-
-                                                        </div>
+                                                        <CustomAvatar className='w-[80px] h-[80px] text-[40px]' image={semestreAtual.semestreCoordenador.avatar} fullname={semestreAtual.semestreCoordenador.coordenador_nome} size="xlarge" shape="circle" />
                                                         <div className='ml-5'>
                                                             <div className=''>
                                                                 <label htmlFor="coordenador" className="font-bold text-gray-700 text-lg">{semestreAtual.semestreCoordenador.coordenador_nome} </label>

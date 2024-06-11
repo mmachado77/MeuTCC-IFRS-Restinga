@@ -14,11 +14,8 @@ const GeraNomeLabel = (nomeCompleto) => {
 }
 
 const CustomAvatar = ({ ...props }) => {
-    if (!props.image) {
-        delete props.image;
-        props.label = props.label || GeraNomeLabel(props?.fullname);
-    }
-    return <Avatar {...props} />
+    props.label = props.label || GeraNomeLabel(props?.fullname);
+    return <Avatar {...props} className={ props.className + ' bg-indigo-600 text-white select-none' } />
 }
 
 export default CustomAvatar;

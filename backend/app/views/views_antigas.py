@@ -48,7 +48,7 @@ class ObterTokenView(APIView):
         username = request.data.get('username')
         
         try:
-            user = User.objects.get(username=username)
+            user = User.objects.get(email=username)
             token = Token.objects.get_or_create(user=user)
             return Response({'token': token[0].key}, status=200)
 

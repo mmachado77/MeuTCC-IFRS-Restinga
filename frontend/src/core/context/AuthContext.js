@@ -25,7 +25,7 @@ export const AuthProvider = ({ children, guards }) => {
             const accessToken = localStorage.getItem('token');
 
             if (guards && guards.length > 0 && !accessToken) {
-                router.push('/auth');
+                window.location.href = ('/auth');
             }
 
             if (!accessToken) {
@@ -36,17 +36,17 @@ export const AuthProvider = ({ children, guards }) => {
             try {
                 const data = await AuthService.detalhesUsuario();
 
-                if('cadastroIncompleto' in data) {
+                if ('cadastroIncompleto' in data) {
                     setLoading(false);
-                    if(router.pathname !== '/cadastro') {
-                        router.push('/cadastro')
+                    if (router.pathname !== '/cadastro') {
+                        window.location.href = ('/cadastro')
                     }
                     return;
                 }
                 setUser(data);
 
                 if (guards && guards.length > 0 && !guards.includes(data.resourcetype)) {
-                    router.push('/acesso-proibido');
+                    window.location.href = '/acesso-proibido';
                     return;
                 }
 
@@ -54,17 +54,17 @@ export const AuthProvider = ({ children, guards }) => {
                 setUser(null);
                 localStorage.removeItem('token');
                 if (guards && guards.length > 0 && router.pathname !== '/auth') {
-                    router.push('/auth');
+                    window.location.href = ('/auth');
                 }
                 console.error(error);
             }
-            
+
             setLoading(false);
 
         }
-        
+
         fetchUsuario();
-        
+
     }, []);
 
     const value = {
