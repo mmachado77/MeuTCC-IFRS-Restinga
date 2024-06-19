@@ -5,11 +5,11 @@ import { Toast } from 'primereact/toast';
 import toast from 'react-hot-toast';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
-import ProfessorService from 'meutcc/services/ProfessorService'; 
+import ProfessorService from 'meutcc/services/ProfessorService';
 import { format } from 'date-fns';
 import FormularioJustificativa from './formularioJustificativa'
 
-export default function listaProfessores() {
+export default function ListaProfessores() {
     let emptyProfessor = {
         id: null,
         tipo: '',
@@ -38,7 +38,7 @@ export default function listaProfessores() {
     const fetchProfessors = async () => {
         try {
             const professoresPendentes = await ProfessorService.getProfessoresPendentes();
-            
+
             setProfessors(professoresPendentes);
         } catch (error) {
             console.error('Erro ao obter professores pendentes:', error);
@@ -59,9 +59,9 @@ export default function listaProfessores() {
         });
         atualizaProfessoresPosAvaliacao()
     };
-    
 
-    useEffect(() => {       
+
+    useEffect(() => {
         fetchProfessors();
     }, []); // Adicionando [] como dependência para garantir que o useEffect seja executado apenas uma vez
 
@@ -76,7 +76,7 @@ export default function listaProfessores() {
 
     const actionBodyTemplate = (rowData) => {
         return (
-                <Button label="Analisar" icon='pi pi-search-plus' severity="success" outlined onClick={() => detalhesProfessor(rowData)} />
+            <Button label="Analisar" icon='pi pi-search-plus' severity="success" outlined onClick={() => detalhesProfessor(rowData)} />
         );
     };
 
@@ -126,34 +126,34 @@ export default function listaProfessores() {
                 {professor.resourcetype === 'ProfessorExterno' && (
                     <>
                         <div style={{ marginBottom: '1rem' }}>
-                        <label htmlFor="identidade" className="font-bold">Identidade: </label>
-                        {professor.identidade ? (
-                            <a href={`${baseURL}${professor.identidade}`} target="_blank" rel="noopener noreferrer">{professor.identidade.split('/').pop()}</a>
-                        ) : (
-                            <span>Não disponível</span>
-                        )}
-                    </div>
-                    <div style={{ marginBottom: '1rem' }}>
-                        <label htmlFor="diploma" className="font-bold">Diploma: </label>
-                        {professor.diploma ? (
-                            <a href={`${baseURL}${professor.diploma}`} target="_blank" rel="noopener noreferrer">{professor.diploma.split('/').pop()}</a>
-                        ) : (
-                            <span>Não disponível</span>
-                        )}
-                    </div>
+                            <label htmlFor="identidade" className="font-bold">Identidade: </label>
+                            {professor.identidade ? (
+                                <a href={`${baseURL}${professor.identidade}`} target="_blank" rel="noopener noreferrer">{professor.identidade.split('/').pop()}</a>
+                            ) : (
+                                <span>Não disponível</span>
+                            )}
+                        </div>
+                        <div style={{ marginBottom: '1rem' }}>
+                            <label htmlFor="diploma" className="font-bold">Diploma: </label>
+                            {professor.diploma ? (
+                                <a href={`${baseURL}${professor.diploma}`} target="_blank" rel="noopener noreferrer">{professor.diploma.split('/').pop()}</a>
+                            ) : (
+                                <span>Não disponível</span>
+                            )}
+                        </div>
                     </>
                 )}
-                <div className='border-0 border-t border-dashed border-gray-200 pt-4'>
-                    <div className={'flex justify-around ' + (exibeFormulario ? 'hidden': '')}>
+                <div className='pt-4 border-0 border-t border-gray-200 border-dashed'>
+                    <div className={'flex justify-around ' + (exibeFormulario ? 'hidden' : '')}>
                         <div>
                             <Button label="Aprovar" severity="success" icon='pi pi-thumbs-up-fill' iconPos='right' onClick={aprovarProfessor} />
                         </div>
                         <div>
-                            <Button label="Recusar" severity="danger" icon='pi pi-thumbs-down-fill' iconPos='right' onClick={ () => setExibeFormulario(!exibeFormulario) } />
+                            <Button label="Recusar" severity="danger" icon='pi pi-thumbs-down-fill' iconPos='right' onClick={() => setExibeFormulario(!exibeFormulario)} />
                         </div>
                     </div>
-                    <div className={(!exibeFormulario ? 'hidden': '')} >
-                        <FormularioJustificativa onSetVisibility={setExibeFormulario} onPosAvaliacao={atualizaProfessoresPosAvaliacao} professor={professor}/>
+                    <div className={(!exibeFormulario ? 'hidden' : '')} >
+                        <FormularioJustificativa onSetVisibility={setExibeFormulario} onPosAvaliacao={atualizaProfessoresPosAvaliacao} professor={professor} />
                     </div>
                 </div>
             </Dialog>
