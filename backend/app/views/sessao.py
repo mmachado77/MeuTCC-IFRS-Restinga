@@ -6,6 +6,7 @@ from datetime import datetime, date
 from ..models import Banca, Sessao
 from ..serializers import SessaoFuturaSerializer
 from rest_framework.permissions import IsAuthenticated
+from app.services.notificacoes import notificacaoService
 
 class SessoesFuturasView(APIView):
     def get(self, request):
@@ -15,6 +16,7 @@ class SessoesFuturasView(APIView):
         return Response(sessoes_serializer, status=status.HTTP_200_OK)
     
 class SessaoEditView(APIView):
+    notificacaoService = notificacaoService()
     def put(self, request):
         try:
             data = request.data
@@ -36,6 +38,7 @@ class SessaoEditView(APIView):
             if 'dataInicio' in data:
                 sessao_atualizada.data_inicio = data['dataInicio']
             sessao_atualizada.validacaoCoordenador = True
+            self.notificacaoService.enviarNotificacaoAgendamentoBanca(request.user, sessao_atualizada, banca_atualizada)
             sessao_atualizada.save()
 
         except Sessao.DoesNotExist:

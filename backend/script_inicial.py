@@ -2,7 +2,7 @@
 # >>> exec(open('script_inicial.py').read())
 
 from django.contrib.auth.models import User
-from app.models import TccStatus, Tcc, Semestre, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno, Convite, SemestreCoordenador
+from app.models import TccStatus, Tcc, Semestre, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno, Convite, SemestreCoordenador, Mensagem
 from datetime import datetime
 
 # Criando usuário admin
@@ -149,5 +149,180 @@ tcc_status = TccStatus.objects.create(
                         tcc= tcc2                                
 
 )
+
+mensagem1 = Mensagem.objects.create(
+        identificador= "PROP001",
+        assunto = "[Meus TCCs - Restinga] Nova solicitação de orientação",
+        mensagem="""Olá {ORIENTADOR_NOME},
+
+Você recebeu uma nova solicitação de orientação no sistema Meus TCCs. Seguem os detalhes:
+
+    • Estudante: {ESTUDANTE_NOME}
+    • Tema: {TCC_TEMA}
+    • Resumo: {TCC_RESUMO}
+
+Por favor, acesse o sistema para revisar a solicitação e tomar as devidas ações.
+
+Atenciosamente,
+
+Equipe Meus TCCs - Campus Restinga
+
+---
+
+Este é um e-mail automático, por favor, não responda.""",
+        descricao="Notificação de nova proposta para o orientador",
+        url_destino="/proposta-pendente",
+        notificacao="Você recebeu uma solicitação de orientação"
+    )
+
+mensagem2 = Mensagem.objects.create(
+        identificador= "PROP002",
+        assunto = "[Meus TCCs - Restinga] Nova solicitação de coorientação",
+        mensagem="""Olá {COORIENTADOR_NOME},
+
+Você recebeu uma nova solicitação de coorientação no sistema Meus TCCs. Seguem os detalhes:
+
+    • Estudante: {ESTUDANTE_NOME}
+    • Tema: {TCC_TEMA}
+    • Resumo: {TCC_RESUMO}
+
+Por favor, acesse o sistema para revisar a solicitação e tomar as devidas ações.
+
+Atenciosamente,
+
+Equipe Meus TCCs - Campus Restinga
+
+---
+
+Este é um e-mail automático, por favor, não responda.""",
+        descricao="Notificação de nova proposta para o coorientador",
+        url_destino="/proposta-pendente",
+        notificacao="Você recebeu uma solicitação de coorientação"
+    )
+
+mensagem3 = Mensagem.objects.create(
+        identificador= "CAD001",
+        assunto = "[Meus TCCs - Restinga] Nova solicitação de cadastro",
+        mensagem="""Olá {COORDENADOR_NOME},
+
+Gostaríamos de informar que há uma nova solicitação de cadastro no sistema Meus TCCs aguardando sua aprovação. 
+
+Por favor, acesse o sistema para revisar a solicitação e tomar as devidas ações.
+
+Detalhes das solicitações pendentes:
+
+  • Nome do Solicitante: {PROFESSOR_NOME}
+  • E-mail do Solicitante: {PROFESSOR_EMAIL}
+  • Tipo do Registro: {PROFESSOR_VINCULO}
+
+Atenciosamente,
+
+Equipe Meus TCCs - Campus Restinga
+
+---
+
+Este é um e-mail automático, por favor, não responda.""",
+        descricao="Notificação de novo cadastro para o coordenador",
+        url_destino="/atualizar-permissoes",
+        notificacao="Há uma nova solicitação de cadastro aguardando aprovação"
+    )
+
+mensagem4 = Mensagem.objects.create(
+        identificador= "CAD002",
+        assunto = "[Meus TCCs - Restinga] Solicitação de cadastro aprovada",
+        mensagem="""Olá {PROFESSOR_NOME},
+
+É com prazer que informamos que seu cadastro no sistema Meu TCC Restinga foi aprovado com sucesso!          
+
+Agora você pode acessar todas as funcionalidades disponíveis para realizar o acompanhamento do seu TCC.
+
+Atenciosamente,
+
+Equipe Meus TCCs - Campus Restinga
+
+---
+
+Este é um e-mail automático, por favor, não responda.""",
+        descricao="Notificação de cadastro aprovado para o professor",
+        url_destino=None,
+        notificacao=None
+    )
+
+mensagem5 = Mensagem.objects.create(
+        identificador= "CAD003",
+        assunto = "[Meus TCCs - Restinga] Solicitação de cadastro negada",
+        mensagem="""Olá {PROFESSOR_NOME},
+
+Lamentamos informar que seu cadastro no sistema Meus TCCs foi negado. Abaixo está a justificativa para a negativa:
+
+    • {JUSTIFICATIVA}
+
+Por favor, verifique as informações fornecidas e tente novamente.
+
+Atenciosamente,
+
+Equipe Meus TCCs - Campus Restinga
+
+---
+
+Este é um e-mail automático, por favor, não responda.""",
+        descricao="Notificação de cadastro negado para o professor",
+        url_destino=None,
+        notificacao=None
+    )
+
+mensagem6 = Mensagem.objects.create(
+        identificador= "SESSAO002",
+        assunto = "[Meus TCCs - Restinga] Nova {SESSAO_TIPO} agendada",
+        mensagem="""Olá {PROFESSOR_NOME},
+
+Temos o prazer de informar que a {SESSAO_TIPO} do TCC {TCC_TEMA} do aluno {ESTUDANTE_NOME} foi agendada.
+
+Detalhes do agendamento:
+
+    • Data: {SESSAO_DATA}
+    • Hora: {SESSAO_HORA}
+    • Local: {SESSAO_LOCAL}
+
+Por favor, confirme sua presença e prepare-se para a avaliação do trabalho.
+
+Atenciosamente,
+
+Equipe Meus TCCs - Campus Restinga
+
+---
+
+Este é um e-mail automático, por favor, não responda.""",
+        descricao="Notificação de agendamento de sessão para banca",
+        url_destino="/detalhes-tcc/{id}",
+        notificacao="Uma nova {SESSAO_TIPO} foi agendada"
+    )
+
+mensagem7 = Mensagem.objects.create(
+        identificador= "SESSAO003",
+        assunto = "[Meus TCCs - Restinga] Nova {SESSAO_TIPO} agendada",
+        mensagem="""Olá {ESTUDANTE_NOME},
+
+Temos o prazer de informar que A {SESSAO_TIPO} do TCC {TCC_TEMA} foi agendada.
+
+Detalhes do agendamento:
+
+    • Data: {SESSAO_DATA}
+    • Hora: {SESSAO_HORA}
+    • Local: {SESSAO_LOCAL}
+
+Por favor, esteja preparado para a apresentação e verifique todos os detalhes necessários com antecedência.
+
+Atenciosamente,
+
+Equipe Meus TCCs - Campus Restinga
+
+---
+
+Este é um e-mail automático, por favor, não responda.""",
+        descricao="Notificação de agendamento de sessão para o estudante",
+        url_destino="/detalhes-tcc/{id}",
+        notificacao="Uma nova {SESSAO_TIPO} foi agendada"
+    )
 
 print("Usuários criados com sucesso!")

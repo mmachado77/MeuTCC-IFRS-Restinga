@@ -10,7 +10,7 @@ import FormularioJustificativa from './formularioJustificativa'
 import TccService from 'meutcc/services/TccService';
 import { STATUS_TCC } from 'meutcc/core/constants';
 
-export default function listaTccsPendentes() {
+export default function ListaTccsPendentes() {
     let emptyTcc = {
         id: null,
         tema: '',
@@ -30,7 +30,7 @@ export default function listaTccsPendentes() {
     const fetchTccsPendentes = async () => {
         try {
             const tccsPendentes = await TccService.getListarTccsPendente();
-            
+
             setTccs(tccsPendentes);
         } catch (error) {
             console.error('Erro ao obter convites pendentes:', error);
@@ -51,9 +51,9 @@ export default function listaTccsPendentes() {
         });
         atualizaConvitesPosAvaliacao()
     };
-    
 
-    useEffect(() => {       
+
+    useEffect(() => {
         fetchTccsPendentes();
     }, []); // Adicionando [] como dependência para garantir que o useEffect seja executado apenas uma vez
 
@@ -68,7 +68,7 @@ export default function listaTccsPendentes() {
 
     const actionBodyTemplate = (rowData) => {
         return (
-                <Button label="Analisar" icon='pi pi-book' severity="success" outlined onClick={() => detalhesConvite(rowData)} />
+            <Button label="Analisar" icon='pi pi-book' severity="success" outlined onClick={() => detalhesConvite(rowData)} />
         );
     };
 
@@ -111,17 +111,17 @@ export default function listaTccsPendentes() {
                     <label htmlFor="dataSubmissao" className="font-bold">Data de Submissão da Proposta: </label>
                     <span>{tcc.dataSubmissaoProposta && format(tcc.dataSubmissaoProposta, 'dd/MM/yyyy')}</span>
                 </div>
-                <div className='border-0 border-t border-dashed border-gray-200 pt-4'>
-                    <div className={'flex justify-around ' + (exibeFormulario ? 'hidden': '')}>
+                <div className='pt-4 border-0 border-t border-gray-200 border-dashed'>
+                    <div className={'flex justify-around ' + (exibeFormulario ? 'hidden' : '')}>
                         <div>
                             <Button label="Aceitar" severity="success" icon='pi pi-thumbs-up-fill' iconPos='right' onClick={aceitarConvite} />
                         </div>
                         <div>
-                            <Button label="Recusar" severity="danger" icon='pi pi-thumbs-down-fill' iconPos='right' onClick={ () => setExibeFormulario(!exibeFormulario) } />
+                            <Button label="Recusar" severity="danger" icon='pi pi-thumbs-down-fill' iconPos='right' onClick={() => setExibeFormulario(!exibeFormulario)} />
                         </div>
                     </div>
-                    <div className={(!exibeFormulario ? 'hidden': '')} >
-                        <FormularioJustificativa onSetVisibility={setExibeFormulario} onPosAvaliacao={atualizaConvitesPosAvaliacao} tcc={tcc}/>
+                    <div className={(!exibeFormulario ? 'hidden' : '')} >
+                        <FormularioJustificativa onSetVisibility={setExibeFormulario} onPosAvaliacao={atualizaConvitesPosAvaliacao} tcc={tcc} />
                     </div>
                 </div>
             </Dialog>
