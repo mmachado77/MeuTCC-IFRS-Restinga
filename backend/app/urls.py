@@ -45,6 +45,7 @@ urlpatterns = [
     path('excluir-documento-sessao/<int:sessaoId>/', views.ExcluirDocumentoSessaoView.as_view(), name='excluir-documento-sessao'),
     path('download-documento-tcc/<int:tccId>/', views.DownloadDocumentoTCCView.as_view(), name='download-documento-tcc'),
     path('download-documento-sessao/<int:sessaoId>/', views.DownloadDocumentoSessaoView.as_view(), name='download-documento-sessao'),
+    path('avaliar/<int:sessaoId>/', views.Avaliar.as_view(), name='avaliar'),
 
 
 

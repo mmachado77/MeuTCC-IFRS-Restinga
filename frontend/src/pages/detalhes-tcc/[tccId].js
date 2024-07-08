@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Button } from 'primereact/button';
 import TccService from 'meutcc/services/TccService';
+import AvaliacaoService from 'meutcc/services/AvaliacaoService';
 import { Tag } from 'primereact/tag';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
@@ -11,12 +12,14 @@ import { GUARDS } from 'meutcc/core/constants';
 import { InputText } from 'primereact/inputtext';
 import { useAuth } from 'meutcc/core/context/AuthContext';
 import { InputTextarea } from 'primereact/inputtextarea';
+import { InputNumber } from 'primereact/inputnumber';
 import { Dropdown } from 'primereact/dropdown';
 import ProfessorService from 'meutcc/services/ProfessorService';
 import toast from 'react-hot-toast';
 import { Calendar } from 'primereact/calendar';
 import CustomAvatar from 'meutcc/components/ui/CustomAvatar';
 import { Toast } from 'primereact/toast';
+import {Checkbox} from "primereact/checkbox";
 
 const FileItem = ({ file, sessaoId, prazoEntrega, user, onFileUpload, onFileDelete, onFileDownload }) => {
     const toast = useRef(null);
@@ -104,7 +107,7 @@ const FileItem = ({ file, sessaoId, prazoEntrega, user, onFileUpload, onFileDele
     );
 };
 
-const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBancaSessaoPreviaClick, onSugerirBancaSessaoFinalClick, onFileUpload, onFileDelete, onFileDownload }) => {
+const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBancaSessaoPreviaClick, onSugerirBancaSessaoFinalClick, onAvaliacaoClick, onFileUpload, onFileDelete, onFileDownload }) => {
     return (
         <Accordion multiple activeIndex={[0]}>
             {sessoes.map((sessao, index) => (
@@ -138,8 +141,13 @@ const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBanca
                             <p><b>Parecer Coordenador: </b> {sessao.parecer_coordenador}</p>
                             <FileItem file={sessao.documentoTCCSessao} prazoEntrega={sessao.prazoEntregaDocumento} user={user} onFileUpload={onFileUpload} onFileDelete={onFileDelete} onFileDownload={onFileDownload} sessaoId={sessao.id} />
                             <p><b>Prazo Para Entrega do Documento:</b> {format(sessao.prazoEntregaDocumento || new Date(), 'dd/MM/yyyy HH:mm')}</p>
+                            {(sessao.tipo === 'Sessão Final' && new Date(sessao.data_inicio) < new Date() && (user.id === orientador.id || sessao.banca.professores.map(professor => professor.id).includes(user.id))) && (
+                                <div>
+                                    <Button label="Avaliar" icon="pi pi-clipboard" style={{ width: '30%',backgroundColor: '#2F9E41' }} onClick={() => onAvaliacaoClick(sessao.id)} />
+                                </div>
+                            )}
                         </div>
-                        {user.resourcetype !== 'Estudante' && (
+                        {(user.resourcetype == 'Coordenador' || user.id == orientador.id) && (
                             <div>
                                 <Button label="Editar" icon="pi pi-pencil" style={{ backgroundColor: '#2F9E41' }} />
                             </div>
@@ -195,6 +203,7 @@ const DetalhesTCC = () => {
     const [visibleSessaoFinal, setVisibleSessaoFinal] = useState(false);
     const [selectedOrientador, setSelectedOrientador] = useState([]);
     const [selectedCoorientador, setSelectedCoorientador] = useState([]);
+    const [visibleAvaliacao, setVisibleAvaliacao] = useState(false);
     const [visibleFormTCC, setVisibleFormTCC] = useState(false);
     const [visibleStatus, setVisibleStatus] = useState(false);
     const [orientadores, setOrientadores] = useState([]);
@@ -205,7 +214,21 @@ const DetalhesTCC = () => {
     const [coorientadorMensagemErro, setCoorientadorMensagemErro] = useState('');
     const [datetime24h, setDateTime24h] = useState(null);
     const [documentoTCC, setDocumentoTCC] = useState(null);
+    const [necessarioAdequacoes, setNecessarioAdequacoes] = React.useState(false);
     const [autorizacaoPublicacao, setAutorizacaoPublicacao] = useState(null);
+    const [comentariosMensagemErro, setComentariosMensagemErro] = useState('');
+    const [sessaoId, setSessaoId] = useState(0);
+    const [adequacoesMensagemErro, setAdequacoesMensagemErro] = useState('');
+    const [notaEstruturaMensagemErro, setNotaEstruturaMensagemErro] = useState('');
+    const [notaRelevanciaMensagemErro, setNotaRelevanciaMensagemErro] = useState('');
+    const [notaConhecimentoMensagemErro, setNotaConhecimentoMensagemErro] = useState('');
+    const [notaBibliografiaMensagemErro, setNotaBibliografiaMensagemErro] = useState('');
+    const [notaRecursosMensagemErro, setNotaRecursosMensagemErro] = useState('');
+    const [notaConteudoMensagemErro, setNotaConteudoMensagemErro] = useState('');
+    const [notaSinteseMensagemErro, setNotaSinteseMensagemErro] = useState('');
+    const [dataEntregaMensagemErro, setDataEntregaMensagemErro] = useState('');
+    const [horarioEntregaMensagemErro, setHorarioEntregaMensagemErro] = useState('');
+
 
     const handleEditarClick = () => {
         setVisibleFormTCC(true);
@@ -219,6 +242,11 @@ const DetalhesTCC = () => {
 
     const handleSugerirBancaSessaoFinalClick = () => {
         setVisibleSessaoFinal(true);
+    };
+
+    const handleAvaliacao = (sessaoIdAvaliacao) => {
+        setSessaoId(sessaoIdAvaliacao)
+        setVisibleAvaliacao(true);
     };
 
     const carregarDetalhesTCC = async () => {
@@ -248,6 +276,105 @@ const DetalhesTCC = () => {
         carregarProfessores();
         carregarDetalhesTCC();
     }, [router]);
+
+    const onSubmitAvaliacao = async (event) => {
+        event.preventDefault();
+        setLoading(true);
+        const formData = new FormData(event.currentTarget);
+        const jsonData = Object.fromEntries(formData);
+
+        if (jsonData.estrutura_trabalho == '') {
+            setNotaEstruturaMensagemErro('A nota de Estrutura do Trabalho é obrigatória');
+            setLoading(false);
+            return;
+        } else {
+            setNotaEstruturaMensagemErro('');
+        }
+
+        if (jsonData.relevancia_originalidade_qualidade == '') {
+            setNotaRelevanciaMensagemErro('A nota de Relevância, Originalidade e Qualidade do Conteúdo é obrigatória');
+            setLoading(false);
+            return;
+        } else {
+            setNotaRelevanciaMensagemErro('');
+        }
+
+        if (jsonData.grau_conhecimento == '') {
+            setNotaConhecimentoMensagemErro('A nota de Grau de Conhecimento é obrigatória');
+            setLoading(false);
+            return;
+        } else {
+            setNotaConhecimentoMensagemErro('');
+        }
+
+        if (jsonData.bibliografia_apresentada == '') {
+            setNotaBibliografiaMensagemErro('A nota de Bibliografia Apresentada é obrigatória');
+            setLoading(false);
+            return;
+        } else {
+            setNotaBibliografiaMensagemErro('');
+        }
+
+        if (jsonData.utilizacao_recursos_didaticos == '') {
+            setNotaRecursosMensagemErro('A nota de Utilização de Recursos Didáticos é obrigatória');
+            setLoading(false);
+            return;
+        } else {
+            setNotaRecursosMensagemErro('');
+        }
+
+        if (jsonData.conteudo_apresentacao == '') {
+            setNotaConteudoMensagemErro('A nota de Conteúdo da Apresentação é obrigatória');
+            setLoading(false);
+            return;
+        } else {
+            setNotaConteudoMensagemErro('');
+        }
+
+        if (jsonData.utilizacao_tempo_sintese == '') {
+            setNotaSinteseMensagemErro('A nota de Utilização do Tempo e Poder de Síntese é obrigatória');
+            setLoading(false);
+            return;
+        } else {
+            setNotaSinteseMensagemErro('');
+        }
+
+        if (necessarioAdequacoes && jsonData.data_entrega === '') {
+            setDataEntregaMensagemErro('O campo Data é obrigatório');
+            setLoading(false);
+            return;
+        } else {
+            setDataEntregaMensagemErro('');
+        }
+
+        if (necessarioAdequacoes && jsonData.horario_entrega === '') {
+            setHorarioEntregaMensagemErro('O campo Horário é obrigatório');
+            setLoading(false);
+            return;
+        } else {
+            setHorarioEntregaMensagemErro('');
+        }
+
+        if (necessarioAdequacoes && jsonData.adequacoes_necessarias === '') {
+            setAdequacoesMensagemErro('O campo Adequações Necessárias é obrigatório');
+            setLoading(false);
+            return;
+        } else {
+            setAdequacoesMensagemErro('');
+        }
+
+        const response = await AvaliacaoService.avaliar(sessaoId, jsonData);
+
+        if (response) {
+            toast.success('Avaliação realizada com sucesso');
+        } else {
+            toast.error('Erro ao realizar avaliação');
+        }
+
+        setLoading(false);
+        carregarDetalhesTCC();
+        setVisibleAvaliacao(false);
+    };
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -382,6 +509,10 @@ const DetalhesTCC = () => {
         }
     };
 
+    const handleAdequacoesChange = (e) => {
+        setNecessarioAdequacoes(!necessarioAdequacoes);
+    }
+
     if (TCCData?.id == null) {
         return (
             <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
@@ -422,6 +553,7 @@ const DetalhesTCC = () => {
                             user={user}
                             onSugerirBancaSessaoPreviaClick={handleSugerirBancaSessaoPreviaClick}
                             onSugerirBancaSessaoFinalClick={handleSugerirBancaSessaoFinalClick}
+                            onAvaliacaoClick={handleAvaliacao}
                             onFileUpload={handleFileUpload}
                             onFileDelete={handleFileDelete}
                             onFileDownload={handleFileDownload}
@@ -490,8 +622,8 @@ const DetalhesTCC = () => {
                                 <Dropdown value={optionLocalSessao} onChange={(e) => setOptionLocalSessao(e.value)} options={optionsLocalSessao} className='w-full' />
                             </div>
                             <div className="flex flex-wrap align-items-center mb-3 gap-2">
-                                <label htmlFor="tema"><b>Local</b></label>
-                                <InputText id="tema" name="tema" placeholder="Tema" className={'w-full ' + (temaMensagemErro ? 'p-invalid' : '')} placeholder='Exemplo, Campus Restinga, sala 403' />
+                                <label htmlFor="local"><b>Local</b></label>
+                                <InputText id="local" name="local" placeholder='Exemplo, Campus Restinga, sala 403' className={'w-full ' + (temaMensagemErro ? 'p-invalid' : '')}  />
                                 {temaMensagemErro && <small id="tema-help" className="text-red-500 py-1 px-2">{temaMensagemErro}</small>}
                             </div>
                         </div>
@@ -513,6 +645,86 @@ const DetalhesTCC = () => {
             </Dialog>
             <Dialog header="Editar Sessão Final" visible={visibleSessaoFinal} style={{ width: '50vw' }} onHide={() => setVisibleSessaoFinal(false)}>
                 <p>A</p>
+            </Dialog>
+            <Dialog header="Avalar TCC" visible={visibleAvaliacao} style={{ width: '50vw' }} onHide={() => setVisibleAvaliacao(false)}>
+                <form onSubmit={onSubmitAvaliacao}>
+                    <div className='grid gap-4'>
+                        <h4> NOTAS TRABALHO ESCRITO </h4>
+                        <div className='grid grid-cols-2 gap-4'>
+                            <div className="flex flex-col align-items-center mb-3 gap-2">
+                                <label htmlFor="estrutura_trabalho"><b>Estrutura do Trabalho</b></label>
+                                <InputNumber className="w-4/6" id="estrutura_trabalho" name="estrutura_trabalho" placeholder= 'Máximo 1,0 ponto' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={1} step={0.1}/>
+                                {notaEstruturaMensagemErro && <small id="nota-estrutura-help" className="text-red-500 py-1 px-2">{notaEstruturaMensagemErro}</small>}
+                            </div>
+                            <div className="flex flex-col align-items-center mb-3 gap-2">
+                                <label htmlFor="relevancia_originalidade_qualidade"><b>Relevância, Originalidade e Qualidade do Conteúdo</b></label>
+                                <InputNumber className="w-4/6" id="relevancia_originalidade_qualidade" name="relevancia_originalidade_qualidade" placeholder= 'Máximo 3,0 pontos' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={3} step={0.1}/>
+                                {notaRelevanciaMensagemErro && <small id="nota-relevancia-help" className="text-red-500 py-1 px-2">{notaRelevanciaMensagemErro}</small>}
+                            </div>
+                        </div>
+                        <div className='grid grid-cols-2 gap-4'>
+                            <div className="flex flex-col align-items-center mb-3 gap-2">
+                                <label htmlFor="grau_conhecimento"><b>Grau de Conhecimento</b></label>
+                                <InputNumber className="w-4/6" id="grau_conhecimento" name="grau_conhecimento" placeholder= 'Máximo 2,0 pontos' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={2} step={0.1}/>
+                                {notaConhecimentoMensagemErro && <small id="nota-conhecimento-help" className="text-red-500 py-1 px-2">{notaConhecimentoMensagemErro}</small>}
+                            </div>
+                            <div className="flex flex-col align-items-center mb-3 gap-2">
+                                <label htmlFor="bibliografia_apresentada"><b>Bibliografia Apresentada</b></label>
+                                <InputNumber className="w-4/6" id="bibliografia_apresentada" name="bibliografia_apresentada" placeholder= 'Máximo 1,0 ponto' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={1} step={0.1}/>
+                                {notaBibliografiaMensagemErro && <small id="nota-bibliografia-help" className="text-red-500 py-1 px-2">{notaBibliografiaMensagemErro}</small>}
+                            </div>
+                        </div>
+                        <h4> NOTAS APRESENTAÇÃO DO TRABALHO </h4>
+                        <div className='grid grid-cols-2 gap-4'>
+                            <div className="flex flex-col align-items-center mb-3 gap-2">
+                                <label htmlFor="utilizacao_recursos_didaticos"><b>Utilização de Recursos Didáticos</b></label>
+                                <InputNumber className="w-4/6" id="utilizacao_recursos_didaticos" name="utilizacao_recursos_didaticos" placeholder= 'Máximo 1,0 ponto' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={1} step={0.1}/>
+                                {notaRecursosMensagemErro && <small id="nota-recursos-help" className="text-red-500 py-1 px-2">{notaRecursosMensagemErro}</small>}
+                            </div>
+                            <div className="flex flex-col align-items-center mb-3 gap-2">
+                                <label htmlFor="conteudo_apresentacao"><b>Conteúdo da Apresentação</b></label>
+                                <InputNumber className="w-4/6" id="conteudo_apresentacao" name="conteudo_apresentacao" placeholder= 'Máximo 1,0 ponto' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={1} step={0.1}/>
+                                {notaConteudoMensagemErro && <small id="nota-apresentacao-help" className="text-red-500 py-1 px-2">{notaConteudoMensagemErro}</small>}
+                            </div>
+                        </div>
+                        <div className='grid grid-cols-2 gap-4'>
+                            <div className="flex flex-col align-items-center mb-3 gap-2">
+                                <label htmlFor="utilizacao_tempo_sintese"><b>Utilização do Tempo e Poder de Síntese</b></label>
+                                <InputNumber className="w-4/6" id="utilizacao_tempo_sintese" name="utilizacao_tempo_sintese" placeholder= 'Máximo 1,0 ponto' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={1} step={0.1}/>
+                                {notaSinteseMensagemErro && <small id="nota-sintese-help" className="text-red-500 py-1 px-2">{notaSinteseMensagemErro}</small>}
+                            </div>
+                        </div>
+                        <h4> CONSIDERAÇÕES FINAIS </h4>
+                        {(user.id === TCCData?.orientador?.id) && (<> <div className="flex flex-wrap align-items-center mb-3 gap-1 pt-2">
+                            <Checkbox inputId="adequacoes" name='adequacoes'  onChange={handleAdequacoesChange} checked={necessarioAdequacoes} />
+                            <label htmlFor="adequacoes" className="ml-2">O Trabalho de Conclusão de Curso (TCC) necessita de adequações para aprovação da versão final</label>
+                        </div>
+                        <div className='grid grid-cols-2 gap-4' style={{ display: necessarioAdequacoes ? 'flex' : 'none' }}>
+                            <div className="flex flex-col align-items-center mb-3 gap-2 w-full">
+                                <label htmlFor="data_entrega"><b>Data</b></label>
+                                <Calendar className="w-10/12" id="data_entrega" name="data_entrega" placeholder="Data para entrega da versão definitiva" value={datetime24h} minDate={new Date()} readOnlyInput onChange={(e) => setDateTime24h(e.value)} />
+                                {dataEntregaMensagemErro && <small id="data-help" className="text-red-500 py-1 px-2">{dataEntregaMensagemErro}</small>}
+                            </div>
+                            <div className="flex flex-col align-items-center mb-3 gap-2 w-full">
+                                <label htmlFor="horario_entrega"><b>Horário</b></label>
+                                <Calendar className="w-10/12" id="horario_entrega" name="horario_entrega" value={datetime24h} placeholder="Horário para entrega da versão definitiva" readOnlyInput onChange={(e) => setDateTime24h(e.value)} timeOnly/>
+                                {horarioEntregaMensagemErro && <small id="horario-help" className="text-red-500 py-1 px-2">{horarioEntregaMensagemErro}</small>}
+                            </div>
+                        </div>
+                        <div className='flex flex-wrap align-items-center mb-3 gap-2' style={{ display: necessarioAdequacoes ? 'flex' : 'none' }}>
+                            <label htmlFor="adequacoes_necessarias" className="ml-2"><b>Adequações Necessárias</b></label>
+                            <InputTextarea id='adequacoes_necessarias' name='adequacoes_necessarias' placeholder='Descreva quais ajustes devem ser realizados pelo estudante mediante a aprovação do Trabalho de Conclusão de Curso (TCC)' rows={6} className={'w-full ' + (resumoMensagemErro ? 'p-invalid' : '')} />
+                            {adequacoesMensagemErro && <small id='tema-help' className='text-red-500 py-1 px-2'>{adequacoesMensagemErro}</small> }
+                        </div></>)}
+                        <div className='flex flex-wrap align-items-center mb-3 gap-2'>
+                            <label htmlFor="comentarios_adicionais" className="ml-2"><b>Comentários Adicionais</b></label>
+                            <InputTextarea id='comentarios_adicionais' name='comentarios_adicionais' placeholder='Escreva um resumo sobre o que será abordado em seu TCC' rows={6} className={'w-full ' + (resumoMensagemErro ? 'p-invalid' : '')} />
+                        </div>
+                    </div>
+                    <div className="flex flex-wrap align-items-center mb-3 gap-2">
+                        <Button label={loading ? "Avaliando TCC" : "Avaliar TCC"} loading={loading} className="w-full" />
+                    </div>
+                </form>
             </Dialog>
         </div>
     );
