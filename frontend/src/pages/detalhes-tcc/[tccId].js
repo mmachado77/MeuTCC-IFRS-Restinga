@@ -114,10 +114,10 @@ const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBanca
                 <AccordionTab key={index} header={sessao.tipo}>
                     <div style={{ display: 'flex', justifyContent: 'center' }}>
                         <div style={{ width: '100%' }}>
-                            <p><b>Data {sessao.tipo}:</b> {format(sessao.data_inicio || new Date(), 'dd/MM/yyyy HH:mm')}</p>
-                            <p><b>Local:</b> {sessao.local}</p>
+                            <p className="mb-7"><b>Data {sessao.tipo}:</b> {format(sessao.data_inicio || new Date(), 'dd/MM/yyyy HH:mm')}</p>
+                            <p className="mb-7"><b>Local:</b> {sessao.local}</p>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <p style={{ margin: 0, marginRight: '40px' }}><b>Participantes:</b></p>
+                                <p className="mb-7" style={{ margin: 0, marginRight: '40px' }}><b>Participantes:</b></p>
                                 <table>
                                     <tbody>
                                         <tr>
@@ -137,13 +137,31 @@ const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBanca
                                     </tbody>
                                 </table>
                             </div>
-                            <p><b>Parecer Orientador: </b>{sessao.parecer_orientador}</p>
-                            <p><b>Parecer Coordenador: </b> {sessao.parecer_coordenador}</p>
+                            <p className="mb-7"><b>Parecer Orientador: </b>{sessao.parecer_orientador}</p>
+                            <p className="mb-7"><b>Parecer Coordenador: </b> {sessao.parecer_coordenador}</p>
+                            <p><b>Documento TCC {sessao.tipo}:</b></p>
                             <FileItem file={sessao.documentoTCCSessao} prazoEntrega={sessao.prazoEntregaDocumento} user={user} onFileUpload={onFileUpload} onFileDelete={onFileDelete} onFileDownload={onFileDownload} sessaoId={sessao.id} />
-                            <p><b>Prazo Para Entrega do Documento:</b> {format(sessao.prazoEntregaDocumento || new Date(), 'dd/MM/yyyy HH:mm')}</p>
+                            {(sessao.tipo === 'Sessão Final' && new Date(sessao.data_inicio) < new Date()) && (
+                                <>
+                                    <p><b>Ficha Avaliação:</b></p>
+                                    <FileItem file={sessao.avaliacao.ficha_avaliacao} prazoEntrega={sessao.prazoEntregaDocumento} user={user} onFileUpload={onFileUpload} onFileDelete={onFileDelete} onFileDownload={onFileDownload} sessaoId={sessao.id} />
+                                </>
+                            )}
+                            <p className="mb-7"><b>Prazo Para Entrega do Documento:</b> {format(sessao.prazoEntregaDocumento || new Date(), 'dd/MM/yyyy HH:mm')}</p>
                             {(sessao.tipo === 'Sessão Final' && new Date(sessao.data_inicio) < new Date() && (user.id === orientador.id || sessao.banca.professores.map(professor => professor.id).includes(user.id))) && (
                                 <div>
-                                    <Button label="Avaliar" icon="pi pi-clipboard" style={{ width: '30%',backgroundColor: '#2F9E41' }} onClick={() => onAvaliacaoClick(sessao.id)} />
+                                    { sessao.avaliacao.nota_orientador !== null && sessao.avaliacao.nota_avaliador1 !== null && sessao.avaliacao.nota_avaliador2 !== null ? (
+                                        <div className='flex flex-column'>
+                                            <Button className="w-1/5" label="Avaliado" icon="pi pi-check" severity="info" />
+                                            <a className="ml-10 flex items-center w-full" href="#">
+                                                Clique aqui para fazer o download da ficha de avaliação preenchida
+                                            </a>
+                                        </div>
+                                    ) : ((user.id === orientador.id && sessao.avaliacao.nota_orientador !== null) || (user.id === sessao.banca.professores[0].id && sessao.avaliacao.nota_avaliador1 !== null) || (user.id === sessao.banca.professores[1].id && sessao.avaliacao.nota_avaliador2 !== null)) ? (
+                                        <Button label="Aguardando Avaliações" icon="pi pi-clock" severity="warning" />
+                                    ) : (
+                                        <Button label="Avaliar" icon="pi pi-file-edit" style={{ backgroundColor: '#2F9E41' }} onClick={() => onAvaliacaoClick(sessao.id)} />
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -169,10 +187,24 @@ const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBanca
                         : <Button style={{ width: '100%', backgroundColor: '#2F9E41' }} label="Agendar Sessão Final" onClick={() => console.log("Adicionar sessão final")} />}
                 </AccordionTab>
             )}
+            {sessoes.map(sessao => (
+                sessao.avaliacao && sessao.avaliacao.ajuste && (
+                    <AccordionTab key="ajuste" header="Ajuste">
+                        <div className="ajuste">
+                            <p className="mb-7"><b>Data de Entrega dos Ajustes: </b>{format(sessao.avaliacao.data_entrega_ajuste || new Date(), 'dd/MM/yyyy HH:mm')}</p>
+                            <p className="mb-7"><b>Ajustes necessários: </b>{sessao.avaliacao.descricao_ajuste}</p>
+                            <p><b>Documento TCC Versão Definitiva:</b></p>
+                            <FileItem file={sessao.avaliacao.tcc_definitivo} prazoEntrega={sessao.avaliacao.data_entrega_ajuste} user={user} onFileUpload={onFileUpload} onFileDelete={onFileDelete} onFileDownload={onFileDownload} sessaoId={sessao.id} />
+                            { (user.id === orientador.id)  && (
+                                <Button label="Avaliar" icon="pi pi-file-edit" style={{ backgroundColor: '#2F9E41' }} onClick={() => console.log("Falta implementar")} />
+                            )}
+                        </div>
+                    </AccordionTab>
+                )
+            ))}
         </Accordion>
     );
 };
-
 const getClassForStatus = (status) => {
     switch (status) {
         case 'PROPOSTA_ANALISE_PROFESSOR':
@@ -543,7 +575,7 @@ const DetalhesTCC = () => {
                 <p style={{ marginBottom: '35px' }}><b>Tema:</b> {TCCData?.tema}</p>
                 <p style={{ marginBottom: '35px' }}><b>Data de Submissão:</b> {format(TCCData?.dataSubmissaoProposta || new Date(), 'dd/MM/yyyy')}</p>
                 <p style={{ marginBottom: '35px' }}><b>Resumo:</b> {TCCData?.resumo}</p>
-                <FileItem file={documentoTCC || TCCData?.documentoTCC} user={user} onFileUpload={handleFileUpload} onFileDelete={handleFileDelete} onFileDownload={handleFileDownload} />
+                <p><b>Documento TCC:</b></p> <FileItem file={documentoTCC || TCCData?.documentoTCC} user={user} onFileUpload={handleFileUpload} onFileDelete={handleFileDelete} onFileDownload={handleFileDownload} />
                 <div>
                     {TCCData?.sessoes && (
                         <SessoesComponent

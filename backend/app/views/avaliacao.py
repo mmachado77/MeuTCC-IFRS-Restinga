@@ -5,9 +5,12 @@ from rest_framework import status
 from django.utils import timezone
 from app.enums import CriteriosEnum
 from app.models import Professor, SessaoFinal, Banca, Avaliacao, Nota
+from app.services import TccService
+from app.enums import StatusTccEnum
 
 class Avaliar(APIView):
     permission_classes = [IsAuthenticated]
+    tccService = TccService()
     def post(self, request, sessaoId):
         try:
             user = request.user
@@ -30,6 +33,8 @@ class Avaliar(APIView):
             sessao.save()
         else:
             avaliacao = sessao.avaliacao
+            if (is_orientador and avaliacao.nota_orientador is not None) or (user == banca.professores.all()[0].user and avaliacao.nota_avaliador1 is not None) or (user == banca.professores.all()[1].user and avaliacao.nota_avaliador2 is not None):
+                return Response({"error": "Você já avaliou este TCC."}, status=status.HTTP_400_BAD_REQUEST)
 
         notas = []
         try:
@@ -43,6 +48,7 @@ class Avaliar(APIView):
                 )
                 notas.append(nota_valor)
             soma_notas = round(sum(notas), 2)
+
         except KeyError as e:
             return Response({'status': 'error', 'message': f'Nota para o critério {e} não encontrada'},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -61,6 +67,8 @@ class Avaliar(APIView):
                     except ValueError as e:
                         return Response({'status': 'error', 'message': f'Erro ao converter data e hora: {e}'}, status=status.HTTP_400_BAD_REQUEST)
                 avaliacao.descricao_ajuste = request.data.get('adequacoes_necessarias', avaliacao.descricao_ajuste)
+                self.tccService.atualizarStatus(sessao.tcc.id, StatusTccEnum.AJUSTE)
+                avaliacao.save()
             avaliacao.comentarios_orientador = request.data.get('comentarios_adicionais',avaliacao.comentarios_orientador)
             avaliacao.nota_orientador = soma_notas
         elif is_in_banca:
@@ -74,6 +82,11 @@ class Avaliar(APIView):
         if avaliacao.nota_orientador is not None and avaliacao.nota_avaliador1 is not None and avaliacao.nota_avaliador2 is not None:
             avaliacao.media_final = round(((avaliacao.nota_orientador + avaliacao.nota_avaliador1 + avaliacao.nota_avaliador2) / 3), 2)
             avaliacao.data_avaliacao = timezone.now()
+            if avaliacao.ajuste is False:
+                if avaliacao.media_final >= 7:
+                    self.tccService.atualizarStatus(sessao.tcc.id, StatusTccEnum.APROVADO)
+                else:
+                    self.tccService.atualizarStatus(sessao.tcc.id, StatusTccEnum.REPROVADO_FINAL, "Não atingiu a média necessária")
 
         avaliacao.save()
         return Response({'status': 'success', 'message': 'Avaliação cadastrada com sucesso.'}, status=status.HTTP_201_CREATED)
