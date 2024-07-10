@@ -36,7 +36,7 @@ export const AppLayout = ({ children, guards }) => {
             {
                 label: 'Validar', icon: 'pi pi-fw pi-check', url: '',
                 items: [
-                    { label: 'Validar Cadastros', icon: 'pi pi-fw pi-list-check', url: '/atualizar-permissoes' },
+                    { label: 'Validar Cadastros', icon: 'pi pi-fw pi-users', url: '/atualizar-permissoes' },
                     { label: 'Validar Propostas', icon: 'pi pi-fw pi-book', url: '/proposta-pendente' },
                     { label: 'Validar Sessões', icon: 'pi pi-fw pi-calendar', url: '/sessoes-futuras' },
 
@@ -47,6 +47,7 @@ export const AppLayout = ({ children, guards }) => {
         ],
         Professor: [
             { label: 'Propostas Pendentes', icon: 'pi pi-fw pi-thumbs-up', url: '/proposta-pendente' },
+            { label: 'Validar Sessões', icon: 'pi pi-fw pi-calendar', url: '/sessoes-futuras-orientador' },
         ],
         ProfessorInterno: [],
         ProfessorExterno: [],
