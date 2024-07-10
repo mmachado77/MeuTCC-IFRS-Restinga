@@ -18,6 +18,7 @@ class Avaliar(APIView):
             banca = Banca.objects.get(sessao=sessao)
             professor = Professor.objects.get(user=user)
             orientador = sessao.tcc.orientador
+            avaliacao = sessao.avaliacao
         except SessaoFinal.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -27,14 +28,8 @@ class Avaliar(APIView):
         if not is_orientador and not is_in_banca:
             return Response({"error": "Você não tem permissão para avaliar este TCC."}, status=status.HTTP_403_FORBIDDEN)
 
-        if not sessao.avaliacao:
-            avaliacao = Avaliacao.objects.create()
-            sessao.avaliacao = avaliacao
-            sessao.save()
-        else:
-            avaliacao = sessao.avaliacao
-            if (is_orientador and avaliacao.nota_orientador is not None) or (user == banca.professores.all()[0].user and avaliacao.nota_avaliador1 is not None) or (user == banca.professores.all()[1].user and avaliacao.nota_avaliador2 is not None):
-                return Response({"error": "Você já avaliou este TCC."}, status=status.HTTP_400_BAD_REQUEST)
+        if (is_orientador and avaliacao.nota_orientador is not None) or (user == banca.professores.all()[0].user and avaliacao.nota_avaliador1 is not None) or (user == banca.professores.all()[1].user and avaliacao.nota_avaliador2 is not None):
+            return Response({"error": "Você já avaliou este TCC."}, status=status.HTTP_400_BAD_REQUEST)
 
         notas = []
         try:

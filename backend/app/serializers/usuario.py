@@ -40,7 +40,7 @@ class EstudanteNomeSerializer(UsuarioSerializer):
 
 class ProfessorSerializer(UsuarioSerializer):
     area_interesse = serializers.JSONField(required=False, allow_null=True)
-    status = StatusCadastroSerializer(read_only=True, source='status')
+    status = StatusCadastroSerializer(read_only=True)
 
     class Meta:
         model = Professor

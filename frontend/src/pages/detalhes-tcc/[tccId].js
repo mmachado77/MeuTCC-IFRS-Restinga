@@ -21,9 +21,10 @@ import CustomAvatar from 'meutcc/components/ui/CustomAvatar';
 import { Toast } from 'primereact/toast';
 import {Checkbox} from "primereact/checkbox";
 
-const FileItem = ({ file, sessaoId, prazoEntrega, user, onFileUpload, onFileDelete, onFileDownload }) => {
+const FileItem = ({ file, sessaoId, prazoEntrega, user, onFileUpload, onFileDelete, onFileDownload, avaliacaoAjusteId, avaliacaoId, orientador }) => {
     const toast = useRef(null);
     const fileInputRef = useRef(null);
+    const [inputId, setInputId] = useState('');
 
     const formatFileSize = (size) => {
         if (!size) return '';
@@ -43,7 +44,7 @@ const FileItem = ({ file, sessaoId, prazoEntrega, user, onFileUpload, onFileDele
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            onFileUpload(file, sessaoId);
+            onFileUpload(file, sessaoId, avaliacaoId, avaliacaoAjusteId);
             if (fileInputRef.current) {
                 fileInputRef.current.value = null; // Reseta o campo de input de arquivo
             }
@@ -51,15 +52,27 @@ const FileItem = ({ file, sessaoId, prazoEntrega, user, onFileUpload, onFileDele
     };
 
     const handleFileDelete = () => {
-        onFileDelete(sessaoId);
+        onFileDelete(sessaoId, avaliacaoId, avaliacaoAjusteId);
         if (fileInputRef.current) {
             fileInputRef.current.value = null; // Reseta o campo de input de arquivo
         }
     };
 
     const handleFileDownload = () => {
-        onFileDownload(sessaoId);
+        onFileDownload(sessaoId, avaliacaoId, avaliacaoAjusteId);
     };
+
+    useEffect(() => {
+        if (avaliacaoId) {
+            setInputId(`fileUpload-avaliacao-${avaliacaoId}`);
+        } else if (avaliacaoAjusteId) {
+            setInputId(`fileUpload-avaliacao-ajuste-${avaliacaoAjusteId}`);
+        } else if (sessaoId) {
+            setInputId(`fileUpload-sessao-${sessaoId}`);
+        } else {
+            setInputId(`fileUpload-tcc`);
+        }
+    }, [avaliacaoId, avaliacaoAjusteId, sessaoId]);
 
     return (
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '35px', borderRadius: '10px', border: '1px solid #ccc', padding: '10px', justifyContent: 'space-between' }}>
@@ -79,7 +92,21 @@ const FileItem = ({ file, sessaoId, prazoEntrega, user, onFileUpload, onFileDele
                 {file && file.name ? (
                     <>
                         <Button icon="pi pi-download" rounded severity="success" aria-label="Baixar" style={{ marginRight: '10px' }} onClick={handleFileDownload} />
-                        {(user.resourcetype === 'Estudante') && (
+                        {(user.resourcetype === 'Estudante' && !avaliacaoId) && (
+                            <>
+                                {prazoExpirado ? (
+                                    <>
+                                        <Button icon="pi pi-upload" rounded severity="secondary" aria-label="Anexar" style={{ marginRight: '10px' }} onClick={erroPrazoExpirado} />
+                                        <Toast ref={toast} />
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button icon="pi pi-trash" rounded severity="danger" aria-label="Excluir" style={{ marginRight: '10px' }} onClick={handleFileDelete} />
+                                    </>
+                                )}
+                            </>
+                        )}
+                        {(orientador && user.id === orientador.id && avaliacaoId) && (
                             <>
                                 {prazoExpirado ? (
                                     <>
@@ -95,12 +122,32 @@ const FileItem = ({ file, sessaoId, prazoEntrega, user, onFileUpload, onFileDele
                         )}
                     </>
                 ) : (
-                    (user.resourcetype === 'Estudante' && !prazoExpirado) && (
-                        <>
-                            <input type="file" accept="application/pdf" style={{ display: 'none' }} onChange={handleFileChange} id={`fileUpload-${sessaoId}`} ref={fileInputRef} />
-                            <Button icon="pi pi-upload" rounded severity="success" aria-label="Anexar" onClick={() => document.getElementById(`fileUpload-${sessaoId}`).click()} />
-                        </>
-                    )
+                    <>
+                        {(user.resourcetype === 'Estudante' && !avaliacaoId && !prazoExpirado) && (
+                            <>
+                                <input type="file" accept="application/pdf" style={{ display: 'none' }} onChange={handleFileChange} id={`fileUpload-${sessaoId}${avaliacaoId}${avaliacaoAjusteId}`} ref={fileInputRef} />
+                                <Button icon="pi pi-upload" rounded severity="success" aria-label="Anexar" onClick={() => document.getElementById(`fileUpload-${sessaoId}${avaliacaoId}${avaliacaoAjusteId}`).click()} />
+                            </>
+                        )}
+                        {(user.resourcetype === 'Estudante' && !avaliacaoId && prazoExpirado) && (
+                            <>
+                                <Button icon="pi pi-upload" rounded severity="secondary" aria-label="Anexar" style={{ marginRight: '10px' }} onClick={erroPrazoExpirado} />
+                                <Toast ref={toast} />
+                            </>
+                        )}
+                        {(orientador && user.id === orientador.id && avaliacaoId && !prazoExpirado) && (
+                            <>
+                                <input type="file" accept="application/pdf" style={{ display: 'none' }} onChange={handleFileChange} id={inputId} ref={fileInputRef} />
+                                <Button icon="pi pi-upload" rounded severity="success" aria-label="Anexar" onClick={() => document.getElementById(inputId).click()} />
+                            </>
+                        )}
+                        {(orientador && user.id === orientador.id && avaliacaoId && prazoExpirado) && (
+                            <>
+                                <Button icon="pi pi-upload" rounded severity="secondary" aria-label="Anexar" style={{ marginRight: '10px' }} onClick={erroPrazoExpirado} />
+                                <Toast ref={toast} />
+                            </>
+                        )}
+                    </>
                 )}
             </div>
         </div>
@@ -144,11 +191,11 @@ const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBanca
                             {(sessao.tipo === 'Sessão Final' && new Date(sessao.data_inicio) < new Date()) && (
                                 <>
                                     <p><b>Ficha Avaliação:</b></p>
-                                    <FileItem file={sessao.avaliacao.ficha_avaliacao} prazoEntrega={sessao.prazoEntregaDocumento} user={user} onFileUpload={onFileUpload} onFileDelete={onFileDelete} onFileDownload={onFileDownload} sessaoId={sessao.id} />
+                                    <FileItem orientador={orientador} avaliacaoId={sessao.avaliacao.id} file={sessao.avaliacao.ficha_avaliacao} user={user} onFileUpload={onFileUpload} onFileDelete={onFileDelete} onFileDownload={onFileDownload}/>
                                 </>
                             )}
                             <p className="mb-7"><b>Prazo Para Entrega do Documento:</b> {format(sessao.prazoEntregaDocumento || new Date(), 'dd/MM/yyyy HH:mm')}</p>
-                            {(sessao.tipo === 'Sessão Final' && new Date(sessao.data_inicio) < new Date() && (user.id === orientador.id || sessao.banca.professores.map(professor => professor.id).includes(user.id))) && (
+                            {(sessao.tipo === 'Sessão Final' && new Date(sessao.data_inicio) < new Date() && sessao.avaliacao.ficha_avaliacao.url == null && (user.id === orientador.id || sessao.banca.professores.map(professor => professor.id).includes(user.id))) && (
                                 <div>
                                     { sessao.avaliacao.nota_orientador !== null && sessao.avaliacao.nota_avaliador1 !== null && sessao.avaliacao.nota_avaliador2 !== null ? (
                                         <div className='flex flex-column'>
@@ -194,7 +241,7 @@ const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBanca
                             <p className="mb-7"><b>Data de Entrega dos Ajustes: </b>{format(sessao.avaliacao.data_entrega_ajuste || new Date(), 'dd/MM/yyyy HH:mm')}</p>
                             <p className="mb-7"><b>Ajustes necessários: </b>{sessao.avaliacao.descricao_ajuste}</p>
                             <p><b>Documento TCC Versão Definitiva:</b></p>
-                            <FileItem file={sessao.avaliacao.tcc_definitivo} prazoEntrega={sessao.avaliacao.data_entrega_ajuste} user={user} onFileUpload={onFileUpload} onFileDelete={onFileDelete} onFileDownload={onFileDownload} sessaoId={sessao.id} />
+                            <FileItem avaliacaoAjusteId={sessao.avaliacao.id} file={sessao.avaliacao.tcc_definitivo} prazoEntrega={sessao.avaliacao.data_entrega_ajuste} user={user} onFileUpload={onFileUpload} onFileDelete={onFileDelete} onFileDownload={onFileDownload} />
                             { (user.id === orientador.id)  && (
                                 <Button label="Avaliar" icon="pi pi-file-edit" style={{ backgroundColor: '#2F9E41' }} onClick={() => console.log("Falta implementar")} />
                             )}
@@ -481,19 +528,27 @@ const DetalhesTCC = () => {
         );
     };
 
-    const handleFileUpload = async (file, sessaoId) => {
+    const handleFileUpload = async (file, sessaoId, avaliacaoId, avaliacaoAjusteId) => {
         const formData = new FormData();
         formData.append('file', file);
-
+        console.log("Sessão Id: " + sessaoId + " Avaliação Id: " + avaliacaoId + " Avaliação Ajuste Id: " + avaliacaoAjusteId);
         try {
-            if (sessaoId) {
+            if (avaliacaoId) {
+                await AvaliacaoService.uploadFichaAvaliacao(avaliacaoId, formData);
+                toast.success('Ficha de avaliação atualizada com sucesso');
+            } else if (avaliacaoAjusteId) {
+                await AvaliacaoService.uploadDocumentoAjuste(avaliacaoAjusteId, formData);
+                toast.success('Documento da ajuste atualizado com sucesso');
+                setDocumentoTCC(file); // Atualiza o documento principal com o último documento enviado
+            } else if (sessaoId) {
                 await TccService.uploadDocumentoSessao(sessaoId, formData);
                 toast.success('Documento da sessão atualizado com sucesso');
+                setDocumentoTCC(file); // Atualiza o documento principal com o último documento enviado
             } else {
                 await TccService.uploadDocumentoTCC(TCCData.id, formData);
                 toast.success('Documento TCC atualizado com sucesso');
+                setDocumentoTCC(file); // Atualiza o documento principal com o último documento enviado
             }
-            setDocumentoTCC(file); // Atualiza o documento principal com o último documento enviado
             carregarDetalhesTCC();
         } catch (error) {
             console.error('Erro ao fazer upload do arquivo:', error);
@@ -501,17 +556,27 @@ const DetalhesTCC = () => {
         }
     };
 
-    const handleFileDelete = async (sessaoId) => {
+    const handleFileDelete = async (sessaoId, avaliacaoId, avaliacaoAjusteId) => {
         try {
-            if (sessaoId) {
+            if (avaliacaoId) {
+                await AvaliacaoService.excluirFichaAvaliacao(avaliacaoId);
+                toast.success('Ficha de avaliação excluída com sucesso');
+            } else if (avaliacaoAjusteId) {
+                await AvaliacaoService.excluirDocumentoAjuste(avaliacaoAjusteId);
+                toast.success('Documento da ajuste excluído com sucesso');
+                setDocumentoTCC(null); // Atualiza o documento principal para null
+                setTCCData(prevData => ({ ...prevData, documentoTCC: null }));
+            } else if (sessaoId) {
                 await TccService.excluirDocumentoSessao(sessaoId);
                 toast.success('Documento da sessão excluído com sucesso');
+                setDocumentoTCC(null); // Atualiza o documento principal para null
+                setTCCData(prevData => ({ ...prevData, documentoTCC: null }));
             } else {
                 await TccService.excluirDocumentoTCC(TCCData.id);
                 toast.success('Documento TCC excluído com sucesso');
+                setDocumentoTCC(null); // Atualiza o documento principal para null
+                setTCCData(prevData => ({ ...prevData, documentoTCC: null }));
             }
-            setDocumentoTCC(null); // Atualiza o documento principal para null
-            setTCCData(prevData => ({ ...prevData, documentoTCC: null }));
             carregarDetalhesTCC();
         } catch (error) {
             console.error('Erro ao excluir arquivo:', error);
@@ -519,10 +584,14 @@ const DetalhesTCC = () => {
         }
     };
 
-    const handleFileDownload = async (sessaoId) => {
+    const handleFileDownload = async (sessaoId, avaliacaoId, avaliacaoAjusteId) => {
         try {
             let response;
-            if (sessaoId) {
+            if (avaliacaoId) {
+                response = await AvaliacaoService.downloadFichaAvaliacao(avaliacaoId);
+            } else if (avaliacaoAjusteId) {
+                response = await AvaliacaoService.downloadDocumentoAjuste(avaliacaoAjusteId);
+            } else if (sessaoId) {
                 response = await TccService.downloadDocumentoSessao(sessaoId);
             } else {
                 response = await TccService.downloadDocumentoTCC(TCCData.id);

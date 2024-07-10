@@ -45,12 +45,13 @@ urlpatterns = [
     path('excluir-documento-sessao/<int:sessaoId>/', views.ExcluirDocumentoSessaoView.as_view(), name='excluir-documento-sessao'),
     path('download-documento-tcc/<int:tccId>/', views.DownloadDocumentoTCCView.as_view(), name='download-documento-tcc'),
     path('download-documento-sessao/<int:sessaoId>/', views.DownloadDocumentoSessaoView.as_view(), name='download-documento-sessao'),
+    path('download-ficha-avaliacao/<int:avaliacaoId>/', views.DownloadFichaAvaliacaoView.as_view(), name='download-ficha-avaliacao'),
+    path('upload-ficha-avaliacao/<int:avaliacaoId>/', views.UploadFichaAvaliacaoView.as_view(), name='upload-ficha-avaliacao'),
+    path('excluir-ficha-avaliacao/<int:avaliacaoId>/', views.ExcluirFichaAvaliacaoView.as_view(), name='excluir-ficha-avaliacao'),
+    path('download-documento-ajuste/<int:avaliacaoId>/', views.DownloadDocumentoAjusteView.as_view(), name='download-documento-ajuste'),
+    path('upload-documento-ajuste/<int:avaliacaoId>/', views.UploadDocumentoAjusteView.as_view(), name='upload-documento-ajuste'),
+    path('excluir-documento-ajuste/<int:avaliacaoId>/', views.ExcluirDocumentoAjusteView.as_view(), name='excluir-documento-ajuste'),
     path('avaliar/<int:sessaoId>/', views.Avaliar.as_view(), name='avaliar'),
-
-
-
-
-
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
