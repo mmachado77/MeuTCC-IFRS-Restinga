@@ -265,7 +265,7 @@ const MeusTccsPage = () => {
                     {(user.resourcetype === 'Coordenador' || user.resourcetype === 'ProfessorInterno' || user.resourcetype === 'ProfessorExterno') && 
                         <Column field="autor.nome" header="Aluno" style={{ width: '20%' }}></Column>
                     }
-
+                    <Column field="semestre.periodo" header="Semestre" style={{ width: '20%' }}></Column>
                     <Column field="orientador.nome" header="Orientador" style={{ width: '20%' }}></Column>
                     <Column body={coorientadorTemplate} header="Coorientador" style={{ width: '20%' }}></Column>
                     <Column body={statusBodyTemplate} header="Status" style={{ width: '10%' }} filter filterMatchMode='contains'></Column>
