@@ -17,6 +17,7 @@ import TccService from 'meutcc/services/TccService';
 import Link from 'next/link';
 import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
 import getClassForStatus from 'meutcc/core/utils/corStatus';
+import SemestreService from 'meutcc/services/SemestreService';
 
 import styled from 'styled-components';
 
@@ -62,6 +63,7 @@ const MeusTccsPage = () => {
     const [filters, setFilters] = React.useState({});
     const [tableSearchValue, setTableSearchValue] = React.useState('');
     const [expandedRows, setExpandedRows] = React.useState({});
+    const [estaNoPrazo, setEstaNoPrazo] = React.useState(false);
     
     const [tccs, setTccs] = React.useState([]);
 
@@ -102,6 +104,19 @@ const MeusTccsPage = () => {
         'APROVADO': 11
     };
 
+    const verificarPrazoEnvioProposta = async () => {
+        const data = await SemestreService.getPrazoEnvioProposta();
+        const hoje = new Date();
+        const dataAbertura = new Date(data.dataAberturaPrazoPropostas);
+        const dataFechamento = new Date(data.dataFechamentoPrazoPropostas);
+
+        if (hoje >= dataAbertura && hoje <= dataFechamento) {
+            setEstaNoPrazo(true);
+        } else {
+            setEstaNoPrazo(false);
+        }
+    };
+
     const fetchTccs = async () => {
 
         setLoading(true);
@@ -130,6 +145,7 @@ const MeusTccsPage = () => {
         }
         fetchTccs();
         initFilters();
+        verificarPrazoEnvioProposta();
     }, []);
 
     const onTableSearchChange = (e) => {
@@ -207,18 +223,30 @@ const MeusTccsPage = () => {
     }
 
     const AbrirProposta = () => {
-        return(
-            <>
-                <div className='py-6 px-2'>
-                    <h2 className='heading-1 px-6 text-gray-700 text-center'>Você não possui uma proposta de TCC ativa</h2>
-                </div>
-                <div className='flex justify-center pb-10'>
-                    <Link href="/submeter-proposta">
-                        <Button label="Submeter Proposta" icon='pi pi-plus' iconPos='right' className='w-full' severity="success"/>
-                    </Link>
-                </div>
-            </>
-        );
+
+        if(!estaNoPrazo){
+            return(
+                <>
+                    <div className='py-6 px-2'>
+                        <h2 className='heading-1 px-6 text-gray-700 text-center'>O período de envio de propostas está fechado!</h2>
+                    </div>
+                </>
+            );
+        }else{
+            return(
+                <>
+                    <div className='py-6 px-2'>
+                        <h2 className='heading-1 px-6 text-gray-700 text-center'>Você não possui uma proposta de TCC ativa</h2>
+                    </div>
+                    <div className='flex justify-center pb-10'>
+                        <Link href="/submeter-proposta">
+                            <Button label="Submeter Proposta" icon='pi pi-plus' iconPos='right' className='w-full' severity="success"/>
+                        </Link>
+                    </div>
+                </>
+            );
+        }
+
     }
 
     const customCollapsedIcon = <i className="pi pi-angle-down"></i>;
