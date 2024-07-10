@@ -52,6 +52,7 @@ urlpatterns = [
     path('upload-documento-ajuste/<int:avaliacaoId>/', views.UploadDocumentoAjusteView.as_view(), name='upload-documento-ajuste'),
     path('excluir-documento-ajuste/<int:avaliacaoId>/', views.ExcluirDocumentoAjusteView.as_view(), name='excluir-documento-ajuste'),
     path('avaliar/<int:sessaoId>/', views.Avaliar.as_view(), name='avaliar'),
+    path('semestre-datas', SemestreDatasView.as_view(), name='semestre-datas'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
