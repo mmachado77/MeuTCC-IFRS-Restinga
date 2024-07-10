@@ -5,12 +5,14 @@ import { Tag } from 'primereact/tag';
 import { format } from 'date-fns';
 import UsuarioService from 'meutcc/services/UsuarioService';
 import { Toast } from 'primereact/toast';
-import { Dropdown } from 'primereact/dropdown';
+import { SelectButton } from 'primereact/selectbutton';
 
 export default function ListaUsuarios() {
-    const [usuario, setUsuarios] = useState([]);
+    const [usuarios, setUsuarios] = useState([]);
+    const [filteredUsuarios, setFilteredUsuarios] = useState([]);
     const [rows, setRows] = useState(10);
     const [first, setFirst] = useState(0);
+    const [statusFilter, setStatusFilter] = useState('Todos');
     const toast = useRef(null);
 
     const fetchUsuarios = async () => {
@@ -18,6 +20,7 @@ export default function ListaUsuarios() {
             const response = await UsuarioService.listarUsuarios();
             console.log('Usuários recebidos:', response.data);
             setUsuarios(response.data);
+            setFilteredUsuarios(response.data);
         } catch (error) {
             toast.current.show({ severity: 'error', summary: 'Erro', detail: 'Erro ao obter a lista de usuários', life: 3000 });
             console.error('Erro ao obter a lista de usuários:', error);
@@ -26,7 +29,21 @@ export default function ListaUsuarios() {
 
     useEffect(() => {
         fetchUsuarios();
-    }, [rows, first]); 
+    }, [rows, first]);
+
+    useEffect(() => {
+        filterUsuarios(statusFilter);
+    }, [statusFilter, usuarios]);
+
+    const filterUsuarios = (status) => {
+        if (status === 'Todos') {
+            setFilteredUsuarios(usuarios);
+        } else if (status === 'Outros') {
+            setFilteredUsuarios(usuarios.filter(user => user.status_cadastro && (user.status_cadastro.status_text === 'Reprovado' || user.status_cadastro.status_text === 'Pendente')));
+        } else if (status === 'Aprovados') {
+            setFilteredUsuarios(usuarios.filter(user => !user.status_cadastro || user.status_cadastro.status_text === 'Aprovado'));
+        }
+    }
 
     const dataCadastroTemplate = (rowData) => {
         return format(new Date(rowData.dataCadastro), 'dd/MM/yyyy');
@@ -51,7 +68,7 @@ export default function ListaUsuarios() {
             }
             return <Tag severity={severity} value={statusText} />;
         }
-        return <Tag severity='success' value='Cadastrado' />;;
+        return <Tag severity='success' value='Cadastrado' />;
     }
 
     const onPageChange = (e) => {
@@ -65,11 +82,20 @@ export default function ListaUsuarios() {
         { label: '20', value: 20 }
     ];
 
+    const statusOptions = [
+        { label: 'Todos', value: 'Todos' },
+        { label: 'Aprovados', value: 'Aprovados' },
+        { label: 'Outros', value: 'Outros' }
+    ];
+
     return (
         <div className="card">
             <Toast ref={toast} />
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                <SelectButton value={statusFilter} onChange={(e) => setStatusFilter(e.value)} options={statusOptions} />
+            </div>
             <DataTable
-                value={usuario}
+                value={filteredUsuarios}
                 paginator
                 rows={rows}
                 first={first}
