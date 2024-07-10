@@ -91,17 +91,17 @@ const MeusTccsPage = () => {
     };
 
     const statusPriority = {
-        'PROPOSTA_ANALISE_PROFESSOR': 1,
-        'PROPOSTA_ANALISE_COORDENADOR': 2,
-        'DESENVOLVIMENTO': 3,
-        'PREVIA': 4,
-        'FINAL': 5,
+        'PROPOSTA_ANALISE_PROFESSOR': 11,
+        'PROPOSTA_ANALISE_COORDENADOR': 10,
+        'DESENVOLVIMENTO': 9,
+        'PREVIA': 8,
+        'FINAL': 7,
         'AJUSTE': 6,
-        'PROPOSTA_RECUSADA_PROFESSOR': 7,
-        'PROPOSTA_RECUSADA_COORDENADOR': 8,
-        'REPROVADO_PREVIA': 9,
-        'REPROVADO_FINAL': 10,
-        'APROVADO': 11
+        'PROPOSTA_RECUSADA_PROFESSOR': 5,
+        'PROPOSTA_RECUSADA_COORDENADOR': 4,
+        'REPROVADO_PREVIA': 3,
+        'REPROVADO_FINAL': 2,
+        'APROVADO': 1
     };
 
     const verificarPrazoEnvioProposta = async () => {
@@ -128,10 +128,22 @@ const MeusTccsPage = () => {
                 data = await TccService.getTccsByAluno();
             }else if(user.resourcetype == 'Coordenador'){
                 data = await TccService.getTccsCoordenacao();
-                if (data) {
-                    data.sort((a, b) => statusPriority[a.status] - statusPriority[b.status]);
-                }
             }
+
+            if (data) {
+                const dataWithPriority = data.map(item => ({
+                    ...item,
+                    priority: statusPriority[item.status[item.status.length - 1].status]
+                }));
+            
+                dataWithPriority.sort((a, b) => b.priority - a.priority);
+            
+                data = dataWithPriority.map(item => {
+                    const { priority, ...originalItem } = item;
+                    return originalItem;
+                });
+            }
+
             setTccs(data);
             setLoading(false);
         } catch (error) {
