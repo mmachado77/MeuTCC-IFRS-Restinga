@@ -34,6 +34,7 @@ const DetailsButton = styled.div`
     display: flex;
     align-items: center;
     margin-left: 1em;
+    margin-right: 1em;
 `;
 
 
