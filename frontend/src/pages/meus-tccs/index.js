@@ -2,8 +2,10 @@
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
+import { InputTextarea } from 'primereact/inputtextarea';
 import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
+
 import { GUARDS } from 'meutcc/core/constants';
 import { set } from 'date-fns';
 import { Tag } from 'primereact/tag';
@@ -16,7 +18,40 @@ import Link from 'next/link';
 import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
 import getClassForStatus from 'meutcc/core/utils/corStatus';
 
+import styled from 'styled-components';
 
+// Estilo para exibir status
+const StatusInfo = styled.div`
+    margin-bottom: 10px;
+    h4 {
+        margin-bottom: 5px;
+    }
+`;
+
+// Estilo para justificativa da recusa
+const JustificativaContainer = styled.div`
+    margin-top: 1em;
+    h4 {
+        margin-bottom: 5px;
+    }
+`;
+
+// Estilo para o botão "Detalhes"
+const DetailsButton = styled.div`
+    display: flex;
+    justify-content: center; /* Centraliza o botão horizontalmente */
+    margin-top: 1em; /* Ajustado para ficar abaixo de tudo */
+    margin-left: 1em;
+    margin-right: 1em;
+`;
+
+// Estilo para os textareas para evitar que o conteúdo ultrapasse a largura da div
+const TextArea = styled(InputTextarea)`
+    width: 100%;
+    overflow: auto; /* Adiciona uma barra de rolagem automática se necessário */
+    white-space: pre-wrap; /* Mantém quebras de linha no texto */
+    word-wrap: break-word; /* Quebra palavras longas */
+`;
 
 const MeusTccsPage = () => {
 
@@ -139,13 +174,34 @@ const MeusTccsPage = () => {
     }
 
     const rowExpansionTemplate = (data) => {
+        // Obtém o último status da lista de status
+        const ultimoStatus = data.status[data.status.length - 1] || {};
+
+        // Acessa o `justificativa` do último status
+        const justificativa = ultimoStatus.justificativa;
+        const status = ultimoStatus.status;
+        const statusMensagem = ultimoStatus.statusMensagem;
         return (
             <div>
                 <h4>Resumo:</h4>
-                <p>{data.resumo}</p>
-                <div className="flex justify-content-left">
-                    <Link label="Detalhes" href={`/detalhes-tcc/${data.id}`}> <Button label="Detalhes" icon='pi pi-external-link' iconPos='right' severity="success" /> </Link>
-                </div>
+                <TextArea value={data.resumo} readOnly rows={5} />
+                {status && statusMensagem && (
+                    <StatusInfo>
+                        <h4>Status Atual:</h4>
+                        <p>{statusMensagem}</p>
+                    </StatusInfo>
+                )}
+                {status === 'PROPOSTA_RECUSADA_PROFESSOR' && justificativa && (
+                    <JustificativaContainer>
+                        <h4>Justificativa da Recusa:</h4>
+                        <TextArea value={justificativa} readOnly rows={2} />
+                    </JustificativaContainer>
+                )}
+                <DetailsButton>
+                    <Link href={`/detalhes-tcc/${data.id}`} passHref>
+                        <Button label="Detalhes" icon='pi pi-external-link' iconPos='right' severity="success" />
+                    </Link>
+                </DetailsButton>
             </div>
         );
     }
