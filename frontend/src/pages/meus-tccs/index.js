@@ -4,6 +4,7 @@ import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
+
 import { GUARDS } from 'meutcc/core/constants';
 import { set } from 'date-fns';
 import { Tag } from 'primereact/tag';
@@ -16,6 +17,24 @@ import Link from 'next/link';
 import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
 import getClassForStatus from 'meutcc/core/utils/corStatus';
 
+import styled from 'styled-components';
+
+const StatusDetails = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1em;
+`;
+
+const StatusInfo = styled.div`
+    flex: 1;
+`;
+
+const DetailsButton = styled.div`
+    display: flex;
+    align-items: center;
+    margin-left: 1em;
+`;
 
 
 const MeusTccsPage = () => {
@@ -139,14 +158,37 @@ const MeusTccsPage = () => {
     }
 
     const rowExpansionTemplate = (data) => {
+        // Obtém o último status da lista de status
+        const ultimoStatus = data.status[data.status.length - 1] || {};
+
+        // Acessa o `justificativa` do último status
+        const justificativa = ultimoStatus.justificativa;
+        const status = ultimoStatus.status;
+        const statusMensagem = ultimoStatus.statusMensagem;
         return (
             <div>
-                <h4>Resumo:</h4>
-                <p>{data.resumo}</p>
-                <div className="flex justify-content-left">
-                    <Link label="Detalhes" href={`/detalhes-tcc/${data.id}`}> <Button label="Detalhes" icon='pi pi-external-link' iconPos='right' severity="success" /> </Link>
+            <h4>Resumo:</h4>
+            <p>{data.resumo}</p>
+            {status === 'PROPOSTA_RECUSADA_PROFESSOR' && (
+                <div>
+                    <h4>Justificativa da Recusa:</h4>
+                    <p>{justificativa}</p>
                 </div>
-            </div>
+            )}
+            <StatusDetails>
+                {status && statusMensagem && (
+                    <StatusInfo>
+                        <h4>Status Atual:</h4>
+                        <p>{statusMensagem}</p>
+                    </StatusInfo>
+                )}
+                <DetailsButton>
+                    <Link href={`/detalhes-tcc/${data.id}`} passHref>
+                        <Button label="Detalhes" icon='pi pi-external-link' iconPos='right' severity="success" />
+                    </Link>
+                </DetailsButton>
+            </StatusDetails>
+        </div>
         );
     }
 
