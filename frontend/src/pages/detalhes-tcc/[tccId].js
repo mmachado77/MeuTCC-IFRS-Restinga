@@ -239,11 +239,11 @@ const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBanca
                     <AccordionTab key="ajuste" header="Ajuste">
                         <div className="ajuste">
                             <p className="mb-7"><b>Data de Entrega dos Ajustes: </b>{format(sessao.avaliacao.data_entrega_ajuste || new Date(), 'dd/MM/yyyy HH:mm')}</p>
-                            <p className="mb-7"><b>Ajustes necessários: </b>{sessao.avaliacao.descricao_ajuste}</p>
+                            <p className="mb-7"><b>Ajustes Necessários: </b>{sessao.avaliacao.descricao_ajuste}</p>
                             <p><b>Documento TCC Versão Definitiva:</b></p>
                             <FileItem avaliacaoAjusteId={sessao.avaliacao.id} file={sessao.avaliacao.tcc_definitivo} prazoEntrega={sessao.avaliacao.data_entrega_ajuste} user={user} onFileUpload={onFileUpload} onFileDelete={onFileDelete} onFileDownload={onFileDownload} />
                             { (sessao.avaliacao.parecer_orientador !== null || sessao.avaliacao.parecer_orientador !== '')  && (
-                                <p className="mb-7"><b>Parecer Orientaodor: </b>{sessao.avaliacao.parecer_orientador}</p>
+                                <p className="mb-7"><b>Parecer Orientador: </b>{sessao.avaliacao.parecer_orientador}</p>
                             )}
                             { (user.id === orientador.id)  && (
                                 <>
@@ -922,7 +922,7 @@ const DetalhesTCC = () => {
                     </div>
                     <div className="flex flex-wrap align-items-center mb-3 gap-2">
                         {avaliarAjusteErro && <small id='avaliar-ajuste-help' className='text-red-500 py-1 px-2'>{avaliarAjusteErro}</small> }
-                        <Button label={loading ? "Avaliando Ajustes" : "Avaliar Ajsutes"} loading={loading} className="w-full" />
+                        <Button label={loading ? "Avaliando Ajustes" : "Avaliar Ajustes"} loading={loading} className="w-full" />
                     </div>
                 </form>
             </Dialog>
