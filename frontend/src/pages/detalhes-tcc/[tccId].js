@@ -241,27 +241,30 @@ const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBanca
                     <AccordionTab key="ajuste" header="Ajuste">
                         <div className="ajuste">
                             <p className="mb-7"><b>Data de Entrega dos Ajustes: </b>{format(sessao.avaliacao.data_entrega_ajuste || new Date(), 'dd/MM/yyyy HH:mm')}</p>
-                            <p className="mb-7"><b>Ajustes necessários: </b>{sessao.avaliacao.descricao_ajuste}</p>
+                            <p className="mb-7"><b>Ajustes Necessários: </b>{sessao.avaliacao.descricao_ajuste}</p>
                             <p><b>Documento TCC Versão Definitiva:</b></p>
                             <FileItem avaliacaoAjusteId={sessao.avaliacao.id} file={sessao.avaliacao.tcc_definitivo} prazoEntrega={sessao.avaliacao.data_entrega_ajuste} user={user} onFileUpload={onFileUpload} onFileDelete={onFileDelete} onFileDownload={onFileDownload} />
                             {(sessao.avaliacao.parecer_orientador !== null || sessao.avaliacao.parecer_orientador !== '') && (
-                                <p className="mb-7"><b>Parecer Orientaodor: </b>{sessao.avaliacao.parecer_orientador}</p>
-                            )}
-                            {(user.id === orientador.id) && (
-                                <>
-                                    {(sessao.avaliacao.parecer_orientador === null || sessao.avaliacao.parecer_orientador === '') ? (
-                                        <Button label="Avaliar" icon="pi pi-file-edit" style={{ backgroundColor: '#2F9E41' }} onClick={() => onAvaliacaoAjusteClick(sessao.avaliacao.id)} />
-                                    ) : (
-                                        <Button label="Avaliado" icon="pi pi-check" severity={'info'} />
-                                    )}
-                                </>
+                                <p className="mb-7"><b>Parecer Orientador: </b>{sessao.avaliacao.parecer_orientador}</p>
+                            )
+                            }
+                            {
+                                (user.id === orientador.id) && (
+                                    <>
+                                        {(sessao.avaliacao.parecer_orientador === null || sessao.avaliacao.parecer_orientador === '') ? (
+                                            <Button label="Avaliar" icon="pi pi-file-edit" style={{ backgroundColor: '#2F9E41' }} onClick={() => onAvaliacaoAjusteClick(sessao.avaliacao.id)} />
+                                        ) : (
+                                            <Button label="Avaliado" icon="pi pi-check" severity={'info'} />
+                                        )}
+                                    </>
 
-                            )}
-                        </div>
-                    </AccordionTab>
+                                )
+                            }
+                        </div >
+                    </AccordionTab >
                 )
             ))}
-        </Accordion>
+        </Accordion >
     );
 };
 const getClassForStatus = (status) => {
@@ -926,13 +929,13 @@ const DetalhesTCC = () => {
                     </div>
                     <div className="flex flex-wrap gap-2 mb-3 align-items-center">
                         {avaliarAjusteErro && <small id='avaliar-ajuste-help' className='px-2 py-1 text-red-500'>{avaliarAjusteErro}</small>}
-                        <Button label={loading ? "Avaliando Ajustes" : "Avaliar Ajsutes"} loading={loading} className="w-full" />
+                        <Button label={loading ? "Avaliando Ajustes" : "Avaliar Ajustes"} loading={loading} className="w-full" />
                     </div>
                 </form>
             </Dialog>
         </div>
     );
-};
+}
 
 DetalhesTCC.guards = [GUARDS.ESTUDANTE, GUARDS.PROFESSOR_INTERNO, GUARDS.PROFESSOR_EXTERNO, GUARDS.COORDENADOR];
 DetalhesTCC.title = 'Detalhes do TCC';
