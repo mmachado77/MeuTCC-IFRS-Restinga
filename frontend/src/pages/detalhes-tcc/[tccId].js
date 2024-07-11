@@ -19,7 +19,9 @@ import toast from 'react-hot-toast';
 import { Calendar } from 'primereact/calendar';
 import CustomAvatar from 'meutcc/components/ui/CustomAvatar';
 import { Toast } from 'primereact/toast';
-import {Checkbox} from "primereact/checkbox";
+import { Checkbox } from "primereact/checkbox";
+import FormSessao from 'meutcc/components/ui/FormSessao';
+import SessoesService from 'meutcc/services/SessoesService';
 
 const FileItem = ({ file, sessaoId, prazoEntrega, user, onFileUpload, onFileDelete, onFileDownload, avaliacaoAjusteId, avaliacaoId, orientador }) => {
     const toast = useRef(null);
@@ -154,7 +156,7 @@ const FileItem = ({ file, sessaoId, prazoEntrega, user, onFileUpload, onFileDele
     );
 };
 
-const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBancaSessaoPreviaClick, onSugerirBancaSessaoFinalClick, onAvaliacaoClick, onAvaliacaoAjusteClick,onFileUpload, onFileDelete, onFileDownload }) => {
+const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBancaSessaoPreviaClick, onSugerirBancaSessaoFinalClick, onAvaliacaoClick, onAvaliacaoAjusteClick, onFileUpload, onFileDelete, onFileDownload }) => {
     return (
         <Accordion multiple activeIndex={[0]}>
             {sessoes.map((sessao, index) => (
@@ -191,16 +193,16 @@ const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBanca
                             {(sessao.tipo === 'Sessão Final' && new Date(sessao.data_inicio) < new Date()) && (
                                 <>
                                     <p><b>Ficha Avaliação:</b></p>
-                                    <FileItem orientador={orientador} avaliacaoId={sessao.avaliacao.id} file={sessao.avaliacao.ficha_avaliacao} user={user} onFileUpload={onFileUpload} onFileDelete={onFileDelete} onFileDownload={onFileDownload}/>
+                                    <FileItem orientador={orientador} avaliacaoId={sessao.avaliacao.id} file={sessao.avaliacao.ficha_avaliacao} user={user} onFileUpload={onFileUpload} onFileDelete={onFileDelete} onFileDownload={onFileDownload} />
                                 </>
                             )}
                             <p className="mb-7"><b>Prazo Para Entrega do Documento:</b> {format(sessao.prazoEntregaDocumento || new Date(), 'dd/MM/yyyy HH:mm')}</p>
                             {(sessao.tipo === 'Sessão Final' && new Date(sessao.data_inicio) < new Date() && sessao.avaliacao.ficha_avaliacao.url == null && (user.id === orientador.id || sessao.banca.professores.map(professor => professor.id).includes(user.id))) && (
                                 <div>
-                                    { sessao.avaliacao.nota_orientador !== null && sessao.avaliacao.nota_avaliador1 !== null && sessao.avaliacao.nota_avaliador2 !== null ? (
+                                    {sessao.avaliacao.nota_orientador !== null && sessao.avaliacao.nota_avaliador1 !== null && sessao.avaliacao.nota_avaliador2 !== null ? (
                                         <div className='flex flex-column'>
                                             <Button className="w-1/5" label="Avaliado" icon="pi pi-check" severity="info" />
-                                            <a className="ml-10 flex items-center w-full" href="#">
+                                            <a className="flex items-center w-full ml-10" href="#">
                                                 Clique aqui para fazer o download da ficha de avaliação preenchida
                                             </a>
                                         </div>
@@ -242,15 +244,15 @@ const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBanca
                             <p className="mb-7"><b>Ajustes necessários: </b>{sessao.avaliacao.descricao_ajuste}</p>
                             <p><b>Documento TCC Versão Definitiva:</b></p>
                             <FileItem avaliacaoAjusteId={sessao.avaliacao.id} file={sessao.avaliacao.tcc_definitivo} prazoEntrega={sessao.avaliacao.data_entrega_ajuste} user={user} onFileUpload={onFileUpload} onFileDelete={onFileDelete} onFileDownload={onFileDownload} />
-                            { (sessao.avaliacao.parecer_orientador !== null || sessao.avaliacao.parecer_orientador !== '')  && (
+                            {(sessao.avaliacao.parecer_orientador !== null || sessao.avaliacao.parecer_orientador !== '') && (
                                 <p className="mb-7"><b>Parecer Orientaodor: </b>{sessao.avaliacao.parecer_orientador}</p>
                             )}
-                            { (user.id === orientador.id)  && (
+                            {(user.id === orientador.id) && (
                                 <>
-                                    { (sessao.avaliacao.parecer_orientador === null || sessao.avaliacao.parecer_orientador === '') ? (
+                                    {(sessao.avaliacao.parecer_orientador === null || sessao.avaliacao.parecer_orientador === '') ? (
                                         <Button label="Avaliar" icon="pi pi-file-edit" style={{ backgroundColor: '#2F9E41' }} onClick={() => onAvaliacaoAjusteClick(sessao.avaliacao.id)} />
                                     ) : (
-                                        <Button label="Avaliado" icon="pi pi-check"  severity={'info'} />
+                                        <Button label="Avaliado" icon="pi pi-check" severity={'info'} />
                                     )}
                                 </>
 
@@ -288,8 +290,7 @@ const DetalhesTCC = () => {
     const { user } = useAuth();
     const router = useRouter();
     const [TCCData, setTCCData] = useState({});
-    const [visibleSessaoPrevia, setVisibleSessaoPrevia] = useState(false);
-    const [visibleSessaoFinal, setVisibleSessaoFinal] = useState(false);
+    const [visibleSessao, setVisibleSessao] = useState(false);
     const [selectedOrientador, setSelectedOrientador] = useState([]);
     const [selectedCoorientador, setSelectedCoorientador] = useState([]);
     const [visibleAvaliacao, setVisibleAvaliacao] = useState(false);
@@ -330,11 +331,13 @@ const DetalhesTCC = () => {
     };
 
     const handleSugerirBancaSessaoPreviaClick = () => {
-        setVisibleSessaoPrevia(true);
+        setSessaoForm({ ...sessaoForm, tipo: 'previa', idTCC: TCCData.id });
+        setVisibleSessao(true);
     };
 
     const handleSugerirBancaSessaoFinalClick = () => {
-        setVisibleSessaoFinal(true);
+        setSessaoForm({ ...sessaoForm, tipo: 'final', idTCC: TCCData.id });
+        setVisibleSessao(true);
     };
 
     const handleAvaliacao = (sessaoIdAvaliacao) => {
@@ -567,7 +570,8 @@ const DetalhesTCC = () => {
     const [optionLocalSessao, setOptionLocalSessao] = useState(null);
     const optionsLocalSessao = [
         { label: 'Presencial', value: 'presencial' },
-        { label: 'Conferência', value: 'conferencia' }
+        { label: 'Conferência', value: 'conferencia' },
+        { label: 'Hibrido', value: 'hibrido' }
     ];
 
     const selectedAvaliadorTemplate = (option, props) => {
@@ -691,13 +695,55 @@ const DetalhesTCC = () => {
         }
     }
 
+    const [sessaoForm, setSessaoForm] = useState({
+        idTCC: '',
+        tipo: '',
+        idSessao: '',
+        avaliador1: null,
+        avaliador2: null,
+        dataInicio: null,
+        localForma: '',
+        localDescricao: '',
+    });
+
+    const handleConfirmarSessao = async () => {
+        setLoading(true);
+        const response = await SessoesService.postNovaSessao(sessaoForm);
+        if (response) {
+            toast.success(sessaoForm.tipo == 'previa' ? 'Sessão Prévia agendada com sucesso' : 'Sessão Final agendada com sucesso');
+            setSessaoForm({
+                idTCC: '',
+                tipo: '',
+                idSessao: '',
+                avaliador1: null,
+                avaliador2: null,
+                dataInicio: null,
+                localForma: '',
+                localDescricao: '',
+            });
+        } else {
+            toast.error(sessaoForm.tipo == 'previa' ? 'Erro ao agendar sessão prévia' : 'Erro ao agendar sessão final');
+        }
+        setLoading(false);
+        setVisibleSessao(false);
+        carregarDetalhesTCC();
+    };
+
+    const footerContent = (
+        <div className='flex items-center justify-between gap-4'>
+            <div className='w-full'>
+                <Button className='w-full' label="Confirmar Sessão" severity="success" icon='pi pi-check' iconPos='right' onClick={handleConfirmarSessao} />
+            </div>
+        </div>
+    );
+
     if (TCCData?.id == null) {
         return (
-            <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
-                <div className='py-3 border-0 border-b border-dashed border-gray-200'>
-                    <h1 className='heading-1 px-6 text-gray-700'>Detalhes do TCC</h1>
+            <div className='flex flex-col max-w-screen-lg m-3 mx-auto mt-6 bg-white'>
+                <div className='py-3 border-0 border-b border-gray-200 border-dashed'>
+                    <h1 className='px-6 text-gray-700 heading-1'>Detalhes do TCC</h1>
                 </div>
-                <div className='py-6 px-2' style={{ padding: '35px', display: 'flex', justifyContent: 'center' }}>
+                <div className='px-2 py-6' style={{ padding: '35px', display: 'flex', justifyContent: 'center' }}>
                     <p>TCC não encontrado.</p>
                 </div>
             </div>
@@ -705,12 +751,12 @@ const DetalhesTCC = () => {
     }
 
     return (
-        <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
-            <div className='py-3 border-0 border-b border-dashed border-gray-200' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h1 className='heading-1 px-6 text-gray-700'>Detalhes do TCC</h1>
+        <div className='flex flex-col max-w-screen-lg m-3 mx-auto mt-6 bg-white'>
+            <div className='py-3 border-0 border-b border-gray-200 border-dashed' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h1 className='px-6 text-gray-700 heading-1'>Detalhes do TCC</h1>
                 {(user.resourcetype === 'Estudante' || user.resourcetype === 'Coordenador') && (<div className='mr-5'><Button label="Editar" icon="pi pi-pencil" style={{ backgroundColor: '#2F9E41' }} onClick={handleEditarClick} /></div>)}
             </div>
-            <div className='py-6 px-2' style={{ padding: '35px' }}>
+            <div className='px-2 py-6' style={{ padding: '35px' }}>
                 <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between' }}>
                     <p><b>Estudante: </b>{TCCData?.autor.nome}</p>
                     <p><b>Fase: </b><Tag value={TCCData?.status?.[TCCData?.status.length - 1]?.statusMensagem} style={{ backgroundColor: getClassForStatus(TCCData?.status?.[TCCData?.status.length - 1]?.status) }} onClick={() => setVisibleStatus(true)}></Tag></p>
@@ -747,181 +793,139 @@ const DetalhesTCC = () => {
                 <form onSubmit={onSubmit}>
                     {user.resourcetype === 'Estudante' && (
                         <div>
-                            <div className="flex flex-wrap align-items-center mb-3 gap-2">
+                            <div className="flex flex-wrap gap-2 mb-3 align-items-center">
                                 <label htmlFor="tema"><b>Tema</b></label>
                                 <InputText id="tema" name="tema" placeholder="Tema" className={'w-full ' + (temaMensagemErro ? 'p-invalid' : '')} defaultValue={TCCData?.tema} />
-                                {temaMensagemErro && <small id="tema-help" className="text-red-500 py-1 px-2">{temaMensagemErro}</small>}
+                                {temaMensagemErro && <small id="tema-help" className="px-2 py-1 text-red-500">{temaMensagemErro}</small>}
                             </div>
-                            <div className="flex flex-wrap align-items-center mb-3 gap-2">
+                            <div className="flex flex-wrap gap-2 mb-3 align-items-center">
                                 <label htmlFor="resumo"><b>Resumo</b></label>
                                 <InputTextarea id="resumo" name="resumo" placeholder="Resumo" rows={6} className={'w-full ' + (resumoMensagemErro ? 'p-invalid' : '')} defaultValue={TCCData?.resumo} />
-                                {resumoMensagemErro && <small id="resumo-help" className="text-red-500 py-1 px-2">{resumoMensagemErro}</small>}
+                                {resumoMensagemErro && <small id="resumo-help" className="px-2 py-1 text-red-500">{resumoMensagemErro}</small>}
                             </div>
                         </div>
                     )}
                     {user.resourcetype === 'Coordenador' && (
                         <div>
-                            <div className="flex flex-wrap align-items-center mb-3 gap-2">
+                            <div className="flex flex-wrap gap-2 mb-3 align-items-center">
                                 <label htmlFor="orientador"><b>Orientador</b></label>
                                 <Dropdown value={selectedOrientador} name="orientador" onChange={(e) => setSelectedOrientador(e.value)} options={orientadores} optionLabel="name" placeholder="Selecione o orientador" className={"w-full md " + (orientadorMensagemErro ? ' p-invalid' : '')} />
-                                {orientadorMensagemErro && <small id="orientador-help" className="text-red-500 py-1 px-2">{orientadorMensagemErro}</small>}
+                                {orientadorMensagemErro && <small id="orientador-help" className="px-2 py-1 text-red-500">{orientadorMensagemErro}</small>}
                             </div>
                             {TCCData?.coorientador && (
-                                <div className="flex flex-wrap align-items-center mb-3 gap-2">
+                                <div className="flex flex-wrap gap-2 mb-3 align-items-center">
                                     <label htmlFor="coorientador"><b>Corientador</b></label>
                                     <Dropdown value={selectedCoorientador} name="coorientador" onChange={(e) => setSelectedCoorientador(e.value)} options={coorientadores} optionLabel="name" placeholder="Selecione o coorientador" className={"w-full md " + (coorientadorMensagemErro ? ' p-invalid' : '')} />
-                                    {coorientadorMensagemErro && <small id="coorientador-help" className="text-red-500 py-1 px-2">{coorientadorMensagemErro}</small>}
+                                    {coorientadorMensagemErro && <small id="coorientador-help" className="px-2 py-1 text-red-500">{coorientadorMensagemErro}</small>}
                                 </div>
                             )}
                         </div>
                     )}
-                    <div className="flex flex-wrap align-items-center mb-3 gap-2">
+                    <div className="flex flex-wrap gap-2 mb-3 align-items-center">
                         <Button label={loading ? "Editando TCC" : "Editar TCC"} loading={loading} className="w-full" />
                     </div>
                 </form>
             </Dialog>
-            <Dialog header="Editar Sessão Prévia" visible={visibleSessaoPrevia} style={{ width: '50vw' }} onHide={() => setVisibleSessaoPrevia(false)}>
-                <form onSubmit={onSubmit}>
-                    <div className='grid gap-4'>
-                        <div className='grid grid-cols-2 gap-4'>
-                            <div className="flex flex-wrap align-items-center mb-3 gap-2">
-                                <label htmlFor="tema"><b>Data</b></label>
-                                <Calendar value={datetime24h} minDate={new Date()} readOnlyInput onChange={(e) => setDateTime24h(e.value)} className='w-full' />
-                                {temaMensagemErro && <small id="tema-help" className="text-red-500 py-1 px-2">{temaMensagemErro}</small>}
-                            </div>
-                            <div className="flex flex-wrap align-items-center mb-3 gap-2">
-                                <label htmlFor="tema"><b>Horário</b></label>
-                                <Calendar value={datetime24h} readOnlyInput onChange={(e) => setDateTime24h(e.value)} timeOnly className='w-full' />
-                                {temaMensagemErro && <small id="tema-help" className="text-red-500 py-1 px-2">{temaMensagemErro}</small>}
-                            </div>
-                        </div>
-                        <div className='grid grid-cols-2 gap-4'>
-                            <div className="flex flex-wrap align-items-center mb-3 gap-2">
-                                <label htmlFor="tema"><b>Local</b></label>
-                                <Dropdown value={optionLocalSessao} onChange={(e) => setOptionLocalSessao(e.value)} options={optionsLocalSessao} className='w-full' />
-                            </div>
-                            <div className="flex flex-wrap align-items-center mb-3 gap-2">
-                                <label htmlFor="local"><b>Local</b></label>
-                                <InputText id="local" name="local" placeholder='Exemplo, Campus Restinga, sala 403' className={'w-full ' + (temaMensagemErro ? 'p-invalid' : '')}  />
-                                {temaMensagemErro && <small id="tema-help" className="text-red-500 py-1 px-2">{temaMensagemErro}</small>}
-                            </div>
-                        </div>
-                        <div className="flex flex-wrap align-items-center mb-3 gap-2">
-                            <label htmlFor="tema"><b>Avaliador 1</b></label>
-                            <Dropdown value={selectedAvaliador1} onChange={(e) => setSelectedAvaliador1(e.value)} options={avaliadores} optionLabel="name" placeholder="Selecione o nome do avaliador" filter valueTemplate={selectedAvaliadorTemplate} itemTemplate={avaliadorOptionTemplate} className="w-full md " />
-                            {temaMensagemErro && <small id="tema-help" className="text-red-500 py-1 px-2">{temaMensagemErro}</small>}
-                        </div>
-                        <div className="flex flex-wrap align-items-center mb-3 gap-2">
-                            <label htmlFor="tema"><b>Avaliador 2</b></label>
-                            <Dropdown value={selectedAvaliador2} onChange={(e) => setSelectedAvaliador2(e.value)} options={avaliadores} optionLabel="name" placeholder="Selecione o nome do avaliador" filter valueTemplate={selectedAvaliadorTemplate} itemTemplate={avaliadorOptionTemplate} className="w-full md " />
-                            {temaMensagemErro && <small id="tema-help" className="text-red-500 py-1 px-2">{temaMensagemErro}</small>}
-                        </div>
-                    </div>
-                    <div className="flex flex-wrap align-items-center mb-3 gap-2">
-                        <Button label={loading ? "Editando TCC" : "Editar TCC"} loading={loading} className="w-full" />
-                    </div>
-                </form>
-            </Dialog>
-            <Dialog header="Editar Sessão Final" visible={visibleSessaoFinal} style={{ width: '50vw' }} onHide={() => setVisibleSessaoFinal(false)}>
-                <p>A</p>
+            <Dialog header={sessaoForm.tipo == 'previa' ? "Sugerir Banca - Sessão Prévia" : 'Sugerir Banca - Sessão Final'} visible={visibleSessao} style={{ width: '50vw' }} footer={footerContent} onHide={() => setVisibleSessao(false)}>
+                <FormSessao onSubmit={() => true} formDisabled={false} sessaoForm={sessaoForm} setSessaoForm={setSessaoForm} />
             </Dialog>
             <Dialog header="Avalar TCC" visible={visibleAvaliacao} style={{ width: '50vw' }} onHide={() => setVisibleAvaliacao(false)}>
                 <form onSubmit={onSubmitAvaliacao}>
                     <div className='grid gap-4'>
                         <h4> NOTAS TRABALHO ESCRITO </h4>
                         <div className='grid grid-cols-2 gap-4'>
-                            <div className="flex flex-col align-items-center mb-3 gap-2">
+                            <div className="flex flex-col gap-2 mb-3 align-items-center">
                                 <label htmlFor="estrutura_trabalho"><b>Estrutura do Trabalho</b></label>
-                                <InputNumber className="w-4/6" id="estrutura_trabalho" name="estrutura_trabalho" placeholder= 'Máximo 1,0 ponto' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={1} step={0.1}/>
-                                {notaEstruturaMensagemErro && <small id="nota-estrutura-help" className="text-red-500 py-1 px-2">{notaEstruturaMensagemErro}</small>}
+                                <InputNumber className="w-4/6" id="estrutura_trabalho" name="estrutura_trabalho" placeholder='Máximo 1,0 ponto' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={1} step={0.1} />
+                                {notaEstruturaMensagemErro && <small id="nota-estrutura-help" className="px-2 py-1 text-red-500">{notaEstruturaMensagemErro}</small>}
                             </div>
-                            <div className="flex flex-col align-items-center mb-3 gap-2">
+                            <div className="flex flex-col gap-2 mb-3 align-items-center">
                                 <label htmlFor="relevancia_originalidade_qualidade"><b>Relevância, Originalidade e Qualidade do Conteúdo</b></label>
-                                <InputNumber className="w-4/6" id="relevancia_originalidade_qualidade" name="relevancia_originalidade_qualidade" placeholder= 'Máximo 3,0 pontos' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={3} step={0.1}/>
-                                {notaRelevanciaMensagemErro && <small id="nota-relevancia-help" className="text-red-500 py-1 px-2">{notaRelevanciaMensagemErro}</small>}
+                                <InputNumber className="w-4/6" id="relevancia_originalidade_qualidade" name="relevancia_originalidade_qualidade" placeholder='Máximo 3,0 pontos' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={3} step={0.1} />
+                                {notaRelevanciaMensagemErro && <small id="nota-relevancia-help" className="px-2 py-1 text-red-500">{notaRelevanciaMensagemErro}</small>}
                             </div>
                         </div>
                         <div className='grid grid-cols-2 gap-4'>
-                            <div className="flex flex-col align-items-center mb-3 gap-2">
+                            <div className="flex flex-col gap-2 mb-3 align-items-center">
                                 <label htmlFor="grau_conhecimento"><b>Grau de Conhecimento</b></label>
-                                <InputNumber className="w-4/6" id="grau_conhecimento" name="grau_conhecimento" placeholder= 'Máximo 2,0 pontos' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={2} step={0.1}/>
-                                {notaConhecimentoMensagemErro && <small id="nota-conhecimento-help" className="text-red-500 py-1 px-2">{notaConhecimentoMensagemErro}</small>}
+                                <InputNumber className="w-4/6" id="grau_conhecimento" name="grau_conhecimento" placeholder='Máximo 2,0 pontos' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={2} step={0.1} />
+                                {notaConhecimentoMensagemErro && <small id="nota-conhecimento-help" className="px-2 py-1 text-red-500">{notaConhecimentoMensagemErro}</small>}
                             </div>
-                            <div className="flex flex-col align-items-center mb-3 gap-2">
+                            <div className="flex flex-col gap-2 mb-3 align-items-center">
                                 <label htmlFor="bibliografia_apresentada"><b>Bibliografia Apresentada</b></label>
-                                <InputNumber className="w-4/6" id="bibliografia_apresentada" name="bibliografia_apresentada" placeholder= 'Máximo 1,0 ponto' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={1} step={0.1}/>
-                                {notaBibliografiaMensagemErro && <small id="nota-bibliografia-help" className="text-red-500 py-1 px-2">{notaBibliografiaMensagemErro}</small>}
+                                <InputNumber className="w-4/6" id="bibliografia_apresentada" name="bibliografia_apresentada" placeholder='Máximo 1,0 ponto' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={1} step={0.1} />
+                                {notaBibliografiaMensagemErro && <small id="nota-bibliografia-help" className="px-2 py-1 text-red-500">{notaBibliografiaMensagemErro}</small>}
                             </div>
                         </div>
                         <h4> NOTAS APRESENTAÇÃO DO TRABALHO </h4>
                         <div className='grid grid-cols-2 gap-4'>
-                            <div className="flex flex-col align-items-center mb-3 gap-2">
+                            <div className="flex flex-col gap-2 mb-3 align-items-center">
                                 <label htmlFor="utilizacao_recursos_didaticos"><b>Utilização de Recursos Didáticos</b></label>
-                                <InputNumber className="w-4/6" id="utilizacao_recursos_didaticos" name="utilizacao_recursos_didaticos" placeholder= 'Máximo 1,0 ponto' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={1} step={0.1}/>
-                                {notaRecursosMensagemErro && <small id="nota-recursos-help" className="text-red-500 py-1 px-2">{notaRecursosMensagemErro}</small>}
+                                <InputNumber className="w-4/6" id="utilizacao_recursos_didaticos" name="utilizacao_recursos_didaticos" placeholder='Máximo 1,0 ponto' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={1} step={0.1} />
+                                {notaRecursosMensagemErro && <small id="nota-recursos-help" className="px-2 py-1 text-red-500">{notaRecursosMensagemErro}</small>}
                             </div>
-                            <div className="flex flex-col align-items-center mb-3 gap-2">
+                            <div className="flex flex-col gap-2 mb-3 align-items-center">
                                 <label htmlFor="conteudo_apresentacao"><b>Conteúdo da Apresentação</b></label>
-                                <InputNumber className="w-4/6" id="conteudo_apresentacao" name="conteudo_apresentacao" placeholder= 'Máximo 1,0 ponto' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={1} step={0.1}/>
-                                {notaConteudoMensagemErro && <small id="nota-apresentacao-help" className="text-red-500 py-1 px-2">{notaConteudoMensagemErro}</small>}
+                                <InputNumber className="w-4/6" id="conteudo_apresentacao" name="conteudo_apresentacao" placeholder='Máximo 1,0 ponto' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={1} step={0.1} />
+                                {notaConteudoMensagemErro && <small id="nota-apresentacao-help" className="px-2 py-1 text-red-500">{notaConteudoMensagemErro}</small>}
                             </div>
                         </div>
                         <div className='grid grid-cols-2 gap-4'>
-                            <div className="flex flex-col align-items-center mb-3 gap-2">
+                            <div className="flex flex-col gap-2 mb-3 align-items-center">
                                 <label htmlFor="utilizacao_tempo_sintese"><b>Utilização do Tempo e Poder de Síntese</b></label>
-                                <InputNumber className="w-4/6" id="utilizacao_tempo_sintese" name="utilizacao_tempo_sintese" placeholder= 'Máximo 1,0 ponto' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={1} step={0.1}/>
-                                {notaSinteseMensagemErro && <small id="nota-sintese-help" className="text-red-500 py-1 px-2">{notaSinteseMensagemErro}</small>}
+                                <InputNumber className="w-4/6" id="utilizacao_tempo_sintese" name="utilizacao_tempo_sintese" placeholder='Máximo 1,0 ponto' mode="decimal" minFractionDigits={1} maxFractionDigits={2} min={0} max={1} step={0.1} />
+                                {notaSinteseMensagemErro && <small id="nota-sintese-help" className="px-2 py-1 text-red-500">{notaSinteseMensagemErro}</small>}
                             </div>
                         </div>
                         <h4> CONSIDERAÇÕES FINAIS </h4>
-                        {(user.id === TCCData?.orientador?.id) && (<> <div className="flex flex-wrap align-items-center mb-3 gap-1 pt-2">
-                            <Checkbox inputId="adequacoes" name='adequacoes'  onChange={handleAdequacoesChange} checked={necessarioAdequacoes} />
+                        {(user.id === TCCData?.orientador?.id) && (<> <div className="flex flex-wrap gap-1 pt-2 mb-3 align-items-center">
+                            <Checkbox inputId="adequacoes" name='adequacoes' onChange={handleAdequacoesChange} checked={necessarioAdequacoes} />
                             <label htmlFor="adequacoes" className="ml-2">O Trabalho de Conclusão de Curso (TCC) necessita de adequações para aprovação da versão final</label>
                         </div>
-                        <div className='grid grid-cols-2 gap-4' style={{ display: necessarioAdequacoes ? 'flex' : 'none' }}>
-                            <div className="flex flex-col align-items-center mb-3 gap-2 w-full">
-                                <label htmlFor="data_entrega"><b>Data</b></label>
-                                <Calendar className="w-10/12" id="data_entrega" name="data_entrega" placeholder="Data para entrega da versão definitiva" value={datetime24h} minDate={new Date()} readOnlyInput onChange={(e) => setDateTime24h(e.value)} />
-                                {dataEntregaMensagemErro && <small id="data-help" className="text-red-500 py-1 px-2">{dataEntregaMensagemErro}</small>}
+                            <div className='grid grid-cols-2 gap-4' style={{ display: necessarioAdequacoes ? 'flex' : 'none' }}>
+                                <div className="flex flex-col w-full gap-2 mb-3 align-items-center">
+                                    <label htmlFor="data_entrega"><b>Data</b></label>
+                                    <Calendar className="w-10/12" id="data_entrega" name="data_entrega" placeholder="Data para entrega da versão definitiva" value={datetime24h} minDate={new Date()} readOnlyInput onChange={(e) => setDateTime24h(e.value)} />
+                                    {dataEntregaMensagemErro && <small id="data-help" className="px-2 py-1 text-red-500">{dataEntregaMensagemErro}</small>}
+                                </div>
+                                <div className="flex flex-col w-full gap-2 mb-3 align-items-center">
+                                    <label htmlFor="horario_entrega"><b>Horário</b></label>
+                                    <Calendar className="w-10/12" id="horario_entrega" name="horario_entrega" value={datetime24h} placeholder="Horário para entrega da versão definitiva" readOnlyInput onChange={(e) => setDateTime24h(e.value)} timeOnly />
+                                    {horarioEntregaMensagemErro && <small id="horario-help" className="px-2 py-1 text-red-500">{horarioEntregaMensagemErro}</small>}
+                                </div>
                             </div>
-                            <div className="flex flex-col align-items-center mb-3 gap-2 w-full">
-                                <label htmlFor="horario_entrega"><b>Horário</b></label>
-                                <Calendar className="w-10/12" id="horario_entrega" name="horario_entrega" value={datetime24h} placeholder="Horário para entrega da versão definitiva" readOnlyInput onChange={(e) => setDateTime24h(e.value)} timeOnly/>
-                                {horarioEntregaMensagemErro && <small id="horario-help" className="text-red-500 py-1 px-2">{horarioEntregaMensagemErro}</small>}
-                            </div>
-                        </div>
-                        <div className='flex flex-wrap align-items-center mb-3 gap-2' style={{ display: necessarioAdequacoes ? 'flex' : 'none' }}>
-                            <label htmlFor="adequacoes_necessarias" className="ml-2"><b>Adequações Necessárias</b></label>
-                            <InputTextarea id='adequacoes_necessarias' name='adequacoes_necessarias' placeholder='Descreva quais ajustes devem ser realizados pelo estudante mediante a aprovação do trabalho de conclusão de curso (TCC)' rows={6} className={'w-full ' + (adequacoesMensagemErro ? 'p-invalid' : '')} />
-                            {adequacoesMensagemErro && <small id='adequacoes_necessarias-help' className='text-red-500 py-1 px-2'>{adequacoesMensagemErro}</small> }
-                        </div></>)}
-                        <div className='flex flex-wrap align-items-center mb-3 gap-2'>
+                            <div className='flex flex-wrap gap-2 mb-3 align-items-center' style={{ display: necessarioAdequacoes ? 'flex' : 'none' }}>
+                                <label htmlFor="adequacoes_necessarias" className="ml-2"><b>Adequações Necessárias</b></label>
+                                <InputTextarea id='adequacoes_necessarias' name='adequacoes_necessarias' placeholder='Descreva quais ajustes devem ser realizados pelo estudante mediante a aprovação do trabalho de conclusão de curso (TCC)' rows={6} className={'w-full ' + (adequacoesMensagemErro ? 'p-invalid' : '')} />
+                                {adequacoesMensagemErro && <small id='adequacoes_necessarias-help' className='px-2 py-1 text-red-500'>{adequacoesMensagemErro}</small>}
+                            </div></>)}
+                        <div className='flex flex-wrap gap-2 mb-3 align-items-center'>
                             <label htmlFor="comentarios_adicionais" className="ml-2"><b>Comentários Adicionais</b></label>
                             <InputTextarea id='comentarios_adicionais' name='comentarios_adicionais' placeholder='Escreva comentários que achar pertinente quanto ao do trabalho de conclusão de curso (TCC) apresentado' rows={6} className={'w-full '} />
                         </div>
                     </div>
-                    <div className="flex flex-wrap align-items-center mb-3 gap-2">
+                    <div className="flex flex-wrap gap-2 mb-3 align-items-center">
                         <Button label={loading ? "Avaliando TCC" : "Avaliar TCC"} loading={loading} className="w-full" />
                     </div>
                 </form>
             </Dialog>
             <Dialog header="Avaliar Ajustes" visible={visibleAvaliarAjuste} style={{ width: '50vw' }} onHide={() => setVisibleAvaliarAjuste(false)}>
                 <form onSubmit={onSubmitAvaliacaoAjuste}>
-                    <div className='flex flex-wrap align-items-center mb-3 gap-2'>
+                    <div className='flex flex-wrap gap-2 mb-3 align-items-center'>
                         <label htmlFor="parecer_orientador" className="ml-2"><b>Parecer Orientador</b></label>
                         <InputTextarea id='parecer_orientador' name='parecer_orientador' placeholder='Escreva seu parecer quanto aos ajustes realizados' rows={6} className={'w-full ' + (parecerOrientadorErro ? 'p-invalid' : '')} />
-                        {parecerOrientadorErro && <small id='parecer-orientador-help' className='text-red-500 py-1 px-2'>{parecerOrientadorErro}</small> }
+                        {parecerOrientadorErro && <small id='parecer-orientador-help' className='px-2 py-1 text-red-500'>{parecerOrientadorErro}</small>}
                     </div>
-                    <div className="flex flex-wrap align-items-center mb-3 gap-1 pt-2">
-                        <Checkbox inputId="ajuste-aprovado" name='ajuste_aprovado'onChange={handleAprovacaoAjusteChange} checked={ajusteAprovado} />
+                    <div className="flex flex-wrap gap-1 pt-2 mb-3 align-items-center">
+                        <Checkbox inputId="ajuste-aprovado" name='ajuste_aprovado' onChange={handleAprovacaoAjusteChange} checked={ajusteAprovado} />
                         <label htmlFor="ajuste_aprovado" className="ml-2">Os ajustes estão de acordo com o solicitado e o Trabalho de Conclusão de Curso (TCC) está aprovado</label>
                     </div>
-                    <div className="flex flex-wrap align-items-center mb-3 gap-1 pt-2">
+                    <div className="flex flex-wrap gap-1 pt-2 mb-3 align-items-center">
                         <Checkbox inputId="ajuste_reprovado" name='ajuste_reprovado' onChange={handleReprovacaoAjusteChange} checked={ajusteReprovado} />
                         <label htmlFor="ajuste_reprovado" className="ml-2">Os ajustes não estão de acordo com o solicitado e o Trabalho de Conclusão de Curso (TCC) está reprovado</label>
                     </div>
-                    <div className="flex flex-wrap align-items-center mb-3 gap-2">
-                        {avaliarAjusteErro && <small id='avaliar-ajuste-help' className='text-red-500 py-1 px-2'>{avaliarAjusteErro}</small> }
+                    <div className="flex flex-wrap gap-2 mb-3 align-items-center">
+                        {avaliarAjusteErro && <small id='avaliar-ajuste-help' className='px-2 py-1 text-red-500'>{avaliarAjusteErro}</small>}
                         <Button label={loading ? "Avaliando Ajustes" : "Avaliar Ajsutes"} loading={loading} className="w-full" />
                     </div>
                 </form>

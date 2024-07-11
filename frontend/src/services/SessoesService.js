@@ -16,9 +16,14 @@ async function putEditarSessaoOrientador(data) {
     return apiClient.put('/app/editar-sessao-orientador', data).then((response) => response.data);
 }
 
+async function postNovaSessao(data) {
+    return apiClient.post('/app/nova-sessao', data).then((response) => response.data);
+}
+
 export default {
     getSessoesPendentes,
     getSessoesPendentesOrientador,
     putEditarSessao,
-    putEditarSessaoOrientador
+    putEditarSessaoOrientador,
+    postNovaSessao,
 }

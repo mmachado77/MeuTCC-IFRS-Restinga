@@ -56,6 +56,7 @@ urlpatterns = [
     path('avaliar/<int:sessaoId>/', views.Avaliar.as_view(), name='avaliar'),
     path('avaliar-ajustes/<int:avaliacaoId>/', views.AvaliarAjustes.as_view(), name='avaliar-ajustes'),
     path('semestre-datas', SemestreDatasView.as_view(), name='semestre-datas'),
+    path('nova-sessao', SessaoCreateView.as_view(), name='nova-sessao'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

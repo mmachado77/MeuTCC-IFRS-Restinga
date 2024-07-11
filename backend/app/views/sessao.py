@@ -3,10 +3,13 @@ from rest_framework.response import Response
 from django.db.models import Q
 from rest_framework import status
 from datetime import datetime, date
-from ..models import Banca, Sessao, Tcc, Usuario
+from ..models import Banca, Sessao, SessaoPrevia, SessaoFinal, Tcc, Usuario
 from ..serializers import SessaoFuturaSerializer
 from rest_framework.permissions import IsAuthenticated
 from app.services.notificacoes import notificacaoService
+from app.services.sessao import SessaoService
+from datetime import date, datetime, time, timedelta
+from dateutil.parser import parse
 
 class SessoesFuturasView(APIView):
     def get(self, request):
@@ -103,3 +106,61 @@ class SessaoEditOrientadorView(APIView):
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
         
         return Response("Sessão atualizada com sucesso", status=status.HTTP_200_OK)
+
+class SessaoCreateView(APIView):
+    notificacaoService = notificacaoService()
+    sessaoService = SessaoService()
+
+    def post(self, request):
+        try:
+            data = request.data
+
+            tcc = data['idTCC']
+
+            if data['tipo'] == 'previa' and SessaoPrevia.objects.filter(tcc__id=tcc).exists():
+                return Response("Já existe uma sessão de prévia para este TCC", status=status.HTTP_400_BAD_REQUEST)
+            
+            if data['tipo'] == 'final' and SessaoFinal.objects.filter(tcc__id=tcc).exists():
+                return Response("Já existe uma sessão final para este TCC", status=status.HTTP_400_BAD_REQUEST)
+
+            dataInicio = parse(data['dataInicio'])
+            dataTermino = dataInicio + timedelta(days=7)
+            local = data['localDescricao']
+            formaApresentacao = data['localForma']
+            prazoEntregaDocumento = dataInicio + timedelta(days=14)
+            avaliador1 = data['avaliador1']
+            avaliador2 = data['avaliador2']
+            tccInstance = Tcc.objects.get(pk=tcc)
+
+            sessao = None
+            if data['tipo'] == 'previa':
+                sessao = SessaoPrevia.objects.create(
+                    data_inicio = dataInicio,
+                    data_termino = dataTermino,
+                    local = local,
+                    forma_apresentacao = formaApresentacao,
+                    prazoEntregaDocumento = prazoEntregaDocumento,
+                    tcc = tccInstance
+                )
+            elif data['tipo'] == 'final':
+                sessao = SessaoFinal.objects.create(
+                    data_inicio = dataInicio,
+                    data_termino = dataTermino,
+                    local = local,
+                    forma_apresentacao = formaApresentacao,
+                    prazoEntregaDocumento = prazoEntregaDocumento,
+                    tcc = tccInstance
+                )
+
+            banca = Banca.objects.create(
+                sessao=sessao,
+            )
+
+            banca.professores.set([avaliador1, avaliador2])
+
+            self.notificacaoService.enviarNotificacaoAgendamentoBanca(request.user, sessao, banca)
+
+            return Response("Sessão criada com sucesso", status=status.HTTP_201_CREATED)
+        except Exception as e:
+            print(e)
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
