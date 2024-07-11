@@ -16,6 +16,7 @@ class Avaliacao(BaseModel):
     tcc_definitivo = models.FileField(upload_to='tcc/documento', null=True, blank=True)
     ficha_avaliacao = models.FileField(upload_to='avaliacoes/fichas', null=True, blank=True)
     data_avaliacao = models.DateTimeField(null=True, blank=True)
+    parecer_orientador = models.TextField(null=True, blank=True)
 
     class meta:
         abstract = False

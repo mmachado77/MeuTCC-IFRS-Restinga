@@ -154,7 +154,7 @@ const FileItem = ({ file, sessaoId, prazoEntrega, user, onFileUpload, onFileDele
     );
 };
 
-const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBancaSessaoPreviaClick, onSugerirBancaSessaoFinalClick, onAvaliacaoClick, onFileUpload, onFileDelete, onFileDownload }) => {
+const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBancaSessaoPreviaClick, onSugerirBancaSessaoFinalClick, onAvaliacaoClick, onAvaliacaoAjusteClick,onFileUpload, onFileDelete, onFileDownload }) => {
     return (
         <Accordion multiple activeIndex={[0]}>
             {sessoes.map((sessao, index) => (
@@ -242,8 +242,18 @@ const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBanca
                             <p className="mb-7"><b>Ajustes necessários: </b>{sessao.avaliacao.descricao_ajuste}</p>
                             <p><b>Documento TCC Versão Definitiva:</b></p>
                             <FileItem avaliacaoAjusteId={sessao.avaliacao.id} file={sessao.avaliacao.tcc_definitivo} prazoEntrega={sessao.avaliacao.data_entrega_ajuste} user={user} onFileUpload={onFileUpload} onFileDelete={onFileDelete} onFileDownload={onFileDownload} />
+                            { (sessao.avaliacao.parecer_orientador !== null || sessao.avaliacao.parecer_orientador !== '')  && (
+                                <p className="mb-7"><b>Parecer Orientaodor: </b>{sessao.avaliacao.parecer_orientador}</p>
+                            )}
                             { (user.id === orientador.id)  && (
-                                <Button label="Avaliar" icon="pi pi-file-edit" style={{ backgroundColor: '#2F9E41' }} onClick={() => console.log("Falta implementar")} />
+                                <>
+                                    { (sessao.avaliacao.parecer_orientador === null || sessao.avaliacao.parecer_orientador === '') ? (
+                                        <Button label="Avaliar" icon="pi pi-file-edit" style={{ backgroundColor: '#2F9E41' }} onClick={() => onAvaliacaoAjusteClick(sessao.avaliacao.id)} />
+                                    ) : (
+                                        <Button label="Avaliado" icon="pi pi-check"  severity={'info'} />
+                                    )}
+                                </>
+
                             )}
                         </div>
                     </AccordionTab>
@@ -285,6 +295,7 @@ const DetalhesTCC = () => {
     const [visibleAvaliacao, setVisibleAvaliacao] = useState(false);
     const [visibleFormTCC, setVisibleFormTCC] = useState(false);
     const [visibleStatus, setVisibleStatus] = useState(false);
+    const [visibleAvaliarAjuste, setVisibleAvaliarAjuste] = useState(false);
     const [orientadores, setOrientadores] = useState([]);
     const [coorientadores, setCoorientadores] = useState([]);
     const [temaMensagemErro, setTemaMensagemErro] = useState('');
@@ -294,9 +305,11 @@ const DetalhesTCC = () => {
     const [datetime24h, setDateTime24h] = useState(null);
     const [documentoTCC, setDocumentoTCC] = useState(null);
     const [necessarioAdequacoes, setNecessarioAdequacoes] = React.useState(false);
+    const [ajusteAprovado, setAjusteAprovado] = React.useState(false);
+    const [ajusteReprovado, setAjusteReprovado] = React.useState(false);
     const [autorizacaoPublicacao, setAutorizacaoPublicacao] = useState(null);
-    const [comentariosMensagemErro, setComentariosMensagemErro] = useState('');
     const [sessaoId, setSessaoId] = useState(0);
+    const [avaliacaoId, setAvaliacaoId] = useState(0);
     const [adequacoesMensagemErro, setAdequacoesMensagemErro] = useState('');
     const [notaEstruturaMensagemErro, setNotaEstruturaMensagemErro] = useState('');
     const [notaRelevanciaMensagemErro, setNotaRelevanciaMensagemErro] = useState('');
@@ -307,7 +320,8 @@ const DetalhesTCC = () => {
     const [notaSinteseMensagemErro, setNotaSinteseMensagemErro] = useState('');
     const [dataEntregaMensagemErro, setDataEntregaMensagemErro] = useState('');
     const [horarioEntregaMensagemErro, setHorarioEntregaMensagemErro] = useState('');
-
+    const [parecerOrientadorErro, setParecerOrientadorErro] = useState('');
+    const [avaliarAjusteErro, setAvaliarAjusteErro] = useState('');
 
     const handleEditarClick = () => {
         setVisibleFormTCC(true);
@@ -326,6 +340,11 @@ const DetalhesTCC = () => {
     const handleAvaliacao = (sessaoIdAvaliacao) => {
         setSessaoId(sessaoIdAvaliacao)
         setVisibleAvaliacao(true);
+    };
+
+    const handleAvaliacaoAjuste = (avaliacaoAjusteId) => {
+        setAvaliacaoId(avaliacaoAjusteId)
+        setVisibleAvaliarAjuste(true);
     };
 
     const carregarDetalhesTCC = async () => {
@@ -453,6 +472,50 @@ const DetalhesTCC = () => {
         setLoading(false);
         carregarDetalhesTCC();
         setVisibleAvaliacao(false);
+    };
+
+    const onSubmitAvaliacaoAjuste = async (event) => {
+        event.preventDefault();
+        setLoading(true);
+        const formData = new FormData(event.currentTarget);
+        const jsonData = Object.fromEntries(formData);
+
+
+        if (jsonData.parecer_orientador == '') {
+            setParecerOrientadorErro('O Parecer do Orientador é obrigatório');
+            setLoading(false);
+            return;
+        } else {
+            setParecerOrientadorErro('');
+        }
+
+        if (!ajusteReprovado && !ajusteAprovado) {
+            setAvaliarAjusteErro('É necessário marcar uma das opções de avaliação');
+            setLoading(false);
+            return;
+        } else {
+            setAvaliarAjusteErro('');
+        }
+
+        if (ajusteReprovado && ajusteAprovado) {
+            setAvaliarAjusteErro('É possível marcar apenas uma das opções de avaliação');
+            setLoading(false);
+            return;
+        } else {
+            setAvaliarAjusteErro('');
+        }
+
+        const response = await AvaliacaoService.avaliarAjustes(avaliacaoId, jsonData);
+
+        if (response) {
+            toast.success('Avaliação realizada com sucesso');
+        } else {
+            toast.error('Erro ao realizar avaliação');
+        }
+
+        setLoading(false);
+        carregarDetalhesTCC();
+        setVisibleAvaliarAjuste(false);
     };
 
     const onSubmit = async (event) => {
@@ -614,6 +677,20 @@ const DetalhesTCC = () => {
         setNecessarioAdequacoes(!necessarioAdequacoes);
     }
 
+    const handleAprovacaoAjusteChange = (e) => {
+        setAjusteAprovado(!ajusteAprovado);
+        if (ajusteReprovado) {
+            setAjusteReprovado(!ajusteReprovado);
+        }
+    }
+
+    const handleReprovacaoAjusteChange = (e) => {
+        setAjusteReprovado(!ajusteReprovado);
+        if (ajusteAprovado) {
+            setAjusteAprovado(!ajusteAprovado);
+        }
+    }
+
     if (TCCData?.id == null) {
         return (
             <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
@@ -655,6 +732,7 @@ const DetalhesTCC = () => {
                             onSugerirBancaSessaoPreviaClick={handleSugerirBancaSessaoPreviaClick}
                             onSugerirBancaSessaoFinalClick={handleSugerirBancaSessaoFinalClick}
                             onAvaliacaoClick={handleAvaliacao}
+                            onAvaliacaoAjusteClick={handleAvaliacaoAjuste}
                             onFileUpload={handleFileUpload}
                             onFileDelete={handleFileDelete}
                             onFileDownload={handleFileDownload}
@@ -814,16 +892,37 @@ const DetalhesTCC = () => {
                         </div>
                         <div className='flex flex-wrap align-items-center mb-3 gap-2' style={{ display: necessarioAdequacoes ? 'flex' : 'none' }}>
                             <label htmlFor="adequacoes_necessarias" className="ml-2"><b>Adequações Necessárias</b></label>
-                            <InputTextarea id='adequacoes_necessarias' name='adequacoes_necessarias' placeholder='Descreva quais ajustes devem ser realizados pelo estudante mediante a aprovação do Trabalho de Conclusão de Curso (TCC)' rows={6} className={'w-full ' + (resumoMensagemErro ? 'p-invalid' : '')} />
-                            {adequacoesMensagemErro && <small id='tema-help' className='text-red-500 py-1 px-2'>{adequacoesMensagemErro}</small> }
+                            <InputTextarea id='adequacoes_necessarias' name='adequacoes_necessarias' placeholder='Descreva quais ajustes devem ser realizados pelo estudante mediante a aprovação do trabalho de conclusão de curso (TCC)' rows={6} className={'w-full ' + (adequacoesMensagemErro ? 'p-invalid' : '')} />
+                            {adequacoesMensagemErro && <small id='adequacoes_necessarias-help' className='text-red-500 py-1 px-2'>{adequacoesMensagemErro}</small> }
                         </div></>)}
                         <div className='flex flex-wrap align-items-center mb-3 gap-2'>
                             <label htmlFor="comentarios_adicionais" className="ml-2"><b>Comentários Adicionais</b></label>
-                            <InputTextarea id='comentarios_adicionais' name='comentarios_adicionais' placeholder='Escreva um resumo sobre o que será abordado em seu TCC' rows={6} className={'w-full ' + (resumoMensagemErro ? 'p-invalid' : '')} />
+                            <InputTextarea id='comentarios_adicionais' name='comentarios_adicionais' placeholder='Escreva comentários que achar pertinente quanto ao do trabalho de conclusão de curso (TCC) apresentado' rows={6} className={'w-full '} />
                         </div>
                     </div>
                     <div className="flex flex-wrap align-items-center mb-3 gap-2">
                         <Button label={loading ? "Avaliando TCC" : "Avaliar TCC"} loading={loading} className="w-full" />
+                    </div>
+                </form>
+            </Dialog>
+            <Dialog header="Avaliar Ajustes" visible={visibleAvaliarAjuste} style={{ width: '50vw' }} onHide={() => setVisibleAvaliarAjuste(false)}>
+                <form onSubmit={onSubmitAvaliacaoAjuste}>
+                    <div className='flex flex-wrap align-items-center mb-3 gap-2'>
+                        <label htmlFor="parecer_orientador" className="ml-2"><b>Parecer Orientador</b></label>
+                        <InputTextarea id='parecer_orientador' name='parecer_orientador' placeholder='Escreva seu parecer quanto aos ajustes realizados' rows={6} className={'w-full ' + (parecerOrientadorErro ? 'p-invalid' : '')} />
+                        {parecerOrientadorErro && <small id='parecer-orientador-help' className='text-red-500 py-1 px-2'>{parecerOrientadorErro}</small> }
+                    </div>
+                    <div className="flex flex-wrap align-items-center mb-3 gap-1 pt-2">
+                        <Checkbox inputId="ajuste-aprovado" name='ajuste_aprovado'onChange={handleAprovacaoAjusteChange} checked={ajusteAprovado} />
+                        <label htmlFor="ajuste_aprovado" className="ml-2">Os ajustes estão de acordo com o solicitado e o Trabalho de Conclusão de Curso (TCC) está aprovado</label>
+                    </div>
+                    <div className="flex flex-wrap align-items-center mb-3 gap-1 pt-2">
+                        <Checkbox inputId="ajuste_reprovado" name='ajuste_reprovado' onChange={handleReprovacaoAjusteChange} checked={ajusteReprovado} />
+                        <label htmlFor="ajuste_reprovado" className="ml-2">Os ajustes não estão de acordo com o solicitado e o Trabalho de Conclusão de Curso (TCC) está reprovado</label>
+                    </div>
+                    <div className="flex flex-wrap align-items-center mb-3 gap-2">
+                        {avaliarAjusteErro && <small id='avaliar-ajuste-help' className='text-red-500 py-1 px-2'>{avaliarAjusteErro}</small> }
+                        <Button label={loading ? "Avaliando Ajustes" : "Avaliar Ajsutes"} loading={loading} className="w-full" />
                     </div>
                 </form>
             </Dialog>

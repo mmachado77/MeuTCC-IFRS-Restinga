@@ -4,6 +4,10 @@ async function avaliar(sessaoId, data) {
     return apiClient.post(`/app/avaliar/${sessaoId}/`, data).then((response) => response.data);
 }
 
+async function avaliarAjustes(avaliacaoId, data) {
+    return apiClient.post(`/app/avaliar-ajustes/${avaliacaoId}/`, data).then((response) => response.data);
+}
+
 async function uploadFichaAvaliacao(avaliacaoId, formData) {
     return apiClient.post(`/app/upload-ficha-avaliacao/${avaliacaoId}/`, formData).then((response) => response.data);
 }
@@ -31,6 +35,7 @@ async function downloadDocumentoAjuste(avaliacaoId) {
 
 export default {
     avaliar,
+    avaliarAjustes,
     uploadFichaAvaliacao,
     excluirFichaAvaliacao,
     downloadFichaAvaliacao,

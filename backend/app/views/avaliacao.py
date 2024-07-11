@@ -86,9 +86,31 @@ class Avaliar(APIView):
         avaliacao.save()
         return Response({'status': 'success', 'message': 'Avaliação cadastrada com sucesso.'}, status=status.HTTP_201_CREATED)
 
+class AvaliarAjustes(APIView):
+    permission_classes = [IsAuthenticated]
+    tccService = TccService()
+    def post(self, request, avaliacaoId):
+        try:
+            avaliacao = Avaliacao.objects.get(id=avaliacaoId)
+            sessao = SessaoFinal.objects.get(avaliacao=avaliacao)
+            orientador = sessao.tcc.orientador
+            user = request.user
+        except Avaliacao.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
+        is_orientador = user == orientador.user
 
+        if not is_orientador:
+            return Response({"error": "Você não tem permissão para avaliar este TCC."}, status=status.HTTP_403_FORBIDDEN)
 
+        avaliacao.parecer_orientador = request.data.get('parecer_orientador')
+        if request.data.get('ajuste_aprovado'):
+            self.tccService.atualizarStatus(sessao.tcc.id, StatusTccEnum.APROVADO)
+        else:
+            self.tccService.atualizarStatus(sessao.tcc.id, StatusTccEnum.REPROVADO_FINAL, request.data.get('parecer_orientador'))
+
+        avaliacao.save()
+        return Response({'status': 'success', 'message': 'Avaliação cadastrada com sucesso.'}, status=status.HTTP_201_CREATED)
 
 
 
