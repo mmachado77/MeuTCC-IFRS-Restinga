@@ -4,11 +4,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.db.models import Max, F, Q
 from app.enums import StatusTccEnum, UsuarioTipoEnum
-from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre, Professor, Coordenador
+from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre, Professor, Coordenador, Sessao, Banca
 from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer
 from app.services.proposta import PropostaService
 from app.models.convite import Convite
 from app.services.tcc import TccService
+from app.services.notificacoes import notificacaoService
 
 class ListarTccPendente(APIView):
     permission_classes = [IsAuthenticated]
@@ -77,6 +78,7 @@ class PossuiProposta(APIView):
 class CriarTCCView(APIView):
     permission_classes = [IsAuthenticated]
     tccService = TccService()
+    notificacaoService = notificacaoService()
 
     def post(self, request):
         
@@ -93,6 +95,7 @@ class CriarTCCView(APIView):
                 return Response({'message': 'Você deve afirmar que conversou com o orientador e coorientador sobre o tema do TCC.'}, status=400) 
                 
             self.tccService.criarTcc(usuario, serializer)
+            self.notificacaoService.enviarNotificacaoProposta(request.user, request.data)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
@@ -151,15 +154,24 @@ class DetalhesTCCView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, tccid, format=None):
+        bancas = []
+        users_banca = []
         try:
             tcc = Tcc.objects.get(id=tccid)
         except Tcc.DoesNotExist:
             return Response({"error": "TCC não encontrado."}, status=status.HTTP_404_NOT_FOUND)
-
+        if Sessao.objects.filter(tcc=tcc).exists():
+            sessoes = Sessao.objects.filter(tcc=tcc)
+            for sessao in sessoes:
+                if Banca.objects.filter(sessao=sessao).exists():
+                    bancas.append(Banca.objects.get(sessao=sessao))
+            for banca in bancas:
+                for professor in banca.professores.all():
+                        users_banca.append(professor.user)
         user = request.user
         coord = Coordenador.objects.filter(user=user)
         if (str(user) == 'admin') or (user == tcc.autor.user) or (user == tcc.orientador.user) or (
-                tcc.coorientador and user == tcc.coorientador.user) or (coord.exists()):
+                tcc.coorientador and user == tcc.coorientador.user) or (coord.exists()) or (user in users_banca):
             serializer = TccSerializer(tcc)
             return Response(serializer.data)
         else:

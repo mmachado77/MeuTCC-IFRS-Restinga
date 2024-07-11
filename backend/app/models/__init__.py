@@ -4,7 +4,6 @@ from .statusCadastro import *
 from .professor import *
 from .professorInterno import *
 from .professorExterno import *
-from .configuracoes import *
 from .semestre import *
 from .tcc import *
 from .avaliacao import *
@@ -12,9 +11,10 @@ from .sessao import *
 from .sessaoFinal import *
 from .sessaoPrevia import *
 from .banca import *
-from .bancaPrioridade import *
+from .nota import *
 from .coordenador import *
 from .tccStatus import *
 from .tema import *
 from .convite import *
 from .semestreCoordenador import *
+from .mensagem import *

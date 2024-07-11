@@ -1,6 +1,7 @@
 from django.urls import path, include
 from . import views
 from .views.semestre import *
+from .views.sessao import *
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -19,7 +20,11 @@ urlpatterns = [
     path('historico-coordenadores', SemestreAtualCoordenadoresView.as_view(), name='historico-coordenadores'),
     path('atualizar-datas-propostas', views.AtualizarDatasPropostasView.as_view(), name='atualizar-datas-propostas'),
     path('alterar-coordenador', views.AlterarCoordenadorSemestre.as_view(), name='alterar-coordenador'),
-    path('coordenador', views.GetCoordenador.as_view(), name='coordenador'),
+    path('coordenador', views.CoordenadorAtualView.as_view(), name='coordenador'),
+    path('sessoes-futuras', SessoesFuturasView.as_view(), name='sessoes-futuras'),
+    path('sessoes-futuras-orientador', SessoesFuturasOrientadorView.as_view(), name='sessoes-futuras-orientador'),
+    path('editar-sessao', SessaoEditView.as_view(), name='editar-sessao'),
+    path('editar-sessao-orientador', SessaoEditOrientadorView.as_view(), name='editar-sessao-orientador'),
     path('professores-pendentes', views.ProfessoresPendentesListAPIView.as_view(), name='professores-pendentes'),
     path('aprovar-professor/<int:idProfessor>', views.AprovarProfessorAPIView.as_view(), name='aprovar-professor'),
     path('recusar-professor/<int:idProfessor>', views.RecusarProfessorAPIView.as_view(), name='recusar-professor'),
@@ -33,6 +38,25 @@ urlpatterns = [
     path('possui-proposta', views.PossuiProposta.as_view(), name='possui-proposta'),
     path('responder-proposta/<int:tccId>', views.TccStatusResponderPropostaView.as_view(), name='responder-proposta'),
     path('upload/professor-externo/', views.FileUploadView.as_view(), name='file-upload-externo'),
+    path('notificacoes', views.ListarNotificacoesNaoLidas.as_view(), name='notificacoes'),
+    path('limpar-notificacoes', views.MarcarNotificacoesComoLidas.as_view(), name='limpar-notificacoes'),
+    path('upload-autorizacao-publicacao/<int:tccId>/', views.UploadAutorizacaoPublicacaoView.as_view(), name='upload_autorizacao_publicacao'),
+    path('upload-documento-tcc/<int:tccId>/', views.UploadDocumentoTCCView.as_view(), name='upload-documento-tcc'),
+    path('upload-documento-sessao/<int:sessaoId>/', views.UploadDocumentoSessaoView.as_view(), name='upload-documento-sessao'),
+    path('excluir-documento-tcc/<int:tccId>/', views.ExcluirDocumentoTCCView.as_view(), name='excluir-documento-tcc'),
+    path('excluir-documento-sessao/<int:sessaoId>/', views.ExcluirDocumentoSessaoView.as_view(), name='excluir-documento-sessao'),
+    path('download-documento-tcc/<int:tccId>/', views.DownloadDocumentoTCCView.as_view(), name='download-documento-tcc'),
+    path('download-documento-sessao/<int:sessaoId>/', views.DownloadDocumentoSessaoView.as_view(), name='download-documento-sessao'),
+    path('download-ficha-avaliacao/<int:avaliacaoId>/', views.DownloadFichaAvaliacaoView.as_view(), name='download-ficha-avaliacao'),
+    path('upload-ficha-avaliacao/<int:avaliacaoId>/', views.UploadFichaAvaliacaoView.as_view(), name='upload-ficha-avaliacao'),
+    path('excluir-ficha-avaliacao/<int:avaliacaoId>/', views.ExcluirFichaAvaliacaoView.as_view(), name='excluir-ficha-avaliacao'),
+    path('download-documento-ajuste/<int:avaliacaoId>/', views.DownloadDocumentoAjusteView.as_view(), name='download-documento-ajuste'),
+    path('upload-documento-ajuste/<int:avaliacaoId>/', views.UploadDocumentoAjusteView.as_view(), name='upload-documento-ajuste'),
+    path('excluir-documento-ajuste/<int:avaliacaoId>/', views.ExcluirDocumentoAjusteView.as_view(), name='excluir-documento-ajuste'),
+    path('avaliar/<int:sessaoId>/', views.Avaliar.as_view(), name='avaliar'),
+    path('avaliar-ajustes/<int:avaliacaoId>/', views.AvaliarAjustes.as_view(), name='avaliar-ajustes'),
+    path('semestre-datas', SemestreDatasView.as_view(), name='semestre-datas'),
+    path('nova-sessao', SessaoCreateView.as_view(), name='nova-sessao'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

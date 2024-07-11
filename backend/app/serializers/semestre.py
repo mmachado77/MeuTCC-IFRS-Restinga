@@ -18,7 +18,7 @@ class SemestreSerializer(serializers.ModelSerializer):
 class CriarSemestreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Semestre
-        fields = ['periodo', 'dataAberturaSemestre', 'dataFechamentoSemestre', 'configuracoes']
+        fields = ['periodo', 'dataAberturaSemestre', 'dataFechamentoSemestre']
 
 
 class SemestreDatasSerializer(serializers.ModelSerializer):

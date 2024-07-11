@@ -15,6 +15,7 @@ class UsuarioService:
                 nome = serializer.validated_data['nome'],
                 cpf= serializer.validated_data['cpf'], 
                 email = usuario.email,
+                avatar = serializer.validated_data['avatar'],
                 area_atuacao = serializer.validated_data['area_atuacao'],
                 titulo = serializer.validated_data['titulo'],
                 area_interesse = serializer.validated_data['area_interesse'],
@@ -32,6 +33,7 @@ class UsuarioService:
                 nome = serializer.validated_data['nome'],
                 cpf = serializer.validated_data['cpf'], 
                 email = str(usuario.email),
+                avatar = serializer.validated_data['avatar'],
                 area_atuacao = serializer.validated_data['area_atuacao'],
                 titulo = serializer.validated_data['titulo'],
                 area_interesse = serializer.validated_data['area_interesse'],
@@ -44,6 +46,7 @@ class UsuarioService:
             nome = serializer.validated_data['nome'],
             cpf = serializer.validated_data['cpf'], 
             email = usuario.email,
+            avatar = serializer.validated_data['avatar'], 
             matricula = serializer.validated_data['matricula'],
             user = usuario
         )

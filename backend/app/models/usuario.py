@@ -10,6 +10,7 @@ class Usuario(PolymorphicModel):
     cpf = models.CharField(verbose_name="cpf", max_length=255)
     email = models.EmailField(max_length = 254)
     dataCadastro = models.DateTimeField(auto_now_add=True)
+    avatar = models.CharField(verbose_name="avatar", max_length=255, null=True, blank=True)
 
     @property
     def tipo(self):

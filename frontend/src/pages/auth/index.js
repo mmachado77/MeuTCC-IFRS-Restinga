@@ -54,27 +54,33 @@ const AuthPage = () => {
         fetchUsuarios();
     }, []);
 
-    return <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
-        <div className='flex flex-wrap align-items-center justify-around items-center py-10'>
-            <div>
-                <Image
-                    src="/ifrs_colorido.svg"
-                    alt="IFRS Logo"
-                    height={100}
-                    width={400}
-                />
-            </div>
-            <div>
-                <Dropdown value={username} onChange={(e) => setUsername(e.value)} options={usuarios} optionLabel="name" 
-                    placeholder="Selecione a conta" className="w-full md:w-14rem" />
-
-                <Button onClick={handleLoginClick} label="Entrar" icon="pi pi-signup" className="p-button-raised p-button-rounded p-button-lg p-m-2" />
-                
-                <Button onClick={handleLoginClick2} label="Entrar com o Google" icon="pi pi-google" className="p-button-raised p-button-rounded p-button-lg p-m-2" />
-                
+    return <>
+        <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
+            <div className='flex flex-wrap align-items-center justify-around items-center py-10'>
+                <div>
+                    <Image
+                        src="/ifrs_colorido.svg"
+                        alt="IFRS Logo"
+                        height={100}
+                        width={400}
+                    />
+                </div>
+                <div>               
+                    <Button onClick={handleLoginClick2} label="Entrar com o Google" icon="pi pi-google" className="p-button-raised p-button-rounded p-button-lg p-m-2" />
+                </div>
             </div>
         </div>
-    </div>;
+        <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
+            <h1 className='text-2xl font-bold px-6 py-2'>
+                Selecione a conta de usuário
+            </h1>
+            <div className='flex flex-row justify-around p-5 gap-5'>
+                <Dropdown value={username} onChange={(e) => setUsername(e.value)} options={usuarios} optionLabel="name" 
+                    placeholder="Selecione a conta" className="w-1/2 md:w-14rem" />
+                <Button onClick={handleLoginClick} label="Entrar" icon="pi pi-signup" className="w-1/2 p-button-raised p-button-rounded p-button-lg p-m-2" />
+            </div>            
+        </div>
+    </>;
 }
 
 AuthPage.title = 'Autenticação';

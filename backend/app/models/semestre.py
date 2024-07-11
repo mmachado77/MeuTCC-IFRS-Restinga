@@ -1,7 +1,6 @@
 from .base import BaseModel
 from django.db import models
 from django.db.models import Q
-from . import Configuracoes
 #from .semestreCoordenador import SemestreCoordenador
 from datetime import datetime  
 
@@ -11,7 +10,6 @@ class Semestre(BaseModel):
     dataFechamentoSemestre = models.DateField(default=datetime.today)
     dataAberturaPrazoPropostas = models.DateField(default=datetime.today)
     dataFechamentoPrazoPropostas = models.DateField(default=datetime.today)
-    configuracoes = models.ForeignKey(Configuracoes, on_delete=models.PROTECT )
 
     class Meta:
         abstract = False
@@ -24,6 +22,7 @@ class Semestre(BaseModel):
             Q(dataFechamentoSemestre__gte=data_consulta)
         )
         
+        #TODO: Pensar sobre a possibilidade de não haver semestres ativos (página de submissão recebe erro 404f)
         if semestres.exists():
             return semestres.first()
         else:

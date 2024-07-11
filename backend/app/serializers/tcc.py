@@ -1,11 +1,12 @@
 from rest_framework import serializers
 from ..models import Tcc,TccStatus, SessaoPrevia, SessaoFinal, Sessao
-from ..serializers import UsuarioPolymorphicSerializer, TccStatusSerializer, SessaoPolymorphicSerializer, FileDetailSerializer
+from ..serializers import UsuarioPolymorphicSerializer, TccStatusSerializer, SessaoPolymorphicSerializer, FileDetailSerializer, EstudanteNomeSerializer, ProfessorNomeSerializer, SemestreSerializer
 
 class TccSerializer(serializers.ModelSerializer):
     autor = UsuarioPolymorphicSerializer()
     orientador = UsuarioPolymorphicSerializer()
     coorientador = UsuarioPolymorphicSerializer()
+    semestre = SemestreSerializer()
     documentoTCC = FileDetailSerializer()
     autorizacaoPublicacao = FileDetailSerializer()
     status = serializers.SerializerMethodField(method_name='get_status')

@@ -11,11 +11,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-from os import getenv, environ
-from dotenv import load_dotenv
 import os
-
-load_dotenv()
+from .env_settings import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'polymorphic',
+    'notifications',
 
 ]
 
@@ -129,6 +127,8 @@ USE_I18N = True
 
 USE_TZ = True
 
+#EMAIL
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -151,16 +151,8 @@ REST_FRAMEWORK = {
     ]
 }
 
-# Google configuration
-GOOGLE_OAUTH2_CLIENT_ID = str(getenv("GOOGLE_OAUTH2_CLIENT_ID"))
-GOOGLE_OAUTH2_CLIENT_SECRET = str(getenv("GOOGLE_OAUTH2_CLIENT_SECRET"))
-GOOGLE_OAUTH2_REDIRECT_URI = str(getenv("GOOGLE_OAUTH2_REDIRECT_URI"))
-GOOGLE_OAUTH2_SCOPE = ['openid', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
-AUTH_FRONTEND_URL = str(getenv("AUTH_FRONTEND_URL"))
-AUTH_ERROR_FRONTEND_URL = str(getenv("AUTH_ERROR_FRONTEND_URL"))
-
 if DEBUG:
-    environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

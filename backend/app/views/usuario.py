@@ -9,12 +9,14 @@ from app.serializers import ProfessorSerializer, UsuarioPolymorphicSerializer, C
 from app.services import UsuarioService
 from rest_framework.parsers import MultiPartParser, FormParser
 from app.serializers import FileSerializer
+from app.services.notificacoes import notificacaoService
 from rest_framework.permissions import AllowAny
 
 class CriarUsuarioView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (MultiPartParser, FormParser) 
     usuario_service = UsuarioService()
+    notificacaoService = notificacaoService()
 
     def post(self, request):
         usuario = request.user
@@ -22,6 +24,7 @@ class CriarUsuarioView(APIView):
         if serializer.is_valid():
             criarUsuario = self.usuario_service.criarUsuario(usuario, serializer)
             if criarUsuario is not None:
+                #self.notificacaoService.enviarNotificacaoCadastroExterno(request.user, serializer) NÃO FOI POSSÍVEL TESTAR
                 return Response({'id': usuario.id}, status=status.HTTP_201_CREATED)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

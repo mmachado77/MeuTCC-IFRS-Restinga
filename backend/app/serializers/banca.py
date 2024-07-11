@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from ..models import Banca
-from ..serializers import UsuarioPolymorphicSerializer
+from ..serializers import UsuarioPolymorphicSerializer, ProfessorNomeSerializer
 
 class BancaSerializer(serializers.ModelSerializer):
     professores = serializers.SerializerMethodField(method_name='get_professores')
@@ -16,4 +16,11 @@ class BancaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Banca
-        fields = ['professores', 'professoresSugeridos']
+        fields = ['professores']
+
+class BancaCompletoSerializer(serializers.ModelSerializer):
+    professores = ProfessorNomeSerializer(many=True)
+    class Meta:
+        model = Banca
+        fields = ['professores']
+        depth = 1

@@ -4,9 +4,9 @@ import { Button } from "primereact/button";
 import toast from "react-hot-toast";
 import ProfessorService from "meutcc/services/ProfessorService";
 
-export default function formularioJustificativa({onSetVisibility, onPosAvaliacao, professor}) {
+export default function FormularioJustificativa({ onSetVisibility, onPosAvaliacao, professor }) {
     const [mensagemJustificativa, setMensagemJustificativa] = useState('');
-    
+
     const [mensagemErro, setMensagemErro] = useState('');
 
     const handleRecusarProfessorClick = async () => {
@@ -34,15 +34,14 @@ export default function formularioJustificativa({onSetVisibility, onPosAvaliacao
             <InputTextarea className={(mensagemErro ? 'p-invalid' : '')} id="justificativa" value={mensagemJustificativa} onChange={(e) => setMensagemJustificativa(e.target.value)} rows={5} cols={30} />
             <label htmlFor="justificativa">Justifique o motivo para a recusa</label>
         </span>
-            { mensagemErro && <small id='tema-help' className='text-red-500 py-1 px-2'>{mensagemErro}</small> }
+        {mensagemErro && <small id='tema-help' className='px-2 py-1 text-red-500'>{mensagemErro}</small>}
         <div className='flex justify-around mt-3'>
             <div>
-                <Button label="Confirmar Recusa" severity="danger" icon='pi pi-check' iconPos='right' onClick={handleRecusarProfessorClick}/>
+                <Button label="Confirmar Recusa" severity="danger" icon='pi pi-check' iconPos='right' onClick={handleRecusarProfessorClick} />
             </div>
             <div>
-                <Button label="Cancelar" severity="secondary" icon='pi pi-times' iconPos='right' onClick={ () => onSetVisibility(false) } />
+                <Button label="Cancelar" severity="secondary" icon='pi pi-times' iconPos='right' onClick={() => onSetVisibility(false)} />
             </div>
         </div>
-        </>)
+    </>)
 }
-        
