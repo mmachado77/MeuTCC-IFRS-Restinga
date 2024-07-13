@@ -20,10 +20,15 @@ async function postNovaSessao(data) {
     return apiClient.post('/app/nova-sessao', data).then((response) => response.data);
 }
 
+async function getSessoesFuturas() {
+    return apiClient.get(`/app/sessoes-futuras`).then((response) => response.data);
+}
+
 export default {
     getSessoesPendentes,
     getSessoesPendentesOrientador,
     putEditarSessao,
     putEditarSessaoOrientador,
     postNovaSessao,
+    getSessoesFuturas,
 }

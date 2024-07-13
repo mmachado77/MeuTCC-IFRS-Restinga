@@ -1,3 +1,5 @@
+
+
 import AuthService from "meutcc/services/AuthService";
 import { useRouter } from "next/router";
 import React from "react";
@@ -16,7 +18,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children, guards }) => {
     const [user, setUser] = React.useState(null);
-    const [loading, setLoading] = React.useState(true);
+    const [loading, setLoading] = React.useState(guards.length > 0);
 
     const router = useRouter();
 

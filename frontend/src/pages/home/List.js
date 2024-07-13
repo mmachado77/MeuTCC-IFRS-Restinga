@@ -1,6 +1,4 @@
-
 import React, { useState, useEffect } from 'react';
-import { OrderList } from 'primereact/orderlist';
 import CustomAvatar from 'meutcc/components/ui/CustomAvatar';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale/pt-BR';
@@ -8,79 +6,49 @@ import { cn } from 'meutcc/libs/utils';
 import { Badge } from 'primereact/badge';
 
 export default function BasicDemo({ ...props }) {
-    const [products, setProducts] = useState([]);
+    const [listaSessoes, setListaSessoes] = useState([]);
 
     useEffect(() => {
-        setProducts([
-            {
-                avatar: 'https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png',
-                name: 'Por que o tiririca é um bom malandro?',
-                category: 'Computação',
-                dataInicio: new Date(),
-                local: 'Campus Restinga, Sala 401 encontrando o professor e o aluno',
-                localForma: 'presencial',
-            },
-            {
-                avatar: 'https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png',
-                name: 'Por que o tiririca é um bom malandro?',
-                category: 'Computação',
-                dataInicio: new Date(),
-                local: 'Campus Restinga, Sala 401 encontrando o professor e o aluno',
-                localForma: 'presencial',
-            },
-            {
-                avatar: 'https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png',
-                name: 'Por que o tiririca é um bom malandro?',
-                category: 'Computação',
-                dataInicio: new Date(),
-                local: 'Campus Restinga, Sala 401 encontrando o professor e o aluno',
-                localForma: 'presencial',
-            },
-            {
-                avatar: 'https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png',
-                name: 'Por que o tiririca é um bom malandro?',
-                category: 'Computação',
-                dataInicio: new Date('2024-07-01 15:00:00'),
-                local: 'https://meet.google.com/abc-def-ghi',
-                localForma: 'remoto',
-            },
-        ]);
-        // ProductService.getProductsSmall().then((data) => setProducts(data));
-    }, []);
+        setListaSessoes(props.sessoes.filter((sessao) => {
+            const dataInicio = new Date(sessao.data_inicio);
+            const data = new Date(props.data);
+            return dataInicio.getFullYear() === data.getFullYear() && dataInicio.getMonth() === data.getMonth();
+        }));
+    }, [props.data]);
 
-    const itemTemplate = (item) => {
+    const sessaoTemplate = (sessao) => {
         return (
             <div className="flex flex-wrap gap-3 p-2 border rounded-md align-items-center hover:bg-gray-100 flex-nowrap ">
                 <div className="p-2">
-                    <CustomAvatar image={item.avatar} fullname={item.name} className='w-[64px] h-[64px] text-[32px]' shape="circle" />
+                    <CustomAvatar image={sessao.tcc.autor.avatar} fullname={sessao.tcc.autor.nome} className='w-[64px] h-[64px] text-[32px]' shape="circle" />
                 </div>
                 <div className="p-2">
-                    <div className="font-medium">{item.name}</div>
+                    <div className="font-medium">{sessao.tcc.tema}</div>
                     <div className='mt-2 mb-4'>
-                        <Badge value={item.category}></Badge>
+                        <Badge value={sessao.tipo}></Badge>
                     </div>
                     <div className="font-light text-gray-500">
                         <div className='flex items-center my-2 flex-nowrap '>
                             <i className='pr-2 pi pi-calendar'></i>
-                            <span>{format(item.dataInicio, "dd 'de' MMMM, HH:ii", { locale: ptBR })}</span>
+                            <span>{format(sessao.data_inicio, "dd 'de' MMMM, HH:ii", { locale: ptBR })}</span>
                         </div>
                         <div className='flex items-center my-2 flex-nowrap '>
                             {
-                                item.localForma === 'remoto' ?
+                                sessao.localForma === 'remoto' ?
                                     <i className='pr-2 pi pi-globe'></i>
                                     :
                                     <i className='pr-2 pi pi-map-marker'></i>
                             }
                             {
-                                item.localForma === 'remoto' ?
+                                sessao.localForma === 'remoto' ?
                                     <a
-                                        href={item.local}
+                                        href={sessao.local}
                                         target='_blank'
                                         rel='noreferrer'
                                         className='text-blue-500'
-                                    >{new URL(item.local).hostname}</a>
+                                    >{new URL(sessao.local).hostname}</a>
                                     :
-                                    <span>{item.local}</span>
+                                    <span>{sessao.local}</span>
                             }
                         </div>
 
@@ -92,7 +60,7 @@ export default function BasicDemo({ ...props }) {
 
     return (
         <div className={cn(props.className, "overflow-auto card flex flex-col justify-content-center")}>
-            {products.map((item) => itemTemplate(item))}
+            {listaSessoes.map((item) => sessaoTemplate(item))}
         </div>
     )
 }
