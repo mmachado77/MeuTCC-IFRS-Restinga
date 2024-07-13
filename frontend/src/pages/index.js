@@ -1,3 +1,5 @@
-import Main from './home'
+import MainPage, { getServerSideProps } from './home'
 
-export default Main;
+export default MainPage;
+
+export { getServerSideProps };
