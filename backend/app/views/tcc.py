@@ -7,7 +7,6 @@ from app.enums import StatusTccEnum, UsuarioTipoEnum
 from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre, Professor, Coordenador, Sessao, Banca
 from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer
 from app.services.proposta import PropostaService
-from app.models.convite import Convite
 from app.services.tcc import TccService
 from app.services.notificacoes import notificacaoService
 

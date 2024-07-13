@@ -1,6 +1,5 @@
 from app.models import TccStatus
 from app.enums import StatusTccEnum
-from app.models.convite import Convite
 from app.models.semestre import Semestre
 from app.models.tcc import Tcc
 from django.db.models import Max, F
@@ -24,11 +23,6 @@ class TccService:
         
         semestreAtual = Semestre.objects.latest('id')
         tcc = Tcc.objects.create(autor = usuario, semestre = semestreAtual, **serializer.validated_data)
-
-        Convite.objects.create(tcc=tcc, professor=tcc.orientador)
-            
-        if tcc.coorientador:
-            Convite.objects.create(tcc=tcc, professor=tcc.coorientador)
  
         TccStatus.objects.create(tcc=tcc, status=StatusTccEnum.PROPOSTA_ANALISE_PROFESSOR)
 

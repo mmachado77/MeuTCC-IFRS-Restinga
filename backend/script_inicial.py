@@ -2,7 +2,7 @@
 # >>> exec(open('script_inicial.py').read())
 
 from django.contrib.auth.models import User
-from app.models import TccStatus, Tcc, Semestre, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno, Convite, SemestreCoordenador, Mensagem
+from app.models import TccStatus, Tcc, Semestre, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno, SemestreCoordenador, Mensagem
 from datetime import datetime
 
 # Criando usuário admin
