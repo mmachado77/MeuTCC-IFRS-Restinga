@@ -1,3 +1,3 @@
-import SugestoesTemasTcc from './sugestoes-temas-tcc'
+import Main from './home'
 
-export default SugestoesTemasTcc;
+export default Main;
