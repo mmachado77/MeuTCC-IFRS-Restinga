@@ -82,8 +82,6 @@ export default function BasicDemo({ ...props }) {
                                     :
                                     <span>{item.local}</span>
                             }
-                            {/* <i className='pr-2 pi pi-map-marker'></i> */}
-                            {/* <span>Campus Restinga, Sala 401 encontrando o professor e o aluno</span> */}
                         </div>
 
                     </div>
@@ -93,7 +91,7 @@ export default function BasicDemo({ ...props }) {
     };
 
     return (
-        <div className={cn(props.className, "overflow-auto card xl:flex xl:justify-content-center")}>
+        <div className={cn(props.className, "overflow-auto card flex flex-col justify-content-center")}>
             {products.map((item) => itemTemplate(item))}
         </div>
     )
