@@ -8,4 +8,4 @@ class TccNomesSerializer(serializers.ModelSerializer):
     orientador = ProfessorNomeSerializer()
     class Meta:
         model = Tcc
-        fields = ['id', 'autor', 'orientador', 'tema']
+        fields = ['id', 'autor', 'orientador', 'tema', 'resumo']

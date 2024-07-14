@@ -30,7 +30,7 @@ async function responderProposta(tccId, data) {
 
 async function getPossuiTcc() {
     return apiClient.get('/app/possui-proposta').then((response) => response.data);
-}   
+}
 
 async function editarTCC(tccId, data) {
     return apiClient.put(`/app/editar-tcc/${tccId}/`, data).then((response) => response.data);
@@ -64,6 +64,9 @@ async function downloadDocumentoSessao(sessaoId) {
     return apiClient.get(`/app/download-documento-sessao/${sessaoId}/`, { responseType: 'blob' }).then((response) => response.data);
 }
 
+async function getTccsPublicados() {
+    return apiClient.get('/app/tccs-publicados').then((response) => response.data);
+}
 
 
 export default {
@@ -82,5 +85,6 @@ export default {
     excluirDocumentoTCC,
     uploadDocumentoSessao,
     excluirDocumentoSessao,
-    downloadDocumentoSessao
+    downloadDocumentoSessao,
+    getTccsPublicados
 }

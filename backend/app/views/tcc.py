@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from django.db.models import Max, F, Q
 from app.enums import StatusTccEnum, UsuarioTipoEnum
@@ -181,3 +181,10 @@ class DetalhesTCCView(APIView):
     
 
     
+class TCCsPublicadosView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        tccs = Tcc.objects.filter(tccstatus__status=StatusTccEnum.APROVADO)
+        serializer = TccSerializer(tccs, many=True)
+        return Response(serializer.data)
