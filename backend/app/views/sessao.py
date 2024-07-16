@@ -7,8 +7,10 @@ from ..models import Banca, Sessao, SessaoPrevia, SessaoFinal, Tcc, Usuario
 from ..serializers import SessaoFuturaSerializer
 from rest_framework.permissions import IsAuthenticated
 from app.services.notificacoes import notificacaoService
+from app.services.tcc import TccService
 from datetime import date, datetime, time, timedelta
 from dateutil.parser import parse
+from app.enums import StatusTccEnum
 
 class SessoesFuturasView(APIView):
     def get(self, request):
@@ -42,11 +44,13 @@ class SessoesFuturasOrientadorView(APIView):
     
 class SessaoEditView(APIView):
     notificacaoService = notificacaoService()
+    tccService = TccService()
     def put(self, request):
         try:
             data = request.data
             id_sessao = data.get('idSessao')
             sessao_atualizada = Sessao.objects.get(pk=id_sessao)
+            tipo = sessao_atualizada.get_tipo
             banca_atualizada = Banca.objects.filter(sessao=sessao_atualizada).first()
             if not banca_atualizada:
                 return Response("Banca não encontrada para esta sessão", status=status.HTTP_400_BAD_REQUEST)
@@ -66,6 +70,11 @@ class SessaoEditView(APIView):
             self.notificacaoService.enviarNotificacaoAgendamentoBanca(request.user, sessao_atualizada, banca_atualizada)
             sessao_atualizada.save()
 
+            if tipo == 'Sessão Prévia':
+                self.tccService.atualizarStatus(sessao_atualizada.tcc.id, StatusTccEnum.PREVIA_AGENDADA)
+            elif tipo == 'Sessão Final':
+                self.tccService.atualizarStatus(sessao_atualizada.tcc.id, StatusTccEnum.FINAL_AGENDADA)
+
         except Sessao.DoesNotExist:
             return Response("Sessão não encontrada", status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -75,11 +84,13 @@ class SessaoEditView(APIView):
         return Response("Sessão atualizada com sucesso", status=status.HTTP_200_OK)
     
 class SessaoEditOrientadorView(APIView):
+    tccService = TccService()
     def put(self, request):
         try:
             data = request.data
             id_sessao = data.get('idSessao')
             sessao_atualizada = Sessao.objects.get(pk=id_sessao)
+            tipo = sessao_atualizada.get_tipo
             banca_atualizada = Banca.objects.filter(sessao=sessao_atualizada).first()
             if not banca_atualizada:
                 return Response("Banca não encontrada para esta sessão", status=status.HTTP_400_BAD_REQUEST)
@@ -98,6 +109,11 @@ class SessaoEditOrientadorView(APIView):
             sessao_atualizada.validacaoOrientador = True
             sessao_atualizada.save()
 
+            if tipo == 'Sessão Prévia':
+                self.tccService.atualizarStatus(sessao_atualizada.tcc.id, StatusTccEnum.PREVIA_COORDENADOR)
+            elif tipo == 'Sessão Final':
+                self.tccService.atualizarStatus(sessao_atualizada.tcc.id, StatusTccEnum.FINAL_COORDENADOR)
+
         except Sessao.DoesNotExist:
             return Response("Sessão não encontrada", status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -108,6 +124,7 @@ class SessaoEditOrientadorView(APIView):
 
 class SessaoCreateView(APIView):
     notificacaoService = notificacaoService()
+    tccService = TccService()
 
     def post(self, request):
         try:
@@ -140,6 +157,7 @@ class SessaoCreateView(APIView):
                     prazoEntregaDocumento = prazoEntregaDocumento,
                     tcc = tccInstance
                 )
+                self.tccService.atualizarStatus(tcc, StatusTccEnum.PREVIA_ORIENTADOR)
             elif data['tipo'] == 'final':
                 sessao = SessaoFinal.objects.create(
                     data_inicio = dataInicio,
@@ -149,6 +167,7 @@ class SessaoCreateView(APIView):
                     prazoEntregaDocumento = prazoEntregaDocumento,
                     tcc = tccInstance
                 )
+                self.tccService.atualizarStatus(tcc, StatusTccEnum.FINAL_ORIENTADOR)
 
             banca = Banca.objects.create(
                 sessao=sessao,
