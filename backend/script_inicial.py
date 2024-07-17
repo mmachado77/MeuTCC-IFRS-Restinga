@@ -2,7 +2,7 @@
 # >>> exec(open('script_inicial.py').read())
 
 from django.contrib.auth.models import User
-from app.models import TccStatus, Tcc, Semestre, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno, SemestreCoordenador, Mensagem
+from app.models import TccStatus, Tcc, Semestre, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno, SemestreCoordenador, Mensagem, Tema
 from datetime import datetime
 
 # Criando usuário admin
@@ -64,6 +64,18 @@ adastolfo = ProfessorInterno.objects.create(nome="Adastolfo",
                          matricula="1994000402",
                          status = status5,
                          user = ProfInter2User
+                        )
+
+ProfInter3User = User.objects.create_user("iurito@restinga.ifrs.edu.br", "iurito@restinga.ifrs.edu.br", "15828000402")
+iuri = ProfessorInterno.objects.create(nome="Iuri", 
+                         cpf="039058047012", 
+                         email="interno@restinga.ifrs.edu.br",
+                         area_atuacao = "CIENCIA DA COMPUTACAO",
+                         titulo="DOUTORADO",
+                         area_interesse="Prog",
+                         matricula="15828000402",
+                         status = status4,
+                         user = ProfInter3User
                         )
 
 # Adiciona professor como atual coordenador
@@ -150,6 +162,43 @@ tcc_status = TccStatus.objects.create(
                         dataStatus= datetime.today(),
                         tcc= tcc2                                
 
+)
+
+# Temas para propostas de tcc
+tema1 = Tema.objects.create(
+    titulo='Pesquisa sobre o porquê o Tiririca é tão bom deputado',
+    descricao='Este trabalho apresenta uma pesquisa sobre o porquê o Tiririca é tão bom deputado.',
+    professor=adastolfo,
+)
+
+tema2 = Tema.objects.create(
+    titulo='Desenvolvimento de um Sistema de Gerenciamento de Tarefas',
+    descricao='Este trabalho apresenta o desenvolvimento de um sistema web para gerenciamento de tarefas, utilizando Django como framework.',
+    professor=cleitin,
+)
+
+tema3 = Tema.objects.create(
+    titulo='Análise de Algoritmos de Machine Learning',
+    descricao='Este trabalho apresenta uma análise comparativa de diferentes algoritmos de machine learning.',
+    professor=andre,
+)
+
+tema4 = Tema.objects.create(
+    titulo='Sistema de Recomendação para E-commerce',
+    descricao='Este trabalho apresenta o desenvolvimento de um sistema de recomendação utilizando técnicas de machine learning para e-commerce.',
+    professor=cleitin,
+)
+
+tema5 = Tema.objects.create(
+    titulo='Desenvolvimento de um Chatbot para Atendimento ao Cliente',
+    descricao='Este trabalho apresenta o desenvolvimento de um chatbot utilizando processamento de linguagem natural para atendimento ao cliente.',
+    professor=andre,
+)
+
+tema6 = Tema.objects.create(
+    titulo='Aplicação de Blockchain em Sistemas de Votação',
+    descricao='Este trabalho apresenta uma aplicação da tecnologia blockchain para melhorar a segurança e transparência em sistemas de votação.',
+    professor=iuri,
 )
 
 mensagem1 = Mensagem.objects.create(
