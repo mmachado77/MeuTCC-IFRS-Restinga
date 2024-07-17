@@ -5,7 +5,7 @@ from . import Tcc
 
 class Sessao(PolymorphicModel):
     local = models.CharField(max_length=255)
-    forma_apresentacao = models.CharField(max_length=255, null=True)
+    forma_apresentacao = models.CharField(max_length=255, null=True) # NULL = Status temporário
     # TODO - Verificar propriedades dos atributos "parecer_orientador" e "parecer_coordenador"
     parecer_orientador = models.TextField(null=True, blank=True)
     parecer_coordenador = models.TextField(null=True, blank=True)
