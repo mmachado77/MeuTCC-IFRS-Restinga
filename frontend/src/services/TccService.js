@@ -68,6 +68,10 @@ async function getTccsPublicados() {
     return apiClient.get('/app/tccs-publicados').then((response) => response.data);
 }
 
+async function getTccsByUsuario() {
+    return apiClient.get('/app/user-tccs').then((response) => response.data);
+}
+
 async function getSugestoes() {
     return apiClient.get('/app/temas-sugeridos').then((response) => response.data);
 }
@@ -112,4 +116,6 @@ export default {
     createTema,
     updateTema,
     deleteTema,
+    getTccsPublicados,
+    getTccsByUsuario
 }

@@ -40,3 +40,11 @@ body {
 .p-avatar:not(.p-avatar-circle) img {
   border-radius: 6px;
 }
+.multiselect-container .p-multiselect {
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.multiselect-container .p-multiselect-label {
+    white-space: normal !important;
+}

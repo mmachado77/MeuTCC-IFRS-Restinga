@@ -53,16 +53,12 @@ urlpatterns = [
     path('download-documento-ajuste/<int:avaliacaoId>/', views.DownloadDocumentoAjusteView.as_view(), name='download-documento-ajuste'),
     path('upload-documento-ajuste/<int:avaliacaoId>/', views.UploadDocumentoAjusteView.as_view(), name='upload-documento-ajuste'),
     path('excluir-documento-ajuste/<int:avaliacaoId>/', views.ExcluirDocumentoAjusteView.as_view(), name='excluir-documento-ajuste'),
+    path('download-ficha-avaliacao-preenchida/<int:avaliacaoId>/', views.DownloadFichaAvaliacaoPreenchidaView.as_view(), name='download-ficha-avaliacao-preenchida'),
     path('avaliar/<int:sessaoId>/', views.Avaliar.as_view(), name='avaliar'),
     path('avaliar-ajustes/<int:avaliacaoId>/', views.AvaliarAjustes.as_view(), name='avaliar-ajustes'),
     path('semestre-datas', SemestreDatasView.as_view(), name='semestre-datas'),
     path('nova-sessao', SessaoCreateView.as_view(), name='nova-sessao'),
     path('tccs-publicados', views.TCCsPublicadosView.as_view(), name='tccs-publicados'),
-    path('temas-sugeridos', views.TemasSugeridosView.as_view(), name='temas-sugeridos'),
-    path('meus-temas-sugeridos', views.MeusTemasSugeridosView.as_view(), name='temas-sugeridos'),
-    path('criar-tema', views.CriarTemaView.as_view(), name='criar-tema'),
-    path('atualizar-tema/<int:pk>/', views.AtualizarTemaView.as_view(), name='atualizar-tema'),
-    path('excluir-tema/<int:pk>/', views.ExcluirTemaView.as_view(), name='excluir-tema'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

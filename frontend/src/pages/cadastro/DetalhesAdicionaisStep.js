@@ -8,14 +8,11 @@ import { Toast } from 'primereact/toast';
 import UsuarioService from 'meutcc/services/UsuarioService';
 import { MultiSelect } from 'primereact/multiselect';
 
-
-
 const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademicos, areaAtuacao, setActiveIndex, activeIndex }) => {
     const toast = useRef(null);
     const [identidade, setIdentidade] = useState(null);
     const [diploma, setDiploma] = useState(null);
     const [selectedInterests, setSelectedInterests] = useState(userData.area_interesse || []);
-
 
     const onFieldChange = (e, fieldName) => {
         setUserData({ ...userData, [fieldName]: e.target.value });
@@ -58,9 +55,6 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
         { label: 'Sistemas Multimídia e Hipermídia', value: 'SISTEMAS_MULTIMIDIA_E_HIPERMIDIA' },
         { label: 'Sistemas Tolerantes a Falhas', value: 'SISTEMAS_TOLERANTES_A_FALHAS' }
     ];
-    
-
-
 
     const validateAndSubmit = () => {
         let error = false;
@@ -98,12 +92,12 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
             formData.append('titulo', userData.titulo);
             formData.append('avatar', userData.avatar);
             formData.append('area_atuacao', userData.area_atuacao);
-            formData.append('area_interesse', userData.area_interesse);
+            formData.append('area_interesse', JSON.stringify(userData.area_interesse)); // Certificando que area_interesse é uma string JSON
+
             if (userData.matricula) formData.append('matricula', userData.matricula);
             if (userData.titulo) formData.append('titulo', userData.titulo);
             if (userData.area_atuacao) formData.append('area', userData.area_atuacao);
-            if (userData.area_interesse) formData.append('area_interesse', userData.area_interesse);
-            
+            if (userData.area_interesse) formData.append('area_interesse', JSON.stringify(userData.area_interesse)); // Certificando que area_interesse é uma string JSON
 
             // Certifique-se de que 'identidade' e 'diploma' são realmente arquivos
             if (identidade) {
@@ -120,6 +114,9 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
                 })
                 .catch(error => {
                     console.error('Erro ao criar usuário:', error);
+                    if (toast.current) {
+                        toast.current.show({ severity: 'error', summary: 'Erro', detail: 'Erro ao criar usuário', life: 3000 });
+                    }
                 });
         }
     };
@@ -133,10 +130,6 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
         setSelectedInterests(e.value);
         setUserData({ ...userData, area_interesse: e.value });
     };
-
-
-
-
 
     const steps = [
         { label: 'Dados Pessoais' },
@@ -172,7 +165,7 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
                     <>
                         <InputText className='w-full mb-2' value={userData.matricula} placeholder="Matrícula" onChange={(e) => onFieldChange(e, 'matricula')} />
                         <Dropdown className='w-full mb-2' value={userData.titulo} options={grausAcademicos} onChange={(e) => onFieldChange(e, 'titulo')} placeholder="Selecione o seu título acadêmico" />
-                        <Dropdown className='w-full mb-2' value={userData.area_atuacao} options={areaAtuacao} onChange={(e) => onFieldChange(e, 'area_atuacao')} placeholder="Selecione sua área de atuação" />                        
+                        <Dropdown className='w-full mb-2' value={userData.area_atuacao} options={areaAtuacao} onChange={(e) => onFieldChange(e, 'area_atuacao')} placeholder="Selecione sua área de atuação" />
                         <MultiSelect className='w-full mb-2' value={selectedInterests} options={areasInteresse} onChange={handleChange} placeholder="Selecione as suas áreas de interesse" />
                         <Button className='w-full mb-2' label="Concluir Cadastro" onClick={validateAndSubmit} />
                     </>
@@ -182,6 +175,5 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
     );
 
 };
-
 
 export default DetalhesAdicionaisStep;

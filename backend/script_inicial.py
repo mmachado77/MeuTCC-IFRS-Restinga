@@ -23,6 +23,10 @@ status3 = StatusCadastro.objects.create(
 status4 = StatusCadastro.objects.create(
     aprovacao = True
 )
+
+status6 = StatusCadastro.objects.create(
+    aprovacao = True
+)
 status5 = StatusCadastro.objects.create(
     aprovacao = False,
     justificativa="Justificativa exemplo"
@@ -35,7 +39,7 @@ andre = ProfessorInterno.objects.create(nome="André Schneider",
                          email="andre@restinga.ifrs.edu.br",
                          area_atuacao = "CIENCIA DA COMPUTACAO",
                          titulo="DOUTORADO",
-                         area_interesse="Estrutura",
+                         area_interesse='["ESTRUTURA"]',
                          matricula="1994000401",
                          status = status,
                          user = andreUser,
@@ -48,7 +52,7 @@ cleitin = ProfessorInterno.objects.create(nome="Cleitin da Silva",
                          email="cleitin@restinga.ifrs.edu.br",
                          area_atuacao = "CIENCIA DA COMPUTACAO",
                          titulo="DOUTORADO",
-                         area_interesse="Estrutura",
+                         area_interesse='["ESTRUTURA"]',
                          matricula="1994000402",
                          status = status4,
                          user = ProfInterUser
@@ -60,7 +64,7 @@ adastolfo = ProfessorInterno.objects.create(nome="Adastolfo",
                          email="interno@restinga.ifrs.edu.br",
                          area_atuacao = "CIENCIA DA COMPUTACAO",
                          titulo="DOUTORADO",
-                         area_interesse="Estrutura",
+                         area_interesse='["ESTRUTURA"]',
                          matricula="1994000402",
                          status = status5,
                          user = ProfInter2User
@@ -74,7 +78,7 @@ iuri = ProfessorInterno.objects.create(nome="Iuri",
                          titulo="DOUTORADO",
                          area_interesse="Prog",
                          matricula="15828000402",
-                         status = status4,
+                         status = status6,
                          user = ProfInter3User
                         )
 
@@ -96,7 +100,7 @@ ProfExterno = ProfessorExterno.objects.create(
                         email="externo@gmail.com",
                         area_atuacao = "CIENCIA DA COMPUTACAO",
                         titulo="DOUTORADO",
-                        area_interesse="Estrutura",
+                        area_interesse='["ESTRUTURA"]',
                         status = status3,
                         user = ProfExternoUser
                         )
@@ -108,7 +112,7 @@ ProfExterno = ProfessorExterno.objects.create(
                         email="externo2@gmail.com",
                         area_atuacao = "CIENCIA DA COMPUTACAO",
                         titulo="DOUTORADO",
-                        area_interesse="Estrutura",
+                        area_interesse='["ESTRUTURA"]',
                         status = status2,
                         user = ProfExterno2User
                         )
