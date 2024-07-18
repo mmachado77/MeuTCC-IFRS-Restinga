@@ -68,6 +68,26 @@ async function getTccsPublicados() {
     return apiClient.get('/app/tccs-publicados').then((response) => response.data);
 }
 
+async function getSugestoes() {
+    return apiClient.get('/app/temas-sugeridos').then((response) => response.data);
+}
+
+async function getMinhasSugestoes() {
+    return apiClient.get('/app/meus-temas-sugeridos').then((response) => response.data);
+}
+
+async function createTema(data) {
+    return apiClient.post('/app/criar-tema', data).then((response) => response.data);
+}
+
+async function updateTema(id, data) {
+    return apiClient.put(`/app/atualizar-tema/${id}/`, data).then((response) => response.data);
+}
+
+async function deleteTema(id) {
+    return apiClient.delete(`/app/excluir-tema/${id}/`).then((response) => response.data);
+}
+
 
 export default {
     submeterProposta,
@@ -86,5 +106,10 @@ export default {
     uploadDocumentoSessao,
     excluirDocumentoSessao,
     downloadDocumentoSessao,
-    getTccsPublicados
+    getTccsPublicados,
+    getSugestoes,
+    getMinhasSugestoes,
+    createTema,
+    updateTema,
+    deleteTema,
 }
