@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
+from app.services.avaliacao import AvaliacaoService
 from app.models import Tcc, Sessao, SessaoFinal, Avaliacao
 from django.http import FileResponse
 class UploadDocumentoTCCView(APIView):
@@ -189,6 +190,17 @@ class DownloadDocumentoAjusteView(APIView):
                 response['Content-Disposition'] = f'attachment; filename="{avaliacao.tcc_definitivo.name}"'
                 return response
             return Response(status=status.HTTP_404_NOT_FOUND)
+        except Avaliacao.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class DownloadFichaAvaliacaoPreenchidaView(APIView):
+    avaliacaoService = AvaliacaoService()
+    def get(self, request, avaliacaoId):
+        try:
+            avaliacao = Avaliacao.objects.get(id=avaliacaoId)
+            return self.avaliacaoService.preencherFichaAvaliacao(avaliacao)
         except Avaliacao.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except Exception as e:

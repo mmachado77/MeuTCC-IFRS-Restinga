@@ -23,6 +23,10 @@ status3 = StatusCadastro.objects.create(
 status4 = StatusCadastro.objects.create(
     aprovacao = True
 )
+
+status6 = StatusCadastro.objects.create(
+    aprovacao = True
+)
 status5 = StatusCadastro.objects.create(
     aprovacao = False,
     justificativa="Justificativa exemplo"
@@ -74,7 +78,7 @@ iuri = ProfessorInterno.objects.create(nome="Iuri",
                          titulo="DOUTORADO",
                          area_interesse="Prog",
                          matricula="15828000402",
-                         status = status4,
+                         status = status6,
                          user = ProfInter3User
                         )
 

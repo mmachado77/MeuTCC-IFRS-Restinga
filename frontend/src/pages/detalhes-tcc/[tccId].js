@@ -156,7 +156,7 @@ const FileItem = ({ file, sessaoId, prazoEntrega, user, onFileUpload, onFileDele
     );
 };
 
-const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBancaSessaoPreviaClick, onSugerirBancaSessaoFinalClick, onAvaliacaoClick, onAvaliacaoAjusteClick, onFileUpload, onFileDelete, onFileDownload }) => {
+const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBancaSessaoPreviaClick, onSugerirBancaSessaoFinalClick, onAvaliacaoClick, onAvaliacaoAjusteClick, onFileUpload, onFileDelete, onFileDownload, onFichaAvaliacaoPreenchidaDownload }) => {
     return (
         <Accordion multiple activeIndex={[0]}>
             {sessoes.map((sessao, index) => (
@@ -202,9 +202,15 @@ const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBanca
                                     {sessao.avaliacao.nota_orientador !== null && sessao.avaliacao.nota_avaliador1 !== null && sessao.avaliacao.nota_avaliador2 !== null ? (
                                         <div className='flex flex-column'>
                                             <Button className="w-1/5" label="Avaliado" icon="pi pi-check" severity="info" />
-                                            <a className="flex items-center w-full ml-10" href="#">
-                                                Clique aqui para fazer o download da ficha de avaliação preenchida
-                                            </a>
+                                            <a className="ml-10 flex items-center w-full"
+                                            href="#"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                onFichaAvaliacaoPreenchidaDownload(sessao.avaliacao.id);
+                                            }}
+                                        >
+                                            Clique aqui para fazer o download da ficha de avaliação preenchida
+                                        </a>
                                         </div>
                                     ) : ((user.id === orientador.id && sessao.avaliacao.nota_orientador !== null) || (user.id === sessao.banca.professores[0].id && sessao.avaliacao.nota_avaliador1 !== null) || (user.id === sessao.banca.professores[1].id && sessao.avaliacao.nota_avaliador2 !== null)) ? (
                                         <Button label="Aguardando Avaliações" icon="pi pi-clock" severity="warning" />
@@ -272,8 +278,13 @@ const getClassForStatus = (status) => {
         case 'PROPOSTA_ANALISE_PROFESSOR':
         case 'PROPOSTA_ANALISE_COORDENADOR':
         case 'DESENVOLVIMENTO':
-        case 'PREVIA':
-        case 'FINAL':
+        case 'PREVIA_ORIENTADOR':
+        case 'PREVIA_COORDENADOR':
+        case 'PREVIA_AGENDADA':
+        case 'PREVIA_OK':
+        case 'FINAL_ORIENTADOR':
+        case 'FINAL_COORDENADOR':
+        case 'FINAL_AGENDADA':
         case 'AJUSTE':
             return '#FFBF00';
         case 'PROPOSTA_RECUSADA_PROFESSOR':
@@ -680,6 +691,24 @@ const DetalhesTCC = () => {
         }
     };
 
+    const handleFichaAvaliacaoPrrenchidaDownload = async (avaliacaoId) => {
+        try {
+            let response;
+            response = await AvaliacaoService.downloadFichaAvaliacaoPreenchida(avaliacaoId);
+            const url = window.URL.createObjectURL(new Blob([response]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'documento.pdf'); // or extract the file name from response
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            toast.success('Download do documento realizado com sucesso');
+        } catch (error) {
+            console.error('Erro ao fazer download do arquivo:', error);
+            toast.error('Erro ao fazer download do arquivo');
+        }
+    };
+
     const handleAdequacoesChange = (e) => {
         setNecessarioAdequacoes(!necessarioAdequacoes);
     }
@@ -785,6 +814,7 @@ const DetalhesTCC = () => {
                             onFileUpload={handleFileUpload}
                             onFileDelete={handleFileDelete}
                             onFileDownload={handleFileDownload}
+                            onFichaAvaliacaoPreenchidaDownload={handleFichaAvaliacaoPrrenchidaDownload}
                         />
                     )}
                 </div>
