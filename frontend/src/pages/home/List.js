@@ -31,13 +31,13 @@ export default function List({ ...props }) {
                         </div>
                         <div className='flex items-center my-2 flex-nowrap '>
                             {
-                                sessao.localForma === 'remoto' ?
+                                sessao.forma_apresentacao === 'remoto' ?
                                     <i className='pr-2 pi pi-globe'></i>
                                     :
                                     <i className='pr-2 pi pi-map-marker'></i>
                             }
                             {
-                                sessao.localForma === 'remoto' ?
+                                sessao.forma_apresentacao === 'remoto' ?
                                     <a
                                         href={sessao.local}
                                         target='_blank'

@@ -53,6 +53,7 @@ urlpatterns = [
     path('download-documento-ajuste/<int:avaliacaoId>/', views.DownloadDocumentoAjusteView.as_view(), name='download-documento-ajuste'),
     path('upload-documento-ajuste/<int:avaliacaoId>/', views.UploadDocumentoAjusteView.as_view(), name='upload-documento-ajuste'),
     path('excluir-documento-ajuste/<int:avaliacaoId>/', views.ExcluirDocumentoAjusteView.as_view(), name='excluir-documento-ajuste'),
+    path('download-ficha-avaliacao-preenchida/<int:avaliacaoId>/', views.DownloadFichaAvaliacaoPreenchidaView.as_view(), name='download-ficha-avaliacao-preenchida'),
     path('avaliar/<int:sessaoId>/', views.Avaliar.as_view(), name='avaliar'),
     path('avaliar-ajustes/<int:avaliacaoId>/', views.AvaliarAjustes.as_view(), name='avaliar-ajustes'),
     path('semestre-datas', SemestreDatasView.as_view(), name='semestre-datas'),
