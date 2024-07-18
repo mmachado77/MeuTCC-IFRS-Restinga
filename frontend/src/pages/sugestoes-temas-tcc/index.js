@@ -1,14 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import { FilterMatchMode } from 'primereact/api';
-
+import { GUARDS } from 'meutcc/core/constants';
+import TccService from 'meutcc/services/TccService';
+import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
 
 const SugestoesTemasTccPage = () => {
 
+    const [loading, setLoading] = React.useState(false);
     const [filters, setFilters] = React.useState({});
     const [tableSearchValue, setTableSearchValue] = React.useState('');
+
+    const [expandedRows, setExpandedRows] = useState(null);
+
+    const [sugestoes, setSugestoes] = React.useState([]);
 
     const initFilters = () => {
         setFilters({
@@ -16,8 +23,22 @@ const SugestoesTemasTccPage = () => {
         });
     };
 
+    const fetchSugestoesTcc = async () => {
+        setLoading(true);
+        try {
+            const data = await TccService.getSugestoes();
+            console.log(data);
+            setSugestoes(data);
+
+        } catch (error) {
+            console.error('Erro ao buscar as sugestoes de temas', error);
+        }
+        setLoading(false);
+    };
+
     React.useEffect(() => {
         initFilters();
+        fetchSugestoesTcc();
     }, []);
 
     const onTableSearchChange = (e) => {
@@ -28,7 +49,7 @@ const SugestoesTemasTccPage = () => {
         setTableSearchValue(value);
     };
 
-
+    /*
     const customers = [
         { tema: 'Ensino de lógica com Robótica educacional', professor: 'Iuri', area: 'Programação / Sistemas EmbarcADOS / Inteligência Artificial' },
         { tema: 'Ensino de lógica com Programação de Jogos', professor: 'Iuri', area: 'Programação / Sistemas EmbarcADOS / Inteligência Artificial' },
@@ -54,6 +75,7 @@ const SugestoesTemasTccPage = () => {
         { tema: 'Sistema de gerenciamento de estágios (WEB)', professor: 'Coordenação ADS', area: 'Gestão de Processos' },
         { tema: 'Desenvolvimento de soluções utilizando o Meta Quest 2', professor: 'Jean', area: 'Redes de Computadores / Hardware' },
     ];
+    */
 
     const renderHeader = (<div>
         <div className="flex justify-content-between">
@@ -65,19 +87,41 @@ const SugestoesTemasTccPage = () => {
 
     </div>);
 
-    return <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
+    const rowExpansionTemplate = (data) => {
+        return (
+            <div className="p-m-3">
+                <h5>Descrição:</h5>
+                <textarea value={data.descricao} readOnly rows={5} style={{ width: '100%', minHeight: '150px' }} />
+            </div>
+        );
+    };
+
+    const onRowToggle = (event) => {
+        setExpandedRows(event.data);
+    };
+
+    const DataTableSugestoes = () => {
+        return (
+            <div className='py-6 px-2'>
+            <DataTable value={sugestoes} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }} rowExpansionTemplate={rowExpansionTemplate} expandedRows={expandedRows} onRowToggle={onRowToggle}>
+                <Column expander style={{ width: '3rem' }}></Column>
+                <Column field="titulo" header="Tema" style={{ width: '77%' }}></Column>
+                <Column field="professor.nome" header="Professor" style={{ width: '20%' }}></Column>
+            </DataTable>
+            </div>
+        );
+    };
+
+    if(loading){
+        return <LoadingSpinner />;
+    }else{
+        return <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
         <div className='py-3 border-0 border-b border-dashed border-gray-200'>
             <h1 className='heading-1 px-6 text-gray-700'>Sugestões de temas para TCC</h1>
         </div>
-
-        <div className='py-6 px-2'>
-            <DataTable value={customers} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }}>
-                <Column field="tema" header="Tema" style={{ width: '80%' }}></Column>
-                <Column field="professor" header="Professor" style={{ width: '20%' }}></Column>
-            </DataTable>
-        </div>
-    </div>;
-
+            <DataTableSugestoes />
+        </div>;
+    }
 }
 
 SugestoesTemasTccPage.title = 'Sugestões de Temas para TCC';
