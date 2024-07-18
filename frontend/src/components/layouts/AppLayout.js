@@ -31,6 +31,7 @@ export const AppLayout = ({ children, guards }) => {
             { label: 'Meus TCCs', icon: 'pi pi-fw pi-book', url: '/meus-tccs' },
         ],
         Estudante: [
+            { label: 'Sugestões de Tema', icon: 'pi pi-fw pi-lightbulb', url: '/sugestoes-temas-tcc' },
         ],
         Coordenador: [
             {
@@ -39,15 +40,28 @@ export const AppLayout = ({ children, guards }) => {
                     { label: 'Validar Cadastros', icon: 'pi pi-fw pi-users', url: '/atualizar-permissoes' },
                     { label: 'Validar Propostas', icon: 'pi pi-fw pi-book', url: '/proposta-pendente' },
                     { label: 'Validar Sessões', icon: 'pi pi-fw pi-calendar', url: '/sessoes-futuras' },
-
                 ]
             },
             { label: 'Semestres', icon: 'pi pi-fw pi-calendar', url: '/painel-configuracoes' },
-            { label: 'Lista de Usuários', icon:'pi pi-fw pi-users', url: '/lista-usuarios'}
+            { label: 'Lista de Usuários', icon:'pi pi-fw pi-users', url: '/lista-usuarios'},
+            {
+                label: 'Sugestões de Tema', icon: 'pi pi-fw pi-lightbulb', url: '',
+                items: [
+                    { label: 'Listar Sugestões', icon: 'pi pi-fw pi-list', url: '/sugestoes-temas-tcc' },
+                    { label: 'Minhas Sugestões', icon: 'pi pi-fw pi-plus', url: '/minhas-sugestoes' },
+                ]
+            }
         ],
         Professor: [
             { label: 'Propostas Pendentes', icon: 'pi pi-fw pi-thumbs-up', url: '/proposta-pendente' },
             { label: 'Validar Sessões', icon: 'pi pi-fw pi-calendar', url: '/sessoes-futuras-orientador' },
+            {
+                label: 'Sugestões de Tema', icon: 'pi pi-fw pi-lightbulb', url: '',
+                items: [
+                    { label: 'Listar Sugestões', icon: 'pi pi-fw pi-list', url: '/sugestoes-temas-tcc' },
+                    { label: 'Minhas Sugestões', icon: 'pi pi-fw pi-plus', url: '/minhas-sugestoes' },
+                ]
+            }
         ],
         ProfessorInterno: [],
         ProfessorExterno: [],
