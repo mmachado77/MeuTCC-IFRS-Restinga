@@ -4,8 +4,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from django.db.models import Max, F, Q
 from app.enums import StatusTccEnum, UsuarioTipoEnum
-from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre, Professor, Coordenador, Sessao, Banca
-from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer
+from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre, Professor, Coordenador, Sessao, Banca, Tema
+from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer, TemaSerializer
 from app.services.proposta import PropostaService
 from app.services.tcc import TccService
 from app.services.notificacoes import notificacaoService
@@ -176,11 +176,7 @@ class DetalhesTCCView(APIView):
         else:
             return Response({"error": "Você não tem permissão para visualizar este TCC."},
                             status=status.HTTP_403_FORBIDDEN)
-
-
-    
-
-    
+            
 class TCCsPublicadosView(APIView):
     permission_classes = [AllowAny]
 
@@ -188,3 +184,73 @@ class TCCsPublicadosView(APIView):
         tccs = Tcc.objects.filter(tccstatus__status=StatusTccEnum.APROVADO)
         serializer = TccSerializer(tccs, many=True)
         return Response(serializer.data)
+    
+# Destinar um lugar apropriado para as views de Temas
+class TemasSugeridosView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        temas = Tema.objects.all()
+        serializer = TemaSerializer(temas, many=True)
+        return Response(serializer.data)
+    
+class MeusTemasSugeridosView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        professor = Professor.objects.get(user=request.user)
+        temas = Tema.objects.filter(professor = professor)
+        serializer = TemaSerializer(temas, many=True)
+        return Response(serializer.data)
+
+class CriarTemaView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            professor = Professor.objects.get(user=request.user)
+        except Professor.DoesNotExist:
+            return Response({"error": "Professor not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        data = request.data
+        data['professor'] = professor.id
+
+        serializer = TemaSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class AtualizarTemaView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, pk):
+        try:
+            tema = Tema.objects.get(pk=pk)
+        except Tema.DoesNotExist:
+            return Response({"error": "Tema not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        if tema.professor.user != request.user:
+            return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        serializer = TemaSerializer(tema, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+class ExcluirTemaView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        try:
+            tema = Tema.objects.get(pk=pk)
+        except Tema.DoesNotExist:
+            return Response({"error": "Tema not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        if tema.professor.user != request.user:
+            return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        tema.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
