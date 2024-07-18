@@ -13,10 +13,13 @@ class Professor(Usuario):
     status = models.OneToOneField(StatusCadastro, related_name="status_cadastro", on_delete=models.CASCADE)
 
     def set_area_interesse(self, data):
-        self.area_interesse = json.dumps(data, cls=DjangoJSONEncoder)
+        self.area_interesse = json.dumps(data)
 
     def get_area_interesse(self):
-        return json.loads(self.area_interesse) if self.area_interesse else []
+        try:
+            return json.loads(self.area_interesse)
+        except ValueError:
+            return []
 
     class Meta:
         abstract = False

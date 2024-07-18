@@ -22,16 +22,29 @@ class StatusCadastroSerializer(serializers.ModelSerializer):
 class UsuarioSerializer(serializers.ModelSerializer):
     tipo = serializers.CharField(source='tipoString', read_only=True)
     status_cadastro = StatusCadastroSerializer(source='status', read_only=True)
+    area_interesse = serializers.JSONField(required=False, allow_null=True)
 
     class Meta:
         model = Usuario
         fields = '__all__'
+        read_only_fields = ['email', 'user']
 
 
 class EstudanteSerializer(UsuarioSerializer):
+    area_interesse = serializers.JSONField(required=False, allow_null=True)
+
+    def validate_area_interesse(self, value):
+        if not isinstance(value, list):
+            raise serializers.ValidationError("A área de interesse deve ser uma lista.")
+        choices = {choice.name for choice in AreaInteresseEnum}  # Ensure using the name part of the enum
+        if not all(item in choices for item in value):
+            raise serializers.ValidationError("Uma ou mais áreas de interesse são inválidas.")
+        return value
+
     class Meta:
         model = Estudante
         fields = '__all__'
+
 
 class EstudanteNomeSerializer(UsuarioSerializer):
     class Meta:
@@ -54,7 +67,7 @@ class ProfessorSerializer(UsuarioSerializer):
     def validate_area_interesse(self, value):
         if not isinstance(value, list):
             raise serializers.ValidationError("A área de interesse deve ser uma lista.")
-        choices = {choice.value for choice in AreaInteresseEnum.choices}
+        choices = {choice.name for choice in AreaInteresseEnum}  # Ensure using the name part of the enum
         if not all(item in choices for item in value):
             raise serializers.ValidationError("Uma ou mais áreas de interesse são inválidas.")
         return value

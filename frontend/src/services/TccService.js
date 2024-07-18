@@ -68,6 +68,11 @@ async function getTccsPublicados() {
     return apiClient.get('/app/tccs-publicados').then((response) => response.data);
 }
 
+async function getTccsByUsuario() {
+    return apiClient.get('/app/user-tccs').then((response) => response.data);
+}
+
+
 
 export default {
     submeterProposta,
@@ -86,5 +91,6 @@ export default {
     uploadDocumentoSessao,
     excluirDocumentoSessao,
     downloadDocumentoSessao,
-    getTccsPublicados
+    getTccsPublicados,
+    getTccsByUsuario
 }

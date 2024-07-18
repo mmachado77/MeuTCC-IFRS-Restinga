@@ -188,3 +188,21 @@ class TCCsPublicadosView(APIView):
         tccs = Tcc.objects.filter(tccstatus__status=StatusTccEnum.APROVADO)
         serializer = TccSerializer(tccs, many=True)
         return Response(serializer.data)
+
+
+class UserTCCs(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        usuario = Usuario.objects.get(user=request.user)
+        if isinstance(usuario, Estudante):
+            tccs = Tcc.objects.filter(autor=usuario)
+        elif isinstance(usuario, Professor):
+            tccs = Tcc.objects.filter(Q(orientador=usuario) | Q(coorientador=usuario))
+        elif isinstance(usuario, Coordenador):
+            tccs = Tcc.objects.all()
+        else:
+            return Response({"error": "Tipo de usuário não permitido."}, status=403)
+
+        serializer = TccSerializer(tccs, many=True)
+        return Response(serializer.data)

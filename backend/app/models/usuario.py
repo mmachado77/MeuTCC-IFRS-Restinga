@@ -11,6 +11,8 @@ class Usuario(PolymorphicModel):
     email = models.EmailField(max_length = 254)
     dataCadastro = models.DateTimeField(auto_now_add=True)
     avatar = models.CharField(verbose_name="avatar", max_length=255, null=True, blank=True)
+    linkedin = models.CharField(max_length=255, null=True, blank=True)
+    github = models.CharField(max_length=255, null=True, blank=True)
 
     @property
     def tipo(self):

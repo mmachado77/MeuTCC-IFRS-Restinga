@@ -7,12 +7,9 @@ import { Badge } from 'primereact/badge';
 import { formatDistanceToNow } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 import NotificacoesService from "meutcc/services/NotificacoesService";
-// import { useRef } from "react";
 import CustomAvatar from "./CustomAvatar";
 
-
 const NavBar = ({ auth = false, notifications, unreadCount }) => {
-
     const { user } = useAuth();
     const menuRight = useRef(null);
     const menuNotify = useRef(null);
@@ -27,9 +24,9 @@ const NavBar = ({ auth = false, notifications, unreadCount }) => {
             label: 'Notificações',
             items: notifications.slice(0, 10).map(notification => ({
                 label: (
-                    <div class="flex ml-4">
+                    <div className="flex ml-4">
                         <p>{notification.verb}</p>
-                        <p class='text-gray-400'>{formatDistanceToNow(new Date(notification.timestamp), { locale: ptBR })} atrás</p>
+                        <p className='text-gray-400'>{formatDistanceToNow(new Date(notification.timestamp), { locale: ptBR })} atrás</p>
                     </div>
                 ),
                 icon: 'pi pi-info-circle',
@@ -42,6 +39,11 @@ const NavBar = ({ auth = false, notifications, unreadCount }) => {
         {
             label: 'Perfil',
             items: [
+                {
+                    label: 'Meu Perfil',
+                    icon: 'pi pi-user',
+                    command: () => window.location.href = `/perfil/${user.id}`
+                },
                 {
                     label: 'Configurações',
                     icon: 'pi pi-cog'
