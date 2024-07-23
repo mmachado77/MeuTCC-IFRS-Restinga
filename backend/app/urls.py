@@ -59,6 +59,13 @@ urlpatterns = [
     path('semestre-datas', SemestreDatasView.as_view(), name='semestre-datas'),
     path('nova-sessao', SessaoCreateView.as_view(), name='nova-sessao'),
     path('tccs-publicados', views.TCCsPublicadosView.as_view(), name='tccs-publicados'),
-
+    path('atualizar-perfil', views.AtualizarPerfil.as_view(), name='atualizar-perfil'),
+    path('perfil/<int:id>/', views.PerfilByIdView.as_view(), name='perfil-by-id'),
+    path('tccs-by-usuario/<int:id>/', views.TccsByUsuarioView.as_view(), name='tccs-by-usuario-id'),
+    path('temas-sugeridos', views.TemasSugeridosView.as_view(), name='temas-sugeridos'),
+    path('meus-temas-sugeridos', views.MeusTemasSugeridosView.as_view(), name='temas-sugeridos'),
+    path('criar-tema', views.CriarTemaView.as_view(), name='criar-tema'),
+    path('atualizar-tema/<int:pk>/', views.AtualizarTemaView.as_view(), name='atualizar-tema'),
+    path('excluir-tema/<int:pk>/', views.ExcluirTemaView.as_view(), name='excluir-tema'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
