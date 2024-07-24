@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'polymorphic',
     'notifications',
+    'django_apscheduler',
 
 ]
 
@@ -157,3 +158,6 @@ if DEBUG:
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+APSCHEDULER_RUN_NOW_TIMEOUT = 120

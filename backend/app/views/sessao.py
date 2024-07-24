@@ -67,6 +67,7 @@ class SessaoEditView(APIView):
             if 'dataInicio' in data:
                 sessao_atualizada.data_inicio = data['dataInicio']
             sessao_atualizada.validacaoCoordenador = True
+            sessao_atualizada.data_agendamento = datetime.now()
             self.notificacaoService.enviarNotificacaoAgendamentoBanca(request.user, sessao_atualizada, banca_atualizada)
             sessao_atualizada.save()
 
@@ -139,7 +140,6 @@ class SessaoCreateView(APIView):
                 return Response("Já existe uma sessão final para este TCC", status=status.HTTP_400_BAD_REQUEST)
 
             dataInicio = parse(data['dataInicio'])
-            dataTermino = dataInicio + timedelta(days=7)
             local = data['localDescricao']
             formaApresentacao = data['localForma']
             prazoEntregaDocumento = dataInicio + timedelta(days=14)
@@ -151,7 +151,6 @@ class SessaoCreateView(APIView):
             if data['tipo'] == 'previa':
                 sessao = SessaoPrevia.objects.create(
                     data_inicio = dataInicio,
-                    data_termino = dataTermino,
                     local = local,
                     forma_apresentacao = formaApresentacao,
                     prazoEntregaDocumento = prazoEntregaDocumento,
@@ -161,7 +160,6 @@ class SessaoCreateView(APIView):
             elif data['tipo'] == 'final':
                 sessao = SessaoFinal.objects.create(
                     data_inicio = dataInicio,
-                    data_termino = dataTermino,
                     local = local,
                     forma_apresentacao = formaApresentacao,
                     prazoEntregaDocumento = prazoEntregaDocumento,
