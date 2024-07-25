@@ -197,22 +197,23 @@ class MeusTemasSugeridosView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        professor = Professor.objects.get(user=request.user)
+        professor = Usuario.objects.get(user=request.user)
         temas = Tema.objects.filter(professor = professor)
         serializer = TemaSerializer(temas, many=True)
         return Response(serializer.data)
-
+    
 class CriarTemaView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        try:
-            professor = Professor.objects.get(user=request.user)
-        except Professor.DoesNotExist:
-            return Response({"error": "Professor not found"}, status=status.HTTP_404_NOT_FOUND)
+        perfil = request.user.perfil
+        if isinstance(perfil, Coordenador) or isinstance(perfil, Professor):
+            usuario_id = request.user.id
+        else:
+            return Response({"error": "Usuário não autorizado para criar um tema."}, status=status.HTTP_400_BAD_REQUEST)
 
         data = request.data
-        data['professor'] = professor.id
+        data['professor'] = usuario_id
 
         serializer = TemaSerializer(data=data)
         if serializer.is_valid():
@@ -227,10 +228,10 @@ class AtualizarTemaView(APIView):
         try:
             tema = Tema.objects.get(pk=pk)
         except Tema.DoesNotExist:
-            return Response({"error": "Tema not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Erro no servidor ao tentar encontrar tema."}, status=status.HTTP_404_NOT_FOUND)
 
-        if tema.professor.user != request.user:
-            return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+        if tema.professor.user != request.user and not isinstance(request.user.perfil, Coordenador):
+            return Response({"error": "Usuário não autorizado.", "usuario": request.user}, status=status.HTTP_401_UNAUTHORIZED)
 
         serializer = TemaSerializer(tema, data=request.data)
         if serializer.is_valid():
@@ -246,10 +247,10 @@ class ExcluirTemaView(APIView):
         try:
             tema = Tema.objects.get(pk=pk)
         except Tema.DoesNotExist:
-            return Response({"error": "Tema not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Tema não encontrado no sistema."}, status=status.HTTP_404_NOT_FOUND)
 
-        if tema.professor.user != request.user:
-            return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+        if tema.professor.user != request.user and not isinstance(request.user.perfil, Coordenador):
+            return Response({"error": "Usuário não autorizado."}, status=status.HTTP_401_UNAUTHORIZED)
 
         tema.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
