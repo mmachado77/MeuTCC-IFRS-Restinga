@@ -4,6 +4,7 @@ from .views.semestre import *
 from .views.sessao import *
 from django.conf import settings
 from django.conf.urls.static import static
+from .views.search import SearchView
 
 urlpatterns = [
     path('professores', views.GetProfessores.as_view(), name='professor-list-create'),
@@ -67,5 +68,6 @@ urlpatterns = [
     path('criar-tema', views.CriarTemaView.as_view(), name='criar-tema'),
     path('atualizar-tema/<int:pk>/', views.AtualizarTemaView.as_view(), name='atualizar-tema'),
     path('excluir-tema/<int:pk>/', views.ExcluirTemaView.as_view(), name='excluir-tema'),
+    path('search', SearchView.as_view(), name='search'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

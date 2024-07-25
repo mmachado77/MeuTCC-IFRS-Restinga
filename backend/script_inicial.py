@@ -5,8 +5,14 @@ from django.contrib.auth.models import User
 from app.models import TccStatus, Tcc, Semestre, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno, SemestreCoordenador, Mensagem, Tema
 from datetime import datetime
 
+
 # Criando usuário admin
 superuser = User.objects.create_superuser("admin", "admin@admin.com", "123")
+notifyuser = User.objects.create_user(
+    username="notifyuser",
+    email="sistema.tcc@restinga.ifrs.edu.br",
+    password="123"
+)
 
 # Cria Status André
 status = StatusCadastro.objects.create(
@@ -379,5 +385,113 @@ Este é um e-mail automático, por favor, não responda.""",
         url_destino="/detalhes-tcc/{id}",
         notificacao="Uma nova {SESSAO_TIPO} foi agendada"
     )
+
+mensagem8 = Mensagem.objects.create(
+    identificador="LEMBRETE001",
+    assunto="[Meus TCCs - Restinga] Lembrete: {SESSAO_TIPO} agendada para daqui a uma semana",
+    mensagem="""Olá {PROFESSOR_NOME},
+
+Este é um lembrete de que a {SESSAO_TIPO} do TCC {TCC_TEMA} do aluno {ESTUDANTE_NOME} está agendada para daqui a uma semana.
+
+Detalhes do agendamento:
+
+    • Data: {SESSAO_DATA}
+    • Hora: {SESSAO_HORA}
+    • Local: {SESSAO_LOCAL}
+
+Por favor, confirme sua presença e prepare-se para a avaliação do trabalho.
+
+Atenciosamente,
+
+Equipe Meus TCCs - Campus Restinga
+
+---
+
+Este é um e-mail automático, por favor, não responda.""",
+    descricao="Lembrete de agendamento de sessão para o professor, uma semana antes",
+    url_destino="/detalhes-tcc/{id}",
+    notificacao="Lembrete: {SESSAO_TIPO} agendada para daqui a uma semana"
+)
+
+mensagem9 = Mensagem.objects.create(
+    identificador="LEMBRETE002",
+    assunto="[Meus TCCs - Restinga] Lembrete: {SESSAO_TIPO} agendada para daqui a uma semana",
+    mensagem="""Olá {ESTUDANTE_NOME},
+
+Este é um lembrete de que a {SESSAO_TIPO} do TCC {TCC_TEMA} está agendada para daqui a uma semana.
+
+Detalhes do agendamento:
+
+    • Data: {SESSAO_DATA}
+    • Hora: {SESSAO_HORA}
+    • Local: {SESSAO_LOCAL}
+
+Por favor, verifique todos os detalhes e prepare-se para a apresentação.
+
+Atenciosamente,
+
+Equipe Meus TCCs - Campus Restinga
+
+---
+
+Este é um e-mail automático, por favor, não responda.""",
+    descricao="Lembrete de agendamento de sessão para o estudante, uma semana antes",
+    url_destino="/detalhes-tcc/{id}",
+    notificacao="Lembrete: {SESSAO_TIPO} agendada para daqui a uma semana"
+)
+
+mensagem10 = Mensagem.objects.create(
+    identificador="LEMBRETE003",
+    assunto="[Meus TCCs - Restinga] Lembrete final: {SESSAO_TIPO} agendada para amanhã",
+    mensagem="""Olá {PROFESSOR_NOME},
+
+Este é um lembrete final de que a {SESSAO_TIPO} do TCC {TCC_TEMA} do aluno {ESTUDANTE_NOME} está agendada para amanhã.
+
+Detalhes do agendamento:
+
+    • Data: {SESSAO_DATA}
+    • Hora: {SESSAO_HORA}
+    • Local: {SESSAO_LOCAL}
+
+Por favor, confirme sua presença e prepare-se para a avaliação do trabalho.
+
+Atenciosamente,
+
+Equipe Meus TCCs - Campus Restinga
+
+---
+
+Este é um e-mail automático, por favor, não responda.""",
+    descricao="Lembrete final de agendamento de sessão para o professor, um dia antes",
+    url_destino="/detalhes-tcc/{id}",
+    notificacao="Lembrete final: {SESSAO_TIPO} agendada para amanhã"
+)
+
+mensagem11 = Mensagem.objects.create(
+    identificador="LEMBRETE004",
+    assunto="[Meus TCCs - Restinga] Lembrete final: {SESSAO_TIPO} agendada para amanhã",
+    mensagem="""Olá {ESTUDANTE_NOME},
+
+Este é um lembrete final de que a {SESSAO_TIPO} do TCC {TCC_TEMA} está agendada para amanhã.
+
+Detalhes do agendamento:
+
+    • Data: {SESSAO_DATA}
+    • Hora: {SESSAO_HORA}
+    • Local: {SESSAO_LOCAL}
+
+Por favor, assegure-se de estar preparado e de que todos os detalhes estejam em ordem para a sua apresentação.
+
+Atenciosamente,
+
+Equipe Meus TCCs - Campus Restinga
+
+---
+
+Este é um e-mail automático, por favor, não responda.""",
+    descricao="Lembrete de agendamento de sessão para o estudante, um dia antes",
+    url_destino="/detalhes-tcc/{id}",
+    notificacao="Lembrete final: {SESSAO_TIPO} agendada para amanhã"
+)
 
 print("Usuários criados com sucesso!")

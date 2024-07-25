@@ -199,7 +199,7 @@ const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBanca
                             <p className="mb-7"><b>Prazo Para Entrega do Documento:</b> {format(sessao.prazoEntregaDocumento || new Date(), 'dd/MM/yyyy HH:mm')}</p>
                             {(sessao.tipo === 'Sessão Final' && new Date(sessao.data_inicio) < new Date() && sessao.avaliacao.ficha_avaliacao.url == null && (user.id === orientador.id || sessao.banca.professores.map(professor => professor.id).includes(user.id))) && (
                                 <div>
-                                    {sessao.avaliacao.nota_orientador !== null && sessao.avaliacao.nota_avaliador1 !== null && sessao.avaliacao.nota_avaliador2 !== null ? (
+                                    {sessao.avaliacao.avaliado_orientador == true && sessao.avaliacao.avaliado_avaliador1 == true && sessao.avaliacao.avaliado_avaliador2 == true ? (
                                         <div className='flex flex-column'>
                                             <Button className="w-1/5" label="Avaliado" icon="pi pi-check" severity="info" />
                                             <a className="ml-10 flex items-center w-full"
@@ -212,7 +212,7 @@ const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBanca
                                             Clique aqui para fazer o download da ficha de avaliação preenchida
                                         </a>
                                         </div>
-                                    ) : ((user.id === orientador.id && sessao.avaliacao.nota_orientador !== null) || (user.id === sessao.banca.professores[0].id && sessao.avaliacao.nota_avaliador1 !== null) || (user.id === sessao.banca.professores[1].id && sessao.avaliacao.nota_avaliador2 !== null)) ? (
+                                    ) : ((user.id === orientador.id && sessao.avaliacao.avaliado_orientador == true) || (user.id === sessao.banca.professores[0].id && sessao.avaliacao.avaliado_avaliador1 == true) || (user.id === sessao.banca.professores[1].id && sessao.avaliacao.avaliado_avaliador2 == true)) ? (
                                         <Button label="Aguardando Avaliações" icon="pi pi-clock" severity="warning" />
                                     ) : (
                                         <Button label="Avaliar" icon="pi pi-file-edit" style={{ backgroundColor: '#2F9E41' }} onClick={() => onAvaliacaoClick(sessao.id)} />

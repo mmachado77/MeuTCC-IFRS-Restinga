@@ -96,7 +96,7 @@ const ProfilePage = () => {
 
     useEffect(() => {
         const fetchTccs = async () => {
-            if (!user) return;
+            if (!id) return;
             try {
                 const response = await UsuarioService.getTccsByUsuarioId(id);
                 setTccs(response);
@@ -108,10 +108,10 @@ const ProfilePage = () => {
                 setTccs([]); // Certifique-se de definir TCCs como uma lista vazia
             }
         };
-        if (user && user.tipo && id) {
+        if (id) {
             fetchTccs();
         }
-    }, [user, id]);
+    }, [id]);
 
     const atualizarPerfil = async () => {
         try {
@@ -231,7 +231,7 @@ const ProfilePage = () => {
                     </div>
                 </Card>
                 <Card className="mt-4">
-                    <h5 style={{ fontSize: '20px',  }}>Redes Sociais</h5>
+                    <h5 style={{ fontSize: '20px' }}>Redes Sociais</h5>
                     <div className="flex flex-col space-y-2">
                         <div className="flex items-center justify-between">
                             <a href={`https://www.linkedin.com/in/${socialLinks.linkedin}`} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2">
@@ -376,7 +376,6 @@ const ProfilePage = () => {
     );
 };
 
-ProfilePage.guards = [GUARDS.ESTUDANTE, GUARDS.PROFESSOR_INTERNO, GUARDS.PROFESSOR_EXTERNO, GUARDS.COORDENADOR];
 ProfilePage.title = 'Perfil';
 
 export default ProfilePage;

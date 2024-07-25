@@ -60,8 +60,12 @@ class AvaliacaoService:
                 '[mes_ajuste]': str(avaliacao.data_entrega_ajuste.month) if avaliacao.data_entrega_ajuste else '',
                 '[ano_ajuste]': str(avaliacao.data_entrega_ajuste.year) if avaliacao.data_entrega_ajuste else '',
                 '[dia_atual]': str(datetime.now().day),
-                '[mes_atual]': str(datetime.now().strftime('%B')),
+                '[mes_atual]': str(datetime.now().strftime('%B')).capitalize(),
                 '[ano_atual]':  str(datetime.now().year)[-2:],
+                '[nome_orientador2]': str(sessao.tcc.orientador.nome),
+                '[nome_orientador3]': str(sessao.tcc.orientador.nome),
+                '[nome_avaliador1]': str(avaliadores[0].nome),
+                '[nome_avaliador2]': str(avaliadores[1].nome),
             }
         except Exception as e:
             print(e)

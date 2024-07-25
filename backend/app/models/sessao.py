@@ -15,6 +15,9 @@ class Sessao(PolymorphicModel):
     prazoEntregaDocumento = models.DateTimeField(default=datetime.now, null=True, blank=True)
     validacaoOrientador = models.BooleanField(default=False)
     validacaoCoordenador = models.BooleanField(default=False)
+    lembrete_semana = models.BooleanField(default=False)
+    lembrete_dia = models.BooleanField(default=False)
+    data_agendamento = models.DateTimeField(null=True, blank=True)
 
     @property
     def get_tipo(self):

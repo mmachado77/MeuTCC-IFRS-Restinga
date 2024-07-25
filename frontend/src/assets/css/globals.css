@@ -40,11 +40,34 @@ body {
 .p-avatar:not(.p-avatar-circle) img {
   border-radius: 6px;
 }
+
 .multiselect-container .p-multiselect {
-    white-space: normal;
-    word-wrap: break-word;
+  white-space: normal;
+  word-wrap: break-word;
 }
 
 .multiselect-container .p-multiselect-label {
-    white-space: normal !important;
+  white-space: normal !important;
 }
+
+.suggestions-container {
+  position: absolute;
+  width: 100%;
+  top: 100%; /* Alinha as sugestões logo abaixo do input */
+  left: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.suggestion-item {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.suggestion-item:hover {
+  background-color: #f0f0f0;
+}
+
