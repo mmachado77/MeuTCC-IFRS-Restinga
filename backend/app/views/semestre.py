@@ -15,7 +15,7 @@ class SemestreDatasView(APIView):
             serializer = SemestreDatasSerializer(semestre_atual)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response({"detail": "Semestre atual não disponível."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Não foi possível recuperar as datas do semestre atual. Por favor, tente novamente mais tarde."}, status=status.HTTP_404_NOT_FOUND)
         
 class SemestreAtualView(APIView):
     def get(self, request):
@@ -30,7 +30,7 @@ class SemestreAtualView(APIView):
             
             return Response(semestre_serializer, status=status.HTTP_200_OK)
         else:
-            return Response({"detail": "Semestre atual não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Não foi possível recuperar as informações do semestre atual. Por favor, tente novamente mais tarde."}, status=status.HTTP_404_NOT_FOUND)
 
 class CoordenadorAtualView(APIView):
     def get(self, request):
@@ -48,7 +48,7 @@ class CoordenadorAtualView(APIView):
                 semestre_coordenador_serializer = SemestreCoordenadorSerializer(semestre_coordenador).data
                 return Response(semestre_coordenador_serializer, status=status.HTTP_200_OK)
             else:
-                return Response({"detail": "Semestre atual não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "Não foi possível recuperar as informações do coordenador do semestre atual."}, status=status.HTTP_404_NOT_FOUND)
         
 
 class SemestreView(APIView):
@@ -64,7 +64,7 @@ class SemestreView(APIView):
             
             return Response(semestre_serializer, status=status.HTTP_200_OK)
         else:
-            return Response({"detail": "Semestre atual não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Não foi possível recuperar as informações do semestre solicitado."}, status=status.HTTP_404_NOT_FOUND)
 
 class SemestreAtualCoordenadoresView(APIView):
 
@@ -77,9 +77,9 @@ class SemestreAtualCoordenadoresView(APIView):
                 semestre_coordenadores_serialized = SemestreCoordenadorSerializer(semestre_coordenadores, many=True).data
                 return Response(semestre_coordenadores_serialized, status=status.HTTP_200_OK)
             else:
-                return Response({"detail": "Nenhum coordenador encontrado para o semestre atual."}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "Não foi possível recuperar a lista de coordenadores do semestre atual."}, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({"detail": "Semestre atual não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Semestre atual não encontrado."}, status=status.HTTP_404_NOT_FOUND)
         
 class SemestreCoordenadoresView(APIView):
 
@@ -92,9 +92,9 @@ class SemestreCoordenadoresView(APIView):
                 semestre_coordenadores_serialized = SemestreCoordenadorSerializer(semestre_coordenadores, many=True).data
                 return Response(semestre_coordenadores_serialized, status=status.HTTP_200_OK)
             else:
-                return Response({"detail": "Nenhum coordenador encontrado para o semestre."}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "Não foi possível recuperar a lista de coordenadores do semestre solicitado."}, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({"detail": "Semestre não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Semestre não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
 class AlterarCoordenadorSemestre(APIView):
     permission_classes = [IsAuthenticated]
@@ -110,9 +110,9 @@ class AlterarCoordenadorSemestre(APIView):
                 semestre_coordenador.save()
                 return Response({'message': 'Coordenador atualizado com sucesso!'}, status=status.HTTP_200_OK)
             else:
-                return Response({'error': 'Semestre atual não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'error': 'Semestre atual não encontrado para alterar coordenador.'}, status=status.HTTP_404_NOT_FOUND)
         except ProfessorInterno.DoesNotExist:
-            return Response({'error': 'Professor não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Professor não encontrado ao alterar coordenador.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class AtualizarDatasPropostasView(APIView):
@@ -133,7 +133,7 @@ class AtualizarDatasPropostasView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Não foi possível atualizar as datas de proposta do semestre atual.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class SemestresView(APIView):
     def get(self, request):
