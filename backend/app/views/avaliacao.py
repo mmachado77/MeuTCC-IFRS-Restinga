@@ -7,6 +7,7 @@ from app.enums import CriteriosEnum
 from app.models import Professor, SessaoFinal, Banca, Avaliacao, Nota
 from app.services import TccService
 from app.enums import StatusTccEnum
+from django.db.models import Sum
 
 class Avaliar(APIView):
     permission_classes = [IsAuthenticated]
@@ -28,10 +29,9 @@ class Avaliar(APIView):
         if not is_orientador and not is_in_banca:
             return Response({"error": "Você não tem permissão para avaliar este TCC."}, status=status.HTTP_403_FORBIDDEN)
 
-        if (is_orientador and avaliacao.nota_orientador is not None) or (user == banca.professores.all()[0].user and avaliacao.nota_avaliador1 is not None) or (user == banca.professores.all()[1].user and avaliacao.nota_avaliador2 is not None):
+        if (is_orientador and avaliacao.avaliado_orientador) or (user == banca.professores.all()[0].user and avaliacao.avaliado_avaliador1) or (user == banca.professores.all()[1].user and avaliacao.avaliado_avaliador2):
             return Response({"error": "Você já avaliou este TCC."}, status=status.HTTP_400_BAD_REQUEST)
 
-        notas = []
         try:
             for criterio in CriteriosEnum:
                 nota_valor = float(request.data.get(criterio.name.lower(), 0))
@@ -41,8 +41,6 @@ class Avaliar(APIView):
                     criterio=criterio,
                     nota=nota_valor
                 )
-                notas.append(nota_valor)
-            soma_notas = round(sum(notas), 2)
 
         except KeyError as e:
             return Response({'status': 'error', 'message': f'Nota para o critério {e} não encontrada'},
@@ -65,20 +63,19 @@ class Avaliar(APIView):
                 self.tccService.atualizarStatus(sessao.tcc.id, StatusTccEnum.AJUSTE)
                 avaliacao.save()
             avaliacao.comentarios_orientador = request.data.get('comentarios_adicionais',avaliacao.comentarios_orientador)
-            avaliacao.nota_orientador = soma_notas
+            avaliacao.avaliado_orientador = True
         elif is_in_banca:
             if user == banca.professores.all()[0].user:
                 avaliacao.comentarios_avaliador1 = request.data.get('comentarios_adicionais', avaliacao.comentarios_avaliador1)
-                avaliacao.nota_avaliador1 = soma_notas
+                avaliacao.avaliado_avaliador1 = True
             elif user == banca.professores.all()[1].user:
                 avaliacao.comentarios_avaliador2 = request.data.get('comentarios_adicionais', avaliacao.comentarios_avaliador2)
-                avaliacao.nota_avaliador2 = soma_notas
+                avaliacao.avaliado_avaliador2 = True
 
-        if avaliacao.nota_orientador is not None and avaliacao.nota_avaliador1 is not None and avaliacao.nota_avaliador2 is not None:
-            avaliacao.media_final = round(((avaliacao.nota_orientador + avaliacao.nota_avaliador1 + avaliacao.nota_avaliador2) / 3), 2)
-            avaliacao.data_avaliacao = timezone.now()
+        if avaliacao.avaliado_orientador and avaliacao.avaliado_avaliador1 and avaliacao.avaliado_avaliador2:
+            media_final = Nota.objects.filter(avaliacao=avaliacao).aggregate(Sum('nota'))['nota__sum'] / 3
             if avaliacao.ajuste is False:
-                if avaliacao.media_final >= 7:
+                if media_final >= 7:
                     self.tccService.atualizarStatus(sessao.tcc.id, StatusTccEnum.APROVADO)
                 else:
                     self.tccService.atualizarStatus(sessao.tcc.id, StatusTccEnum.REPROVADO_FINAL, "Não atingiu a média necessária")
