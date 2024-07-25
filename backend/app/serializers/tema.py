@@ -1,13 +1,18 @@
 from rest_framework import serializers
-from ..models import Tema, Professor
+from ..models import Tema, Professor, Usuario
 
-class ProfessorSerializer(serializers.ModelSerializer):
+#class ProfessorSerializer(serializers.ModelSerializer):
+#    class Meta:
+#        model = Professor
+#        fields = ['id', 'nome'] 
+        
+class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Professor
-        fields = ['id', 'nome'] 
+        model = Usuario
+        fields = ['id', 'nome']
 
 class TemaSerializer(serializers.ModelSerializer):
-    professor_detail = ProfessorSerializer(source='professor', read_only=True)
+    professor_detail = UsuarioSerializer(source='professor', read_only=True)
 
     class Meta:
         model = Tema
@@ -16,7 +21,7 @@ class TemaSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['professor'] = ProfessorSerializer(instance.professor).data
+        representation['professor'] = UsuarioSerializer(instance.professor).data
         return representation
 
     def update(self, instance, validated_data):
