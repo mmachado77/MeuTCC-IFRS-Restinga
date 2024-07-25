@@ -17,6 +17,7 @@ from rest_framework.permissions import AllowAny
 from django.db.models import Q
 
 
+
 class CriarUsuarioView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (MultiPartParser, FormParser) 
@@ -99,7 +100,7 @@ class AtualizarPerfil(APIView):
 
 
 class PerfilByIdView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request, id):
         try:
@@ -111,8 +112,9 @@ class PerfilByIdView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
     def put(self, request, id):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Autenticação necessária para atualizar o perfil."}, status=status.HTTP_401_UNAUTHORIZED)
         try:
             usuario = Usuario.objects.get(id=id)
             if usuario.user != request.user:
@@ -131,7 +133,7 @@ class PerfilByIdView(APIView):
             return Response({"error": "Usuário não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
 class TccsByUsuarioView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request, id, format=None):
         try:
