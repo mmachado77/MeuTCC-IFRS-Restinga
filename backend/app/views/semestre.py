@@ -15,7 +15,7 @@ class SemestreDatasView(APIView):
             serializer = SemestreDatasSerializer(semestre_atual)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response({"detail": "Semestre atual não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Semestre atual não disponível."}, status=status.HTTP_404_NOT_FOUND)
         
 class SemestreAtualView(APIView):
     def get(self, request):

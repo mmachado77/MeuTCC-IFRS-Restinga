@@ -64,8 +64,23 @@ const MeusTccsPage = () => {
     const [tableSearchValue, setTableSearchValue] = React.useState('');
     const [expandedRows, setExpandedRows] = React.useState({});
     const [estaNoPrazo, setEstaNoPrazo] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState('');
     
     const [tccs, setTccs] = React.useState([]);
+
+    const statusPriority = {
+        'PROPOSTA_ANALISE_PROFESSOR': 11,
+        'PROPOSTA_ANALISE_COORDENADOR': 10,
+        'DESENVOLVIMENTO': 9,
+        'PREVIA': 8,
+        'FINAL': 7,
+        'AJUSTE': 6,
+        'PROPOSTA_RECUSADA_PROFESSOR': 5,
+        'PROPOSTA_RECUSADA_COORDENADOR': 4,
+        'REPROVADO_PREVIA': 3,
+        'REPROVADO_FINAL': 2,
+        'APROVADO': 1
+    };
 
     const fetchJaPossuiProposta = async () => {
 
@@ -90,30 +105,25 @@ const MeusTccsPage = () => {
         });
     };
 
-    const statusPriority = {
-        'PROPOSTA_ANALISE_PROFESSOR': 11,
-        'PROPOSTA_ANALISE_COORDENADOR': 10,
-        'DESENVOLVIMENTO': 9,
-        'PREVIA': 8,
-        'FINAL': 7,
-        'AJUSTE': 6,
-        'PROPOSTA_RECUSADA_PROFESSOR': 5,
-        'PROPOSTA_RECUSADA_COORDENADOR': 4,
-        'REPROVADO_PREVIA': 3,
-        'REPROVADO_FINAL': 2,
-        'APROVADO': 1
-    };
-
     const verificarPrazoEnvioProposta = async () => {
-        const data = await SemestreService.getPrazoEnvioProposta();
-        const hoje = new Date();
-        const dataAbertura = new Date(data.dataAberturaPrazoPropostas);
-        const dataFechamento = new Date(data.dataFechamentoPrazoPropostas);
-
-        if (hoje >= dataAbertura && hoje <= dataFechamento) {
-            setEstaNoPrazo(true);
-        } else {
-            setEstaNoPrazo(false);
+        try {
+            const data = await SemestreService.getPrazoEnvioProposta();
+            const hoje = new Date();
+            const dataAbertura = new Date(data.dataAberturaPrazoPropostas);
+            const dataFechamento = new Date(data.dataFechamentoPrazoPropostas);
+    
+            if (hoje >= dataAbertura && hoje <= dataFechamento) {
+                setEstaNoPrazo(true);
+            } else {
+                setEstaNoPrazo(false);
+            }
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                setErrorMessage(error.response.data.details);
+            } else {
+                console.error(error);
+                setErrorMessage('Ocorreu um erro inesperado ao verificar o prazo de envio da proposta.');
+            }
         }
     };
 
@@ -306,6 +316,7 @@ const MeusTccsPage = () => {
                     <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
                         <div className='py-3 border-0 border-b border-dashed border-gray-200'>
                             <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
+                            {errorMessage && <span className="error-message">{errorMessage}</span>}
                         </div>
                         <AbrirProposta />
                         <DataTableMeusTccs />
@@ -315,6 +326,7 @@ const MeusTccsPage = () => {
                     <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
                         <div className='py-3 border-0 border-b border-dashed border-gray-200'>
                             <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
+                            {errorMessage && <span className="error-message">{errorMessage}</span>}
                         </div>
                         <AbrirProposta />
                     </div>
