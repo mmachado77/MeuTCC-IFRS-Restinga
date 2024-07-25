@@ -19,6 +19,10 @@ import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
 import getClassForStatus from 'meutcc/core/utils/corStatus';
 import SemestreService from 'meutcc/services/SemestreService';
 
+import { toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import styled from 'styled-components';
 
 // Estilo para exibir status
@@ -64,7 +68,7 @@ const MeusTccsPage = () => {
     const [tableSearchValue, setTableSearchValue] = React.useState('');
     const [expandedRows, setExpandedRows] = React.useState({});
     const [estaNoPrazo, setEstaNoPrazo] = React.useState(false);
-    const [errorMessage, setErrorMessage] = React.useState('');
+    const [errorMessages, setErrorMessages] = React.useState([]);
     
     const [tccs, setTccs] = React.useState([]);
 
@@ -119,10 +123,10 @@ const MeusTccsPage = () => {
             }
         } catch (error) {
             if (error.response && error.response.status === 404) {
-                setErrorMessage(error.response.data.details);
+                setErrorMessages(prevErrors => [...prevErrors, error.response.data.details]);
             } else {
                 console.error(error);
-                setErrorMessage('Ocorreu um erro inesperado ao verificar o prazo de envio da proposta.');
+                setErrorMessages(prevErrors => [...prevErrors, 'Erro inesperado ao buscar prazo de envio de proposta']);
             }
         }
     };
@@ -157,7 +161,7 @@ const MeusTccsPage = () => {
             setTccs(data);
             setLoading(false);
         } catch (error) {
-            console.error('Erro ao buscar os TCCs', error);
+            setErrorMessage(prevErrors => [...prevErrors, 'Erro ao buscar TCCs', error]);
         }
     };
 
@@ -169,6 +173,13 @@ const MeusTccsPage = () => {
         initFilters();
         verificarPrazoEnvioProposta();
     }, []);
+
+    // Exibir array de mensagens de erro caso existam
+    React.useEffect(() => {
+        errorMessages.forEach(errorMessage => {
+            toast.error(errorMessage);
+        });
+    }, [errorMessages]);
 
     const onTableSearchChange = (e) => {
         const value = e.target.value || '';
@@ -316,8 +327,8 @@ const MeusTccsPage = () => {
                     <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
                         <div className='py-3 border-0 border-b border-dashed border-gray-200'>
                             <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
-                            {errorMessage && <span className="error-message">{errorMessage}</span>}
                         </div>
+                        <ToastContainer />
                         <AbrirProposta />
                         <DataTableMeusTccs />
                     </div>
@@ -326,8 +337,8 @@ const MeusTccsPage = () => {
                     <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
                         <div className='py-3 border-0 border-b border-dashed border-gray-200'>
                             <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
-                            {errorMessage && <span className="error-message">{errorMessage}</span>}
                         </div>
+                        <ToastContainer />
                         <AbrirProposta />
                     </div>
                 )
