@@ -11,10 +11,7 @@ import SessoesService from 'meutcc/services/SessoesService';
 import TccService from 'meutcc/services/TccService';
 
 export default function Page({ sessoes, tccs }) {
-
     const [scheduleDate, setScheduleDate] = React.useState(new Date());
-
-    console.log({ sessoes, tccs });
 
     const handleScheduleMonthChange = (e) => {
         const date = new Date(scheduleDate.toISOString());
