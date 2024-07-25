@@ -147,6 +147,7 @@ const NavBar = ({ auth = false, notifications, unreadCount }) => {
                                     onClick={() => {
                                         setSearchQuery(suggestion.label);
                                         setSuggestions([]);
+                                        handleSearch(event);
                                     }}
                                 >
                                     {suggestion.label}
