@@ -146,7 +146,7 @@ const SearchResults = () => {
                                 {result.type === 'user' ? (
                                     <a href={`/perfil/${result.id}`}>{result.label}</a>
                                 ) : (
-                                    <a href={`/tcc/${result.id}`}>{result.label}</a>
+                                    <a href={`/detalhes-tcc/${result.id}`}>{result.label}</a>
                                 )}
                             </li>
                         ))

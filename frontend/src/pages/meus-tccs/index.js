@@ -69,17 +69,22 @@ const MeusTccsPage = () => {
     const [tccs, setTccs] = React.useState([]);
 
     const statusPriority = {
-        'PROPOSTA_ANALISE_PROFESSOR': 11,
-        'PROPOSTA_ANALISE_COORDENADOR': 10,
+        'PROPOSTA_ANALISE_PROFESSOR': 15,
+        'PROPOSTA_ANALISE_COORDENADOR': 14,
+        'PREVIA_ORIENTADOR': 13,
+        'PREVIA_COORDENADOR': 12,
+        'FINAL_ORIENTADOR': 11,
+        'FINAL_COORDENADOR': 10,
         'DESENVOLVIMENTO': 9,
-        'PREVIA': 8,
-        'FINAL': 7,
-        'AJUSTE': 6,
-        'PROPOSTA_RECUSADA_PROFESSOR': 5,
-        'PROPOSTA_RECUSADA_COORDENADOR': 4,
-        'REPROVADO_PREVIA': 3,
-        'REPROVADO_FINAL': 2,
-        'APROVADO': 1
+        'PREVIA_AGENDADA': 8,
+        'PREVIA_OK': 7,
+        'FINAL_AGENDADA': 6,
+        'AJUSTE': 5,
+        'APROVADO': 4,
+        'REPROVADO_FINAL': 3,
+        'REPROVADO_PREVIA': 2,
+        'PROPOSTA_RECUSADA_PROFESSOR': 1,
+        'PROPOSTA_RECUSADA_COORDENADOR': 0
     };
 
     const fetchJaPossuiProposta = async () => {
@@ -105,19 +110,6 @@ const MeusTccsPage = () => {
         });
     };
 
-    const statusPriority = {
-        'PROPOSTA_ANALISE_PROFESSOR': 11,
-        'PROPOSTA_ANALISE_COORDENADOR': 10,
-        'DESENVOLVIMENTO': 9,
-        'PREVIA': 8,
-        'FINAL': 7,
-        'AJUSTE': 6,
-        'PROPOSTA_RECUSADA_PROFESSOR': 5,
-        'PROPOSTA_RECUSADA_COORDENADOR': 4,
-        'REPROVADO_PREVIA': 3,
-        'REPROVADO_FINAL': 2,
-        'APROVADO': 1
-    };
 
     const verificarPrazoEnvioProposta = async () => {
         try {
