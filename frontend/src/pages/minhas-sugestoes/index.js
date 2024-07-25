@@ -10,6 +10,8 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputTextarea } from 'primereact/inputtextarea';
 
+import { useAuth } from 'meutcc/core/context/AuthContext'; // TODO Ver se essa importação não é redundante
+
 const SugestoesTemasTccPage = () => {
     const [loading, setLoading] = useState(false);
     const [filters, setFilters] = useState({});
@@ -25,6 +27,8 @@ const SugestoesTemasTccPage = () => {
     const [themeToDelete, setThemeToDelete] = useState(null);
     const [expandedRows, setExpandedRows] = useState(null);
 
+    const { user } = useAuth();
+
     const initFilters = () => {
         setFilters({
             global: { value: '', matchMode: FilterMatchMode.CONTAINS }
@@ -34,8 +38,9 @@ const SugestoesTemasTccPage = () => {
     const fetchSugestoesTcc = async () => {
         setLoading(true);
         try {
-            const data = await TccService.getMinhasSugestoes();
+            const data = user.resourcetype === 'Coordenador' ? await TccService.getSugestoes() : await TccService.getMinhasSugestoes();
             setSugestoes(data);
+            console.log(data);
         } catch (error) {
             console.error('Erro ao buscar as sugestoes de temas', error);
         }
@@ -67,7 +72,7 @@ const SugestoesTemasTccPage = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success p-mr-2" onClick={() => editAction(rowData)} />
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success p-mr-2 mr-2" onClick={() => editAction(rowData)} />
                 <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => confirmDeleteAction(rowData)} />
             </div>
         );
@@ -85,9 +90,11 @@ const SugestoesTemasTccPage = () => {
     };
 
     const handleSubmit = async () => {
+        console.log('handleSubmit chamado'); // Verifique se isso é logado
         try {
             const data = { titulo, descricao };
-            await TccService.createTema(data);
+            const response = await TccService.createTema(data);
+            console.log('Resposta da API:', response); // Verifique se isso é logado
             fetchSugestoesTcc();
             setDisplayDialog(false);
             setTitulo('');
@@ -148,7 +155,7 @@ const SugestoesTemasTccPage = () => {
         return (
             <Dialog header="Confirmação" visible={displayConfirmDialog} style={{ width: '50vw' }} onHide={cancelDeleteAction}>
                 <p>Certeza de que deseja excluir o tema?</p>
-                <Button label="Sim" className="p-button-success" onClick={deleteAction} />
+                <Button label="Sim" className="p-button-success mr-2" onClick={deleteAction} />
                 <Button label="Não" className="p-button-danger" onClick={cancelDeleteAction} />
             </Dialog>
         );
@@ -164,11 +171,11 @@ const SugestoesTemasTccPage = () => {
                         <label htmlFor="titulo">Título</label>
                         <InputText id="titulo" value={isEdit ? editTitulo : titulo} onChange={(e) => isEdit ? setEditTitulo(e.target.value) : setTitulo(e.target.value)} />
                     </div>
-                    <div className="p-field">
+                    <div className="p-field mt-2">
                         <label htmlFor="descricao">Descrição</label>
                         <InputTextarea id="descricao" value={isEdit ? editDescricao : descricao} onChange={(e) => isEdit ? setEditDescricao(e.target.value) : setDescricao(e.target.value)} rows={3} />
                     </div>
-                    <Button label={isEdit ? "Salvar" : "Enviar"} className="p-button-success" onClick={isEdit ? handleEditSubmit : handleSubmit} />
+                    <Button label={isEdit ? "Salvar" : "Enviar"} className="p-button-success mt-2" onClick={isEdit ? handleEditSubmit : handleSubmit} />
                 </div>
             </Dialog>
         );
@@ -207,7 +214,7 @@ const SugestoesTemasTccPage = () => {
             <div className='max-w-screen-lg mx-auto bg-white m-3 mt-6 flex flex-col'>
                 <div className='py-3 border-0 border-b border-dashed border-gray-200 flex flex-col items-center'>
                     <h1 className='heading-1 px-6 text-gray-700'>Minhas Sugestões de Tema</h1>
-                    <Button label="Criar Tema" className="p-button-success mt-4" onClick={createTheme} />
+                    <Button label="Criar Tema" className="p-button-success mb-2" onClick={createTheme} />
                 </div>
                 <DataTableSugestoes />
                 {renderDialog()}
