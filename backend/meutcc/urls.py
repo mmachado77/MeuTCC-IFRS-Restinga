@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from meutcc.views import GoogleAuthView, GoogleAuthCallbackView
+from meutcc.views import GoogleAuthView, GoogleAuthCallbackView, GoogleDriveView, GoogleDriveCallbackView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -24,5 +24,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('app/', include('app.urls')),
     path('auth-google', GoogleAuthView.as_view(), name='auth_google'),
-    path('oauth2callback', GoogleAuthCallbackView.as_view(), name='google_callback')
+    path('oauth2callback', GoogleAuthCallbackView.as_view(), name='google_callback'),
+
+    path('auth-google-drive', GoogleDriveView.as_view(), name='auth_google_drive'),
+    path('drive_oauth2callback', GoogleDriveCallbackView.as_view(), name='google_drive_callback'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
