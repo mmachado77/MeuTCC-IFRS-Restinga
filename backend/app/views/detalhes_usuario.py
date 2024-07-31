@@ -15,9 +15,6 @@ class DetalhesUsuario(CustomAPIView):
             serializer = UsuarioPolymorphicSerializer(usuario)
             return Response(serializer.data)
         except:
-            try:
-                user = User.objects.get(pk=request.user.id)
-                return Response({'cadastroIncompleto': True})
-            except:
-                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            user = User.objects.get(pk=request.user.id)
+            return Response({'cadastroIncompleto': True})
                     
