@@ -24,6 +24,8 @@ export default function List({ ...props }) {
                 </div>
                 <div className="p-2">
                     <div className="font-medium">{sessao.tcc.tema}</div>
+                    <Badge value={sessao.tipo} />
+                    <div class="text-gray-500">{sessao.tcc.autor.nome}</div>
                     <div className="font-light text-gray-500">
                         <div className='flex items-center my-2 flex-nowrap '>
                             <i className='pr-2 pi pi-calendar'></i>

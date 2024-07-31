@@ -9,6 +9,8 @@ import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputTextarea } from 'primereact/inputtextarea';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
 
 import { useAuth } from 'meutcc/core/context/AuthContext'; // TODO Ver se essa importação não é redundante
 
@@ -62,10 +64,10 @@ const SugestoesTemasTccPage = () => {
 
     const renderHeader = (
         <div className="flex justify-content-between">
-            <span className="p-input-icon-left">
-                <i className="pi pi-search" />
-                <InputText value={tableSearchValue} onChange={onTableSearchChange} placeholder="Buscar tema" />
-            </span>
+            <IconField iconPosition="left">
+                    <InputIcon className="pi pi-search" />
+                    <InputText value={tableSearchValue} onChange={onTableSearchChange} placeholder="Buscar tema" />
+                </IconField>
         </div>
     );
 
@@ -194,19 +196,6 @@ const SugestoesTemasTccPage = () => {
         setExpandedRows(event.data);
     };
 
-    const DataTableSugestoes = () => {
-        return (
-            <div className='py-6 px-2'>
-            <DataTable value={sugestoes} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }} rowExpansionTemplate={rowExpansionTemplate} expandedRows={expandedRows} onRowToggle={onRowToggle}>
-                <Column expander style={{ width: '3rem' }}></Column>
-                <Column field="titulo" header="Tema" style={{ width: '77%' }}></Column>
-                <Column field="professor.nome" header="Professor" style={{ width: '20%' }}></Column>
-                <Column body={actionBodyTemplate}></Column>
-            </DataTable>
-            </div>
-        );
-    };
-
     if (loading) {
         return <LoadingSpinner />;
     } else {
@@ -216,7 +205,14 @@ const SugestoesTemasTccPage = () => {
                     <h1 className='heading-1 px-6 text-gray-700'>Minhas Sugestões de Tema</h1>
                     <Button label="Criar Tema" className="p-button-success mb-2" onClick={createTheme} />
                 </div>
-                <DataTableSugestoes />
+                <div className='py-6 px-2'>
+            <DataTable value={sugestoes} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }} rowExpansionTemplate={rowExpansionTemplate} expandedRows={expandedRows} onRowToggle={onRowToggle}>
+                <Column expander style={{ width: '3rem' }}></Column>
+                <Column field="titulo" header="Tema" style={{ width: '77%' }}></Column>
+                <Column field="professor.nome" header="Professor" style={{ width: '20%' }}></Column>
+                <Column body={actionBodyTemplate}></Column>
+            </DataTable>
+            </div>
                 {renderDialog()}
                 {renderConfirmDialog()}
             </div>
