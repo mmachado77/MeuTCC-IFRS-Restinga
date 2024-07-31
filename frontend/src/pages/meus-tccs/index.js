@@ -108,13 +108,6 @@ const MeusTccsPage = () => {
         }
     }
 
-    const initFilters = () => {
-        setFilters({
-            global: { value: '', matchMode: FilterMatchMode.CONTAINS }
-        });
-    };
-
-
     const verificarPrazoEnvioProposta = async () => {
         try {
             const data = await SemestreService.getPrazoEnvioProposta();
@@ -128,8 +121,9 @@ const MeusTccsPage = () => {
                 setEstaNoPrazo(false);
             }
         } catch (error) {
+
             if (error.response && error.response.status === 404) {
-                setErrorMessages(prevErrors => [...prevErrors, error.response.data.details]);
+                setErrorMessages(prevErrors => [...prevErrors, error.response.data.error]);
             } else {
                 console.error(error);
                 setErrorMessages(prevErrors => [...prevErrors, 'Erro inesperado ao buscar prazo de envio de proposta']);
@@ -182,10 +176,17 @@ const MeusTccsPage = () => {
 
     // Exibir array de mensagens de erro caso existam
     React.useEffect(() => {
+        console.log('errorMessages changed:', errorMessages);
         errorMessages.forEach(errorMessage => {
             toast.error(errorMessage);
         });
     }, [errorMessages]);
+
+    const initFilters = () => {
+        setFilters({
+            global: { value: '', matchMode: FilterMatchMode.CONTAINS }
+        });
+    };
 
     const onTableSearchChange = (e) => {
         const value = e.target.value || '';
@@ -334,7 +335,6 @@ const MeusTccsPage = () => {
                         <div className='py-3 border-0 border-b border-dashed border-gray-200'>
                             <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
                         </div>
-                        <ToastContainer />
                         <AbrirProposta />
                         <DataTableMeusTccs />
                     </div>
@@ -344,7 +344,6 @@ const MeusTccsPage = () => {
                         <div className='py-3 border-0 border-b border-dashed border-gray-200'>
                             <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
                         </div>
-                        <ToastContainer />
                         <AbrirProposta />
                     </div>
                 )
@@ -361,6 +360,7 @@ const MeusTccsPage = () => {
                     </div>
                     <div className='py-6 px-2'>
                         <h2 className='heading-1 px-6 text-gray-700 text-center'>Nenhum TCC encontrado</h2>
+                        <ToastContainer />
                     </div>
                 </div>
             );
@@ -370,6 +370,7 @@ const MeusTccsPage = () => {
             <div className='py-3 border-0 border-b border-dashed border-gray-200'>
                 <h1 className='heading-1 px-6 text-gray-700'>{user.resourcetype === 'Coordenador' ? 'TCCs' : 'Meus TCCs'}</h1>
             </div>
+                <ToastContainer />
                 <DataTableMeusTccs />
             </div>
         );
