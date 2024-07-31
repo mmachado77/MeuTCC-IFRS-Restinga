@@ -314,24 +314,24 @@ const MeusTccsPage = () => {
                     <h1 className='heading-1 px-6 text-gray-700'>Meus TCCs</h1>
                 </div>
                     
-            <div className='py-6 px-2'>
-                <DataTable value={tccs} filters={filters} globalFilter={'tema'} expandedRows={expandedRows} 
-                    onRowToggle={(e) => setExpandedRows(e.data)} onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} 
-                    rowExpansionTemplate={rowExpansionTemplate} dataKey="id" header={renderHeader} tableStyle={{ minWidth: '50rem' }} 
-                    emptyMessage="Nenhum tema encontrado" paginator rows={5} expandedRowIcon={customExpandedIcon} collapsedRowIcon={customCollapsedIcon}>
+                    <div className='py-6 px-2'>
+                        <DataTable value={tccs} filters={filters} globalFilter={'tema'} expandedRows={expandedRows} 
+                            onRowToggle={(e) => setExpandedRows(e.data)} onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} 
+                            rowExpansionTemplate={rowExpansionTemplate} dataKey="id" header={renderHeader} tableStyle={{ minWidth: '50rem' }} 
+                            emptyMessage="Nenhum tema encontrado" paginator rows={5} expandedRowIcon={customExpandedIcon} collapsedRowIcon={customCollapsedIcon}>
 
-                    <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
+                            <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
 
-                    {(user.resourcetype === 'Coordenador' || user.resourcetype === 'ProfessorInterno' || user.resourcetype === 'ProfessorExterno') && 
-                        <Column field="autor.nome" header="Aluno" style={{ width: '20%' }}></Column>
-                    }
+                            {(user.resourcetype === 'Coordenador' || user.resourcetype === 'ProfessorInterno' || user.resourcetype === 'ProfessorExterno') && 
+                                <Column field="autor.nome" header="Aluno" style={{ width: '20%' }}></Column>
+                            }
 
-                    <Column field="semestre.periodo" header="Semestre" style={{ width: '20%' }}></Column>
-                    <Column body={orientadoresTemplate} header="Orientadores" style={{ width: '20%' }}></Column>
-                    <Column body={statusBodyTemplate} header="Status" style={{ width: '10%' }} ></Column>
-                    <Column expander={allowExpansion} style={{ width: '5rem' }} />
-                </DataTable>
-            </div>
+                            <Column field="semestre.periodo" header="Semestre" style={{ width: '20%' }}></Column>
+                            <Column body={orientadoresTemplate} header="Orientadores" style={{ width: '20%' }}></Column>
+                            <Column body={statusBodyTemplate} header="Status" style={{ width: '10%' }} ></Column>
+                            <Column expander={allowExpansion} style={{ width: '5rem' }} />
+                        </DataTable>
+                    </div>
         
             </div>;
         }else{
@@ -343,24 +343,24 @@ const MeusTccsPage = () => {
                         </div>
                         <AbrirProposta />
                         
-            <div className='py-6 px-2'>
-                <DataTable value={tccs} filters={filters} globalFilter={'tema'} expandedRows={expandedRows} 
-                    onRowToggle={(e) => setExpandedRows(e.data)} onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} 
-                    rowExpansionTemplate={rowExpansionTemplate} dataKey="id" header={renderHeader} tableStyle={{ minWidth: '50rem' }} 
-                    emptyMessage="Nenhum tema encontrado" paginator rows={5} expandedRowIcon={customExpandedIcon} collapsedRowIcon={customCollapsedIcon}>
+                        <div className='py-6 px-2'>
+                            <DataTable value={tccs} filters={filters} globalFilter={'tema'} expandedRows={expandedRows} 
+                                onRowToggle={(e) => setExpandedRows(e.data)} onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} 
+                                rowExpansionTemplate={rowExpansionTemplate} dataKey="id" header={renderHeader} tableStyle={{ minWidth: '50rem' }} 
+                                emptyMessage="Nenhum tema encontrado" paginator rows={5} expandedRowIcon={customExpandedIcon} collapsedRowIcon={customCollapsedIcon}>
 
-                    <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
+                                <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
 
-                    {(user.resourcetype === 'Coordenador' || user.resourcetype === 'ProfessorInterno' || user.resourcetype === 'ProfessorExterno') && 
-                        <Column field="autor.nome" header="Aluno" style={{ width: '20%' }}></Column>
-                    }
+                                {(user.resourcetype === 'Coordenador' || user.resourcetype === 'ProfessorInterno' || user.resourcetype === 'ProfessorExterno') && 
+                                    <Column field="autor.nome" header="Aluno" style={{ width: '20%' }}></Column>
+                                }
 
-                    <Column field="semestre.periodo" header="Semestre" style={{ width: '20%' }}></Column>
-                    <Column body={orientadoresTemplate} header="Orientadores" style={{ width: '20%' }}></Column>
-                    <Column body={statusBodyTemplate} header="Status" style={{ width: '10%' }} ></Column>
-                    <Column expander={allowExpansion} style={{ width: '5rem' }} />
-                </DataTable>
-            </div>
+                                <Column field="semestre.periodo" header="Semestre" style={{ width: '20%' }}></Column>
+                                <Column body={orientadoresTemplate} header="Orientadores" style={{ width: '20%' }}></Column>
+                                <Column body={statusBodyTemplate} header="Status" style={{ width: '10%' }} ></Column>
+                                <Column expander={allowExpansion} style={{ width: '5rem' }} />
+                            </DataTable>
+                        </div>
         
                     </div>
                     
@@ -396,25 +396,24 @@ const MeusTccsPage = () => {
                 <h1 className='heading-1 px-6 text-gray-700'>{user.resourcetype === 'Coordenador' ? 'TCCs' : 'Meus TCCs'}</h1>
             </div>
                 <ToastContainer />
-                
-            <div className='py-6 px-2'>
-                <DataTable value={tccs} filters={filters} globalFilter={'tema'} expandedRows={expandedRows} 
-                    onRowToggle={(e) => setExpandedRows(e.data)} onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} 
-                    rowExpansionTemplate={rowExpansionTemplate} dataKey="id" header={renderHeader} tableStyle={{ minWidth: '50rem' }} 
-                    emptyMessage="Nenhum tema encontrado" paginator rows={5} expandedRowIcon={customExpandedIcon} collapsedRowIcon={customCollapsedIcon}>
+                <div className='py-6 px-2'>
+                    <DataTable value={tccs} filters={filters} globalFilter={'tema'} expandedRows={expandedRows} 
+                        onRowToggle={(e) => setExpandedRows(e.data)} onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} 
+                        rowExpansionTemplate={rowExpansionTemplate} dataKey="id" header={renderHeader} tableStyle={{ minWidth: '50rem' }} 
+                        emptyMessage="Nenhum tema encontrado" paginator rows={5} expandedRowIcon={customExpandedIcon} collapsedRowIcon={customCollapsedIcon}>
 
-                    <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
+                        <Column field="tema" header="Título" style={{ width: '80%' }}></Column>
 
-                    {(user.resourcetype === 'Coordenador' || user.resourcetype === 'ProfessorInterno' || user.resourcetype === 'ProfessorExterno') && 
-                        <Column field="autor.nome" header="Aluno" style={{ width: '20%' }}></Column>
-                    }
+                        {(user.resourcetype === 'Coordenador' || user.resourcetype === 'ProfessorInterno' || user.resourcetype === 'ProfessorExterno') && 
+                            <Column field="autor.nome" header="Aluno" style={{ width: '20%' }}></Column>
+                        }
 
-                    <Column field="semestre.periodo" header="Semestre" style={{ width: '20%' }}></Column>
-                    <Column body={orientadoresTemplate} header="Orientadores" style={{ width: '20%' }}></Column>
-                    <Column body={statusBodyTemplate} header="Status" style={{ width: '10%' }} ></Column>
-                    <Column expander={allowExpansion} style={{ width: '5rem' }} />
-                </DataTable>
-            </div>
+                        <Column field="semestre.periodo" header="Semestre" style={{ width: '20%' }}></Column>
+                        <Column body={orientadoresTemplate} header="Orientadores" style={{ width: '20%' }}></Column>
+                        <Column body={statusBodyTemplate} header="Status" style={{ width: '10%' }} ></Column>
+                        <Column expander={allowExpansion} style={{ width: '5rem' }} />
+                    </DataTable>
+                </div>
         
             </div>
         );
