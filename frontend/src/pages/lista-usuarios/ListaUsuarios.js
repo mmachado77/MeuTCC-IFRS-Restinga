@@ -8,6 +8,8 @@ import UsuarioService from 'meutcc/services/UsuarioService';
 import { Toast } from 'primereact/toast';
 import { SelectButton } from 'primereact/selectbutton';
 import { useRouter } from 'next/router';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
 
 export default function ListaUsuarios() {
     const [usuarios, setUsuarios] = useState([]);
@@ -101,10 +103,11 @@ export default function ListaUsuarios() {
             <div>
                 <SelectButton value={statusFilter} onChange={(e) => setStatusFilter(e.value)} options={statusOptions} />
             </div>
-            <span className="p-input-icon-left" style={{ marginLeft: '20px' }}>
-                <i className="pi pi-search" />
-                <InputText type="search" onInput={onGlobalFilterChange} placeholder="Buscar..." />
-            </span>
+            <IconField iconPosition="left">
+                    <InputIcon className="pi pi-search" />
+                    <InputText type="search" onInput={onGlobalFilterChange} placeholder="Buscar..." className=''/>
+                </IconField>
+            
         </div>
     );
 
@@ -121,11 +124,11 @@ export default function ListaUsuarios() {
                 globalFilter={globalFilter}
                 header={header}
             >
-                <Column field="nome" header="Nome" sortable filter filterPlaceholder="Buscar por nome" style={{ width: '30%' }}></Column>
-                <Column field="email" header="Email" sortable filter filterPlaceholder="Buscar por email" style={{ width: '30%' }}></Column>
-                <Column field="tipo" header="Tipo de Usuário" body={tipoUsuarioTemplate} sortable filter filterPlaceholder="Buscar por tipo" style={{ width: '20%' }}></Column>
-                <Column field="status_cadastro.status_text" header="Status de Cadastro" body={statusCadastroTemplate} sortable filter filterPlaceholder="Buscar por status" style={{ width: '20%' }}></Column>
-                <Column body={perfilButtonTemplate} header="Ações" style={{ width: '10%' }}></Column>
+                <Column field="nome" header="Nome" sortable style={{ width: '30%' }}></Column>
+                <Column field="email" header="Email" sortable style={{ width: '30%' }}></Column>
+                <Column field="tipo" header="Tipo de Usuário" body={tipoUsuarioTemplate} sortable style={{ width: '15%' }}></Column>
+                <Column field="status_cadastro.status_text" header="Status" body={statusCadastroTemplate} sortable style={{ width: '10%' }}></Column>
+                <Column body={perfilButtonTemplate} header="Ações" style={{ width: '20%' }}></Column>
             </DataTable>
         </div>
     );

@@ -80,11 +80,10 @@ const SugestoesTemasTccPage = () => {
     const renderHeader = (<div>
         <div className="flex justify-content-between">
             <span className="p-input-icon-left">
-                <i className="pi pi-search" />
-                <InputText value={tableSearchValue} onChange={onTableSearchChange} placeholder="Buscar tema" />
+                <i className="pi pi-search ml-2" />
+                <InputText value={tableSearchValue} onChange={onTableSearchChange} placeholder="Buscar tema" className='pl-7'/>
             </span>
         </div>
-
     </div>);
 
     const rowExpansionTemplate = (data) => {
@@ -100,17 +99,17 @@ const SugestoesTemasTccPage = () => {
         setExpandedRows(event.data);
     };
 
-    const DataTableSugestoes = () => {
-        return (
-            <div className='py-6 px-2'>
-            <DataTable value={sugestoes} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }} rowExpansionTemplate={rowExpansionTemplate} expandedRows={expandedRows} onRowToggle={onRowToggle}>
-                <Column expander style={{ width: '3rem' }}></Column>
-                <Column field="titulo" header="Tema" style={{ width: '77%' }}></Column>
-                <Column field="professor.nome" header="Professor" style={{ width: '20%' }}></Column>
-            </DataTable>
-            </div>
-        );
-    };
+    // const DataTableSugestoes = () => {
+    //     return (
+    //         <div className='py-6 px-2'>
+    //         <DataTable value={sugestoes} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }} rowExpansionTemplate={rowExpansionTemplate} expandedRows={expandedRows} onRowToggle={onRowToggle}>
+    //             <Column expander style={{ width: '3rem' }}></Column>
+    //             <Column field="titulo" header="Tema" style={{ width: '77%' }}></Column>
+    //             <Column field="professor.nome" header="Professor" style={{ width: '20%' }}></Column>
+    //         </DataTable>
+    //         </div>
+    //     );
+    // };
 
     if(loading){
         return <LoadingSpinner />;
@@ -119,7 +118,13 @@ const SugestoesTemasTccPage = () => {
         <div className='py-3 border-0 border-b border-dashed border-gray-200'>
             <h1 className='heading-1 px-6 text-gray-700'>Sugestões de temas para TCC</h1>
         </div>
-            <DataTableSugestoes />
+        <div className='py-6 px-2'>
+            <DataTable value={sugestoes} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }} rowExpansionTemplate={rowExpansionTemplate} expandedRows={expandedRows} onRowToggle={onRowToggle}>
+                <Column expander style={{ width: '3rem' }}></Column>
+                <Column field="titulo" header="Tema" style={{ width: '77%' }}></Column>
+                <Column field="professor.nome" header="Professor" style={{ width: '20%' }}></Column>
+            </DataTable>
+            </div>
         </div>;
     }
 }
