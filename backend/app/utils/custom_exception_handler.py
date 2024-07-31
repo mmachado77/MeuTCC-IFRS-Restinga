@@ -6,27 +6,27 @@ def custom_exception_handler(exc, context):
 
     if response is not None:
         if isinstance(exc, exceptions.NotFound):
-            response.data = {'mensagem': 'O recurso solicitado não foi encontrado.'}
+            response.data = {'status': 'error', 'message': 'O recurso solicitado não foi encontrado.'}
         elif isinstance(exc, exceptions.PermissionDenied):
-            response.data = {'mensagem': 'Você não tem permissão para realizar esta ação.'}
+            response.data = {'status': 'error', 'message': 'Você não tem permissão para realizar esta ação.'}
         elif isinstance(exc, exceptions.ValidationError):
-            response.data = {'mensagem': 'Os dados enviados são inválidos.'}
+            response.data = {'status': 'error', 'message': 'Os dados enviados são inválidos.'}
         elif isinstance(exc, exceptions.AuthenticationFailed):
-            response.data = {'mensagem': 'Falha na autenticação.'}
+            response.data = {'status': 'error', 'message': 'Falha na autenticação.'}
         elif isinstance(exc, exceptions.NotAuthenticated):
-            response.data = {'mensagem': 'Autenticação necessária.'}
+            response.data = {'status': 'error', 'message': 'Autenticação necessária.'}
         elif isinstance(exc, exceptions.ParseError):
-            response.data = {'mensagem': 'Erro ao analisar a solicitação.'}
+            response.data = {'status': 'error', 'message': 'Erro ao analisar a solicitação.'}
         elif isinstance(exc, exceptions.MethodNotAllowed):
-            response.data = {'mensagem': 'Método HTTP não permitido.'}
+            response.data = {'status': 'error', 'message': 'Método HTTP não permitido.'}
         elif isinstance(exc, exceptions.NotAcceptable):
-            response.data = {'mensagem': 'O cliente não aceita as representações de conteúdo disponíveis.'}
+            response.data = {'status': 'error', 'message': 'O cliente não aceita as representações de conteúdo disponíveis.'}
         elif isinstance(exc, exceptions.UnsupportedMediaType):
-            response.data = {'mensagem': 'Tipo de mídia não suportado.'}
+            response.data = {'status': 'error', 'message': 'Tipo de mídia não suportado.'}
         elif isinstance(exc, exceptions.Throttled):
-            response.data = {'mensagem': 'Excedeu a taxa de solicitações permitida.'}
+            response.data = {'status': 'error', 'message': 'Excedeu a taxa de solicitações permitida.'}
         else:
-            response.data = {'mensagem': 'Ocorreu um erro inesperado.'}
+            response.data = {'status': 'error', 'message': 'Ocorreu um erro inesperado.'}
 
         response.data['status_code'] = response.status_code
 
