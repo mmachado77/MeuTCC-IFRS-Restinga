@@ -1,12 +1,12 @@
+from .custom_api_view import CustomAPIView
 from rest_framework import generics, status
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from app.models import Professor, ProfessorInterno, StatusCadastro
 from app.serializers import UsuarioPolymorphicSerializer
 from rest_framework.permissions import IsAuthenticated
 from app.services.notificacoes import notificacaoService
 
-class ProfessoresPendentesListAPIView(APIView):
+class ProfessoresPendentesListAPIView(CustomAPIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None):
@@ -14,7 +14,7 @@ class ProfessoresPendentesListAPIView(APIView):
         serializer = UsuarioPolymorphicSerializer(professores_pendentes, many=True)
         return Response(serializer.data)
 
-class AprovarProfessorAPIView(APIView):
+class AprovarProfessorAPIView(CustomAPIView):
     permission_classes = [IsAuthenticated]
     notificacaoService = notificacaoService()
 
@@ -31,7 +31,7 @@ class AprovarProfessorAPIView(APIView):
         except StatusCadastro.DoesNotExist:
             return Response({'error': 'Status de cadastro não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
-class RecusarProfessorAPIView(APIView):
+class RecusarProfessorAPIView(CustomAPIView):
     permission_classes = [IsAuthenticated]
     notificacaoService = notificacaoService()
 

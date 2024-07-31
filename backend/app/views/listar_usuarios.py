@@ -1,10 +1,10 @@
-from rest_framework.views import APIView
+from .custom_api_view import CustomAPIView
 from rest_framework.response import Response
 
 from app.models import Usuario
 from app.serializers import UsuarioPolymorphicSerializer
 
-class ListarUsuarios(APIView):
+class ListarUsuarios(CustomAPIView):
 
     def get(self, request, format=None):
         usuario = Usuario.objects.all()

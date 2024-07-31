@@ -9,8 +9,9 @@ from app.serializers import TccSerializer, TccCreateSerializer, TccStatusRespond
 from app.services.proposta import PropostaService
 from app.services.tcc import TccService
 from app.services.notificacoes import notificacaoService
+from .custom_api_view import CustomAPIView
 
-class ListarTccPendente(APIView):
+class ListarTccPendente(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -33,7 +34,7 @@ class ListarTccPendente(APIView):
         serializer = TccSerializer(tccs, many=True)
         return Response(serializer.data)
     
-class TCCs(APIView):
+class TCCs(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -43,7 +44,7 @@ class TCCs(APIView):
         
         return Response(serializer.data)
     
-class TCCsByAluno(APIView):
+class TCCsByAluno(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -54,7 +55,7 @@ class TCCsByAluno(APIView):
         return Response(serializer.data)
     
 
-class TCCsByOrientador(APIView):
+class TCCsByOrientador(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -65,7 +66,7 @@ class TCCsByOrientador(APIView):
         serializer = TccSerializer(tccs, many=True)
         return Response(serializer.data)
     
-class PossuiProposta(APIView):
+class PossuiProposta(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -74,7 +75,7 @@ class PossuiProposta(APIView):
         
         return Response({'possuiProposta': possuiProposta})
         
-class CriarTCCView(APIView):
+class CriarTCCView(CustomAPIView):
     permission_classes = [IsAuthenticated]
     tccService = TccService()
     notificacaoService = notificacaoService()
@@ -104,7 +105,7 @@ class CriarTCCView(APIView):
             return Response({'message': str(e)}, status=400)
         
 
-class TccStatusResponderPropostaView(APIView):
+class TccStatusResponderPropostaView(CustomAPIView):
     permission_classes = [IsAuthenticated]
     propostaService = PropostaService()
 
@@ -121,7 +122,7 @@ class TccStatusResponderPropostaView(APIView):
         return Response({'message': 'Status atualizado com sucesso!'})
 
 
-class EditarTCCView(APIView):
+class EditarTCCView(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request, tccid):
@@ -149,7 +150,7 @@ class EditarTCCView(APIView):
         return Response({"error": "Você não tem permissão para editar este TCC."}, status=status.HTTP_403_FORBIDDEN)
 
 
-class DetalhesTCCView(APIView):
+class DetalhesTCCView(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, tccid, format=None):
@@ -177,7 +178,7 @@ class DetalhesTCCView(APIView):
             return Response({"error": "Você não tem permissão para visualizar este TCC."},
                             status=status.HTTP_403_FORBIDDEN)
             
-class TCCsPublicadosView(APIView):
+class TCCsPublicadosView(CustomAPIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
@@ -185,7 +186,7 @@ class TCCsPublicadosView(APIView):
         serializer = TccSerializer(tccs, many=True)
         return Response(serializer.data)
 
-class TemasSugeridosView(APIView):
+class TemasSugeridosView(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -193,7 +194,7 @@ class TemasSugeridosView(APIView):
         serializer = TemaSerializer(temas, many=True)
         return Response(serializer.data)
 
-class MeusTemasSugeridosView(APIView):
+class MeusTemasSugeridosView(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -202,7 +203,7 @@ class MeusTemasSugeridosView(APIView):
         serializer = TemaSerializer(temas, many=True)
         return Response(serializer.data)
     
-class CriarTemaView(APIView):
+class CriarTemaView(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -221,7 +222,7 @@ class CriarTemaView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class AtualizarTemaView(APIView):
+class AtualizarTemaView(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request, pk):
@@ -240,7 +241,7 @@ class AtualizarTemaView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class ExcluirTemaView(APIView):
+class ExcluirTemaView(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, pk):

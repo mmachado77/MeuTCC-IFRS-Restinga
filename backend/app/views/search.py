@@ -1,5 +1,5 @@
 import logging
-from rest_framework.views import APIView
+from .custom_api_view import CustomAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from app.models import Tcc, Usuario
@@ -7,7 +7,7 @@ from app.serializers import UsuarioSerializer, TccSerializer
 
 logger = logging.getLogger(__name__)
 
-class SearchView(APIView):
+class SearchView(CustomAPIView):
     def get(self, request, format=None):
         logger.info("SearchView accessed")  # Log to verify if the view is being accessed
         query = request.GET.get('q', '')

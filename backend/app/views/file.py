@@ -1,11 +1,11 @@
-from rest_framework.views import APIView
+from .custom_api_view import CustomAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from app.services.avaliacao import AvaliacaoService
 from app.models import Tcc, Sessao, SessaoFinal, Avaliacao
 from django.http import FileResponse
-class UploadDocumentoTCCView(APIView):
+class UploadDocumentoTCCView(CustomAPIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, tccId):
@@ -18,7 +18,7 @@ class UploadDocumentoTCCView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-class UploadDocumentoSessaoView(APIView):
+class UploadDocumentoSessaoView(CustomAPIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, sessaoId):
@@ -36,7 +36,7 @@ class UploadDocumentoSessaoView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-class UploadFichaAvaliacaoView(APIView):
+class UploadFichaAvaliacaoView(CustomAPIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, avaliacaoId):
@@ -50,7 +50,7 @@ class UploadFichaAvaliacaoView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-class UploadDocumentoAjusteView(APIView):
+class UploadDocumentoAjusteView(CustomAPIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, avaliacaoId):
@@ -69,7 +69,7 @@ class UploadDocumentoAjusteView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-class ExcluirDocumentoTCCView(APIView):
+class ExcluirDocumentoTCCView(CustomAPIView):
     def delete(self, request, tccId):
         try:
             tcc = Tcc.objects.get(id=tccId)
@@ -83,7 +83,7 @@ class ExcluirDocumentoTCCView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-class ExcluirDocumentoSessaoView(APIView):
+class ExcluirDocumentoSessaoView(CustomAPIView):
     def delete(self, request, sessaoId):
         try:
             sessao = Sessao.objects.get(id=sessaoId)
@@ -97,7 +97,7 @@ class ExcluirDocumentoSessaoView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-class ExcluirFichaAvaliacaoView(APIView):
+class ExcluirFichaAvaliacaoView(CustomAPIView):
     def delete(self, request, avaliacaoId):
         try:
             avaliacao = Avaliacao.objects.get(id=avaliacaoId)
@@ -111,7 +111,7 @@ class ExcluirFichaAvaliacaoView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-class ExcluirDocumentoAjusteView(APIView):
+class ExcluirDocumentoAjusteView(CustomAPIView):
     def delete(self, request, avaliacaoId):
         try:
             avaliacao = Avaliacao.objects.get(id=avaliacaoId)
@@ -125,7 +125,7 @@ class ExcluirDocumentoAjusteView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
-class UploadAutorizacaoPublicacaoView(APIView):
+class UploadAutorizacaoPublicacaoView(CustomAPIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request, tccId, *args, **kwargs):
@@ -139,7 +139,7 @@ class UploadAutorizacaoPublicacaoView(APIView):
         except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
         
-class DownloadDocumentoTCCView(APIView):
+class DownloadDocumentoTCCView(CustomAPIView):
     def get(self, request, tccId):
         try:
             tcc = Tcc.objects.get(id=tccId)
@@ -153,7 +153,7 @@ class DownloadDocumentoTCCView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-class DownloadDocumentoSessaoView(APIView):
+class DownloadDocumentoSessaoView(CustomAPIView):
     def get(self, request, sessaoId):
         try:
             sessao = Sessao.objects.get(id=sessaoId)
@@ -167,7 +167,7 @@ class DownloadDocumentoSessaoView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-class DownloadFichaAvaliacaoView(APIView):
+class DownloadFichaAvaliacaoView(CustomAPIView):
     def get(self, request, avaliacaoId):
         try:
             avaliacao = Avaliacao.objects.get(id=avaliacaoId)
@@ -181,7 +181,7 @@ class DownloadFichaAvaliacaoView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-class DownloadDocumentoAjusteView(APIView):
+class DownloadDocumentoAjusteView(CustomAPIView):
     def get(self, request, avaliacaoId):
         try:
             avaliacao = Avaliacao.objects.get(id=avaliacaoId)
@@ -195,7 +195,7 @@ class DownloadDocumentoAjusteView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-class DownloadFichaAvaliacaoPreenchidaView(APIView):
+class DownloadFichaAvaliacaoPreenchidaView(CustomAPIView):
     avaliacaoService = AvaliacaoService()
     def get(self, request, avaliacaoId):
         try:

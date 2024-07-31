@@ -1,4 +1,4 @@
-from rest_framework.views import APIView
+from .custom_api_view import CustomAPIView
 from rest_framework.response import Response
 from django.db.models import Q
 from rest_framework import status
@@ -12,7 +12,7 @@ from datetime import date, datetime, time, timedelta
 from dateutil.parser import parse
 from app.enums import StatusTccEnum
 
-class SessoesFuturasView(APIView):
+class SessoesFuturasView(CustomAPIView):
     def get(self, request):
         sessoes = Sessao.objects.filter(
                 data_inicio__gt=datetime.now(),
@@ -22,7 +22,7 @@ class SessoesFuturasView(APIView):
         sessoes_serializer = SessaoFuturaSerializer(sessoes, many=True).data
         return Response(sessoes_serializer, status=status.HTTP_200_OK)
     
-class SessoesFuturasOrientadorView(APIView):
+class SessoesFuturasOrientadorView(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -42,7 +42,7 @@ class SessoesFuturasOrientadorView(APIView):
         except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
     
-class SessaoEditView(APIView):
+class SessaoEditView(CustomAPIView):
     notificacaoService = notificacaoService()
     tccService = TccService()
     def put(self, request):
@@ -84,7 +84,7 @@ class SessaoEditView(APIView):
         
         return Response("Sessão atualizada com sucesso", status=status.HTTP_200_OK)
     
-class SessaoEditOrientadorView(APIView):
+class SessaoEditOrientadorView(CustomAPIView):
     tccService = TccService()
     def put(self, request):
         try:
@@ -123,7 +123,7 @@ class SessaoEditOrientadorView(APIView):
         
         return Response("Sessão atualizada com sucesso", status=status.HTTP_200_OK)
 
-class SessaoCreateView(APIView):
+class SessaoCreateView(CustomAPIView):
     notificacaoService = notificacaoService()
     tccService = TccService()
 

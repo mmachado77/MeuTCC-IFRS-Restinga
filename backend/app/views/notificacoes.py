@@ -1,10 +1,10 @@
-from rest_framework.views import APIView
+from .custom_api_view import CustomAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from notifications.models import Notification
 from app.serializers import NotificacaoSerializer
 
-class ListarNotificacoesNaoLidas(APIView):
+class ListarNotificacoesNaoLidas(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
@@ -18,7 +18,7 @@ class ListarNotificacoesNaoLidas(APIView):
         }
         return Response(data)
 
-class MarcarNotificacoesComoLidas(APIView):
+class MarcarNotificacoesComoLidas(CustomAPIView):
     permission_classes = [IsAuthenticated]
     def post(self, request, format=None):
         notifications = Notification.objects.unread().filter(recipient=request.user)

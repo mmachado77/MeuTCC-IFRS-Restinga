@@ -1,4 +1,4 @@
-from rest_framework.views import APIView
+from .custom_api_view import CustomAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
@@ -9,7 +9,7 @@ from app.services import TccService
 from app.enums import StatusTccEnum
 from django.db.models import Sum
 
-class Avaliar(APIView):
+class Avaliar(CustomAPIView):
     permission_classes = [IsAuthenticated]
     tccService = TccService()
     def post(self, request, sessaoId):
@@ -83,7 +83,7 @@ class Avaliar(APIView):
         avaliacao.save()
         return Response({'status': 'success', 'message': 'Avaliação cadastrada com sucesso.'}, status=status.HTTP_201_CREATED)
 
-class AvaliarAjustes(APIView):
+class AvaliarAjustes(CustomAPIView):
     permission_classes = [IsAuthenticated]
     tccService = TccService()
     def post(self, request, avaliacaoId):

@@ -1,8 +1,7 @@
 import json
 import logging
-from rest_framework.views import APIView
+from .custom_api_view import CustomAPIView
 from django.shortcuts import render
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
@@ -18,7 +17,7 @@ from django.db.models import Q
 
 
 
-class CriarUsuarioView(APIView):
+class CriarUsuarioView(CustomAPIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (MultiPartParser, FormParser) 
     usuario_service = UsuarioService()
@@ -36,7 +35,7 @@ class CriarUsuarioView(APIView):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class FileUploadView(APIView):
+class FileUploadView(CustomAPIView):
     parser_classes = (MultiPartParser, FormParser)
     permission_classes = [IsAuthenticated]
 
@@ -50,7 +49,7 @@ class FileUploadView(APIView):
         
 logger = logging.getLogger(__name__)
 
-class AtualizarPerfil(APIView):
+class AtualizarPerfil(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
@@ -99,7 +98,7 @@ class AtualizarPerfil(APIView):
             return Response({"detail": "An unexpected error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class PerfilByIdView(APIView):
+class PerfilByIdView(CustomAPIView):
     permission_classes = [AllowAny]
 
     def get(self, request, id):
@@ -132,7 +131,7 @@ class PerfilByIdView(APIView):
         except Usuario.DoesNotExist:
             return Response({"error": "Usuário não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
-class TccsByUsuarioView(APIView):
+class TccsByUsuarioView(CustomAPIView):
     permission_classes = [AllowAny]
 
     def get(self, request, id, format=None):

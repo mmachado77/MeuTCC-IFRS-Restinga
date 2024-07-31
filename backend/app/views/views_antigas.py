@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.views import APIView
+from .custom_api_view import CustomAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
@@ -43,7 +43,7 @@ class GetProfessoresInternos(generics.ListCreateAPIView):
 #             return Response({'id': usuario.id}, status=status.HTTP_201_CREATED)
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class ObterTokenView(APIView):
+class ObterTokenView(CustomAPIView):
     def post(self, request, format=None):
         username = request.data.get('username')
         
@@ -56,7 +56,7 @@ class ObterTokenView(APIView):
             return Response({'error': 'Usuário não encontrado.'}, status=404)
         
         
-class DetalhesEstudanteView(APIView):
+class DetalhesEstudanteView(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
