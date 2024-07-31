@@ -3,6 +3,11 @@ import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
 from meutcc import settings
 from uuid import uuid4
+import google.auth
+from googleapiclient.errors import HttpError
+from googleapiclient.http import MediaFileUpload
+from pathlib import Path
+
 
 # Classe que realiza a autenticação com o Google
 # os fluxos foram baseados na documentação do Google
@@ -47,7 +52,27 @@ class GoogleDriveService:
         credentials = self.fetch_token(request)
         user_info = self.get_user_info(credentials)
         return user_info
-    
+
+    def upload_basic(self, creds):
+        try:
+            # create drive api client
+            service = build("drive", "v3", credentials=creds)
+
+            file_metadata = {"name": "download.jpeg"}
+            media = MediaFileUpload(Path(__file__).resolve().parent / "download.txt", mimetype="image/jpeg")
+            # pylint: disable=maybe-no-member
+            file = (
+                service.files()
+                .create(body=file_metadata, media_body=media, fields="id")
+                .execute()
+            )
+            print(f'File ID: {file.get("id")}')
+
+        except HttpError as error:
+            print(f"An error occurred: {error}")
+            file = None
+
+        return file.get("id")
     
 
     
