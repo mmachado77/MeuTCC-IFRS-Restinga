@@ -27,10 +27,10 @@ class Avaliar(CustomAPIView):
         is_in_banca = any(professor.user == user for professor in banca.professores.all())
 
         if not is_orientador and not is_in_banca:
-            return Response({"error": "Você não tem permissão para avaliar este TCC."}, status=status.HTTP_403_FORBIDDEN)
+            return Response({'status': 'error', 'message': "Você não tem permissão para avaliar este TCC."}, status=status.HTTP_403_FORBIDDEN)
 
         if (is_orientador and avaliacao.avaliado_orientador) or (user == banca.professores.all()[0].user and avaliacao.avaliado_avaliador1) or (user == banca.professores.all()[1].user and avaliacao.avaliado_avaliador2):
-            return Response({"error": "Você já avaliou este TCC."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 'error', 'message': "Você já avaliou este TCC."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             for criterio in CriteriosEnum:
@@ -98,7 +98,7 @@ class AvaliarAjustes(CustomAPIView):
         is_orientador = user == orientador.user
 
         if not is_orientador:
-            return Response({"error": "Você não tem permissão para avaliar este TCC."}, status=status.HTTP_403_FORBIDDEN)
+            return Response({'status': 'error', 'message': "Você não tem permissão para avaliar este TCC."}, status=status.HTTP_403_FORBIDDEN)
 
         avaliacao.parecer_orientador = request.data.get('parecer_orientador')
         if request.data.get('ajuste_aprovado'):
