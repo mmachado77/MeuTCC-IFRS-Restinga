@@ -3,11 +3,14 @@ import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
 from meutcc import settings
 from uuid import uuid4
-import google.auth
 from googleapiclient.errors import HttpError
-from googleapiclient.http import MediaFileUpload
+from googleapiclient.http import MediaFileUpload, MediaIoBaseUpload, MediaIoBaseDownload
 from pathlib import Path
+from app.models import Credenciais
+from google.oauth2.credentials import Credentials
+import json
 
+from tempfile import NamedTemporaryFile
 
 # Classe que realiza a autenticação com o Google
 # os fluxos foram baseados na documentação do Google
@@ -74,5 +77,46 @@ class GoogleDriveService:
 
         return file.get("id")
     
+    def get_credentials(self):
+        credencial = Credenciais.objects.first()
+        data = json.loads(credencial.access_token)
+        return Credentials.from_authorized_user_info(data)
+        
+    def upload_file(self, file):
+        try:
+            credentials = self.get_credentials()
 
+            service = build("drive", "v3", credentials=credentials)
+
+            file_metadata = {"name": file.name}
+
+            media = MediaIoBaseUpload(file.file, mimetype=file.content_type)
+
+            file = (
+                service.files()
+                .create(body=file_metadata, media_body=media, fields="id")
+                .execute()
+            )
+
+            return file.get("id")
+        
+        except Exception as e:
+            return None
     
+    def download_file(self, file_id):
+        try:
+            credentials = self.get_credentials()
+            service = build("drive", "v3", credentials=credentials)
+            file_metadata = service.files().get(fileId=file_id, fields='name').execute()
+            file_name = file_metadata.get('name', 'downloaded_file')
+            fh = NamedTemporaryFile(mode='w+b')
+            downloader = MediaIoBaseDownload(fh, service.files().get_media(fileId=file_id), chunksize=1024*1024)
+            done = False
+            while done is False:
+                _, done = downloader.next_chunk()
+            fh.seek(0)
+            return fh, file_name
+
+        except Exception as e:
+            return None
+
