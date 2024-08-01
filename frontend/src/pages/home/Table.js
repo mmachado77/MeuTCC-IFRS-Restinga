@@ -6,6 +6,7 @@ import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
+import Link from 'next/link';
 
 export default function Table({ ...props }) {
     const [filters, setFilters] = useState({
@@ -37,7 +38,9 @@ export default function Table({ ...props }) {
     const actionBodyTemplate = (rowData) => {
         return (
             <div className="flex gap-2">
-                <button className="p-button p-button-rounded p-button-text" onClick={() => { console.log(rowData); }}>Ver trabalho</button>
+                <Link href={`/detalhes-tcc/${rowData.id}`} passHref>
+                    <button className="p-button p-button-rounded p-button-text">Ver trabalho</button>
+                </Link>
             </div>
         );
     };

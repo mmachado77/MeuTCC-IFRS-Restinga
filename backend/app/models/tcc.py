@@ -26,7 +26,7 @@ class Tcc(BaseModel):
     tema = models.CharField(max_length=255)
     resumo = models.TextField()
     dataSubmissaoProposta = models.DateTimeField(auto_now_add=True)
-    documentoTCC = models.FileField(upload_to='tcc/documento', null=True, blank=True)
+    documentoTCC = models.TextField(null=True, blank=True)
     autorizacaoPublicacao = models.FileField(upload_to='tcc/autorizacaoPublicacao', null=True, blank=True)
     #TODO - mudar caminho dos arquivos
     dataInicio = models.DateTimeField(default=datetime.now, null=True, blank=True)
