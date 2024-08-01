@@ -27,6 +27,8 @@ import styled from 'styled-components';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 
+import getClassForStatus, { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
+
 // Estilo para exibir status
 const StatusInfo = styled.div`
     margin-bottom: 10px;
@@ -79,7 +81,6 @@ const MeusTccsPage = () => {
     const [tableSearchValue, setTableSearchValue] = useState('');
     const [expandedRows, setExpandedRows] = useState({});
     const [estaNoPrazo, setEstaNoPrazo] = useState(false);
-    const [errorMessages, setErrorMessages] = useState([]);
     
     const [tccs, setTccs] = useState([]);
 
@@ -113,9 +114,10 @@ const MeusTccsPage = () => {
                 setPossuiProposta(true);
             }
             setLoading(false);
+            handleApiResponse(response);
 
         } catch (error) {
-            console.error('Erro ao buscar propostas existentes', error);
+            handleApiResponse(error.response);
         }
     }
 
@@ -131,13 +133,15 @@ const MeusTccsPage = () => {
             } else {
                 setEstaNoPrazo(false);
             }
-        } catch (error) {
 
-            if (error.response && error.response.status === 404) {
-                setErrorMessages(prevErrors => [...prevErrors, error.response.data.error]);
+            handleApiResponse(response);
+            
+        } catch (error) {
+            if (error.response) {
+                handleApiResponse(error.response);
             } else {
                 console.error(error);
-                setErrorMessages(prevErrors => [...prevErrors, 'Erro inesperado ao buscar prazo de envio de proposta']);
+                toast.error('Erro inesperado ao buscar prazo de envio de proposta');
             }
         }
     };
@@ -171,8 +175,11 @@ const MeusTccsPage = () => {
 
             setTccs(data);
             setLoading(false);
+
+            handleApiResponse(response);
+
         } catch (error) {
-            setErrorMessage(prevErrors => [...prevErrors, 'Erro ao buscar TCCs', error]);
+            handleApiResponse(error.response);
         }
     };
 
@@ -184,14 +191,6 @@ const MeusTccsPage = () => {
         initFilters();
         verificarPrazoEnvioProposta();
     }, []);
-
-    // Exibir array de mensagens de erro caso existam
-    React.useEffect(() => {
-        console.log('errorMessages changed:', errorMessages);
-        errorMessages.forEach(errorMessage => {
-            toast.error(errorMessage);
-        });
-    }, [errorMessages]);
 
     const initFilters = () => {
         setFilters({
@@ -385,7 +384,6 @@ const MeusTccsPage = () => {
                     </div>
                     <div className='py-6 px-2'>
                         <h2 className='heading-1 px-6 text-gray-700 text-center'>Nenhum TCC encontrado</h2>
-                        <ToastContainer />
                     </div>
                 </div>
             );
@@ -395,7 +393,6 @@ const MeusTccsPage = () => {
             <div className='py-3 border-0 border-b border-dashed border-gray-200'>
                 <h1 className='heading-1 px-6 text-gray-700'>{user.resourcetype === 'Coordenador' ? 'TCCs' : 'Meus TCCs'}</h1>
             </div>
-                <ToastContainer />
                 <div className='py-6 px-2'>
                     <DataTable value={tccs} filters={filters} globalFilter={'tema'} expandedRows={expandedRows} 
                         onRowToggle={(e) => setExpandedRows(e.data)} onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} 
