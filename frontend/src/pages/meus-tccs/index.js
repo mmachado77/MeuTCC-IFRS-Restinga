@@ -20,14 +20,13 @@ import getClassForStatus from 'meutcc/core/utils/corStatus';
 import SemestreService from 'meutcc/services/SemestreService';
 
 import { toast } from 'react-toastify';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import styled from 'styled-components';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 
-import getClassForStatus, { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
+import { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
 
 // Estilo para exibir status
 const StatusInfo = styled.div`
