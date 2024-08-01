@@ -9,6 +9,9 @@ import ConfiguracoesService from "meutcc/services/ConfiguracoesService";
 import React, { useState } from "react";
 import Image from "next/image";
 import NotificacoesService from "meutcc/services/NotificacoesService";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 export const AppLayout = ({ children, guards }) => {
 
@@ -99,6 +102,7 @@ export const AppLayout = ({ children, guards }) => {
 
     return (
         <div className='bg-gray-100 min-h-screen'>
+            <ToastContainer />
             <Toaster
                 position="top-center"
                 reverseOrder={false}
