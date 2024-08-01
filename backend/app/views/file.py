@@ -5,13 +5,16 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from app.services.avaliacao import AvaliacaoService
 from app.models import Tcc, Sessao, SessaoFinal, Avaliacao
 from django.http import FileResponse
+from meutcc.services.google_drive import GoogleDriveService
+
 class UploadDocumentoTCCView(CustomAPIView):
     parser_classes = [MultiPartParser, FormParser]
+    googleDriveService = GoogleDriveService()
 
     def post(self, request, tccId):
         try:
             tcc = Tcc.objects.get(id=tccId)
-            tcc.documentoTCC = request.FILES['file']
+            tcc.documentoTCC = self.googleDriveService.upload_file(request.FILES['file'])
             tcc.save()
             return Response({'status': 'success', 'message': 'Upload realizado com sucesso!'}, status=status.HTTP_200_OK)
         except Tcc.DoesNotExist:
@@ -140,12 +143,15 @@ class UploadAutorizacaoPublicacaoView(CustomAPIView):
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
         
 class DownloadDocumentoTCCView(CustomAPIView):
+    googleDriveService = GoogleDriveService()
+
     def get(self, request, tccId):
         try:
             tcc = Tcc.objects.get(id=tccId)
             if tcc.documentoTCC:
-                response = FileResponse(tcc.documentoTCC, as_attachment=True)
-                response['Content-Disposition'] = f'attachment; filename="{tcc.documentoTCC.name}"'
+                content, file_name = self.googleDriveService.download_file(tcc.documentoTCC)
+                response = FileResponse(content, as_attachment=True)
+                response['Content-Disposition'] = f'attachment; filename="{file_name}"'
                 return response
             return Response(status=status.HTTP_404_NOT_FOUND)
         except Tcc.DoesNotExist:
