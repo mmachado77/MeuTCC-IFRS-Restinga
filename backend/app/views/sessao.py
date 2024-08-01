@@ -77,12 +77,12 @@ class SessaoEditView(CustomAPIView):
                 self.tccService.atualizarStatus(sessao_atualizada.tcc.id, StatusTccEnum.FINAL_AGENDADA)
 
         except Sessao.DoesNotExist:
-            return Response("Sessão não encontrada", status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 'error', 'message': "Sessão não encontrada"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             print(e)
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
         
-        return Response("Sessão atualizada com sucesso", status=status.HTTP_200_OK)
+        return Response({'status': 'success', 'message': "Sessão atualizada com sucesso"}, status=status.HTTP_200_OK)
     
 class SessaoEditOrientadorView(CustomAPIView):
     tccService = TccService()
@@ -94,7 +94,7 @@ class SessaoEditOrientadorView(CustomAPIView):
             tipo = sessao_atualizada.get_tipo
             banca_atualizada = Banca.objects.filter(sessao=sessao_atualizada).first()
             if not banca_atualizada:
-                return Response("Banca não encontrada para esta sessão", status=status.HTTP_400_BAD_REQUEST)
+                return Response({'status': 'error', 'message': "Banca não encontrada para esta sessão"}, status=status.HTTP_400_BAD_REQUEST)
             
             professores_atualizados = []
             if 'avaliador1' in data:
@@ -116,12 +116,12 @@ class SessaoEditOrientadorView(CustomAPIView):
                 self.tccService.atualizarStatus(sessao_atualizada.tcc.id, StatusTccEnum.FINAL_COORDENADOR)
 
         except Sessao.DoesNotExist:
-            return Response("Sessão não encontrada", status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 'error', 'message': "Sessão não encontrada"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             print(e)
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
         
-        return Response("Sessão atualizada com sucesso", status=status.HTTP_200_OK)
+        return Response({'status': 'success', 'message': "Sessão atualizada com sucesso"}, status=status.HTTP_200_OK)
 
 class SessaoCreateView(CustomAPIView):
     notificacaoService = notificacaoService()
@@ -175,7 +175,7 @@ class SessaoCreateView(CustomAPIView):
 
             self.notificacaoService.enviarNotificacaoAgendamentoBanca(request.user, sessao, banca)
 
-            return Response("Sessão criada com sucesso", status=status.HTTP_201_CREATED)
+            return Response({'status': 'success', 'message': "Sessão criada com sucesso"}, status=status.HTTP_201_CREATED)
         except Exception as e:
             print(e)
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
