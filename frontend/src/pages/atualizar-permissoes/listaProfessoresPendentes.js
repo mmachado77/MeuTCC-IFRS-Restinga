@@ -8,6 +8,7 @@ import { Dialog } from 'primereact/dialog';
 import ProfessorService from 'meutcc/services/ProfessorService';
 import { format } from 'date-fns';
 import FormularioJustificativa from './formularioJustificativa'
+import { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
 
 export default function ListaProfessores() {
     let emptyProfessor = {
@@ -41,6 +42,7 @@ export default function ListaProfessores() {
 
             setProfessors(professoresPendentes);
         } catch (error) {
+            handleApiResponse(error.response);
             console.error('Erro ao obter professores pendentes:', error);
             // Exiba uma mensagem de erro se necessário
         }
