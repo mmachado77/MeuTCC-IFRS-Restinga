@@ -18,6 +18,7 @@ import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { ScrollPanel } from 'primereact/scrollpanel';
 import CustomAvatar from 'meutcc/components/ui/CustomAvatar';
+import { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
 
 const ConfiguracoesPage = () => {
     const [startDate, setStartDate] = useState(null);
@@ -50,8 +51,10 @@ const ConfiguracoesPage = () => {
             }
             semestres.push(...response)
             setSemestres(semestres);
+            handleApiResponse(response);
         }
         catch (error) {
+            handleApiResponse(error.response);
             console.error('Erro ao carregar semestres'.error);
         }
     }
@@ -62,7 +65,9 @@ const ConfiguracoesPage = () => {
             setSemestreAtual(response);
             setStartDate(parseISO(response.dataAberturaPrazoPropostas))
             setEndDate(parseISO(response.dataFechamentoPrazoPropostas))
+            handleApiResponse(response);
         } catch (error) {
+            handleApiResponse(error.response);
             console.error('Erro ao buscar o semestre atual:', error);
         }
     }
@@ -73,7 +78,9 @@ const ConfiguracoesPage = () => {
             const response2 = await ConfiguracoesService.getCoordenadoresSemestre(id);
             setSemestreDetalhes(response);
             setSemestreCoordenadores(response2)
+            handleApiResponse(response);
         } catch (error) {
+            handleApiResponse(error.response);
             console.error('Erro ao buscar o semestre:', error);
         }
     }
@@ -82,7 +89,9 @@ const ConfiguracoesPage = () => {
         try {
             const historico = await ConfiguracoesService.getHistoricoCoordenadores(); // Chame a função getHistoricoCoordenadores
             setHistoricoCoordenadores(historico);
+            handleApiResponse(response);
         } catch (error) {
+            handleApiResponse(error.response);
             console.error('Erro ao buscar o histórico de coordenadores:', error);
         }
     }
@@ -111,7 +120,9 @@ const ConfiguracoesPage = () => {
                 value: professor.id
             }));
             setProfessores(professores2); // Define os dados dos professores no estado local
+            handleApiResponse(response);
         } catch (error) {
+            handleApiResponse(error.response);
             console.error('Erro ao buscar professores', error);
         }
     }
@@ -168,7 +179,9 @@ const ConfiguracoesPage = () => {
             await fetchSemestres()
             await fetchSemestreAtual()
             setVisibleForm(false)
+            handleApiResponse(response);
         } catch (e) {
+            handleApiResponse(error.response);
             console.error(e);
         }
 
