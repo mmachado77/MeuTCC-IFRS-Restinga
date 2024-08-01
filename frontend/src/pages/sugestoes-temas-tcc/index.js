@@ -6,6 +6,7 @@ import { FilterMatchMode } from 'primereact/api';
 import { GUARDS } from 'meutcc/core/constants';
 import TccService from 'meutcc/services/TccService';
 import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
+import getClassForStatus, { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
 
 const SugestoesTemasTccPage = () => {
 
@@ -29,9 +30,9 @@ const SugestoesTemasTccPage = () => {
             const data = await TccService.getSugestoes();
             console.log(data);
             setSugestoes(data);
-
+            handleApiResponse(response);
         } catch (error) {
-            console.error('Erro ao buscar as sugestoes de temas', error);
+            handleApiResponse(error.response);
         }
         setLoading(false);
     };
