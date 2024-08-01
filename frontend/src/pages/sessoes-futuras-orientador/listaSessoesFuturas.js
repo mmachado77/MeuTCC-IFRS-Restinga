@@ -9,6 +9,7 @@ import SessoesService from 'meutcc/services/SessoesService';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
+import { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
 
 export default function ListaSessoesFuturas() {
     const [sessoes, setSessoes] = useState([]);
@@ -31,7 +32,9 @@ export default function ListaSessoesFuturas() {
         try {
             const sessoesFuturas = await SessoesService.getSessoesPendentesOrientador();
             setSessoes(sessoesFuturas);
+            handleApiResponse(response);
         } catch (error) {
+            handleApiResponse(error.response);
             console.error('Erro ao obter sessões:', error);
         }
     };
@@ -60,7 +63,9 @@ export default function ListaSessoesFuturas() {
 
             fetchSessoesFuturas();
             fecharDialogo();
+            handleApiResponse(response);
         } catch (error) {
+            handleApiResponse(error.response);
             console.error('Erro ao editar sessão:', error);
         }
     };
