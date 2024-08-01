@@ -25,11 +25,11 @@ class AprovarProfessorAPIView(CustomAPIView):
             status_cadastro.aprovacao = True
             status_cadastro.save()
             self.notificacaoService.enviarNotificacaoCadastroExternoAprovado(professor)
-            return Response({'message': 'Professor aprovado com sucesso!'}, status=status.HTTP_200_OK)
+            return Response({'status': 'success', 'message': 'Professor aprovado com sucesso!'}, status=status.HTTP_200_OK)
         except Professor.DoesNotExist:
-            return Response({'error': 'Professor não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'error', 'message': 'Professor não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
         except StatusCadastro.DoesNotExist:
-            return Response({'error': 'Status de cadastro não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'error', 'message': 'Status de cadastro não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
 class RecusarProfessorAPIView(CustomAPIView):
     permission_classes = [IsAuthenticated]
@@ -45,10 +45,10 @@ class RecusarProfessorAPIView(CustomAPIView):
             status_cadastro.justificativa = justificativa
             status_cadastro.save()
             self.notificacaoService.enviarNotificacaoCadastroExternoNegado(professor, justificativa)
-            return Response({'message': 'Professor reprovado com sucesso!'}, status=status.HTTP_200_OK)
+            return Response({'status': 'success', 'message': 'Professor reprovado com sucesso!'}, status=status.HTTP_200_OK)
         except Professor.DoesNotExist:
-            return Response({'error': 'Professor não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'error', 'message': 'Professor não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
         except StatusCadastro.DoesNotExist:
-            return Response({'error': 'Status de cadastro não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'error', 'message': 'Status de cadastro não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

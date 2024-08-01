@@ -37,7 +37,6 @@ const SubmeterPropostaPage = () => {
             setLoading(true);
             try {
                 const data = await TccService.getPossuiTcc();
-                console.log(data.value);
 
                 if (data.possuiProposta == true) {
                     router.push('/meus-tccs');

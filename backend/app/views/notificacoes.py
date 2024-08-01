@@ -23,4 +23,4 @@ class MarcarNotificacoesComoLidas(CustomAPIView):
     def post(self, request, format=None):
         notifications = Notification.objects.unread().filter(recipient=request.user)
         notifications.mark_all_as_read()
-        return Response({"message": "Notificações marcadas como lidas."})
+        return Response({"status": "success", "message": "Notificações marcadas como lidas."})
