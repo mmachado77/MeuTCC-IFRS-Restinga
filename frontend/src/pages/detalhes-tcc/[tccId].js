@@ -22,6 +22,7 @@ import { Toast } from 'primereact/toast';
 import { Checkbox } from "primereact/checkbox";
 import FormSessao from 'meutcc/components/ui/FormSessao';
 import SessoesService from 'meutcc/services/SessoesService';
+import { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
 
 const FileItem = ({ file, sessaoId, prazoEntrega, user, onFileUpload, onFileDelete, onFileDownload, avaliacaoAjusteId, avaliacaoId, orientador }) => {
     const toast = useRef(null);
@@ -371,6 +372,7 @@ const DetalhesTCC = () => {
             const data = await TccService.getDetalhesTCC(tccId);
             setTCCData(data);
         } catch (error) {
+            handleApiResponse(error.response);
             console.error('Erro ao carregar detalhes:', error);
         }
     };
@@ -384,6 +386,7 @@ const DetalhesTCC = () => {
                 setCoorientadores(professores);
                 setAvaliadores(data.map((professor) => ({ ...professor, name: professor.nome, value: professor.id })));
             } catch (error) {
+                handleApiResponse(error.response);
                 console.error('Erro ao buscar professores', error);
             }
         };
@@ -632,8 +635,9 @@ const DetalhesTCC = () => {
             }
             carregarDetalhesTCC();
         } catch (error) {
+            handleApiResponse(error.response);
             console.error('Erro ao fazer upload do arquivo:', error);
-            toast.error('Erro ao fazer upload do arquivo');
+            //toast.error('Erro ao fazer upload do arquivo');
         }
     };
 
@@ -644,7 +648,7 @@ const DetalhesTCC = () => {
                 toast.success('Ficha de avaliação excluída com sucesso');
             } else if (avaliacaoAjusteId) {
                 await AvaliacaoService.excluirDocumentoAjuste(avaliacaoAjusteId);
-                toast.success('Documento da ajuste excluído com sucesso');
+                toast.success('Documento de ajuste excluído com sucesso');
                 setDocumentoTCC(null); // Atualiza o documento principal para null
                 setTCCData(prevData => ({ ...prevData, documentoTCC: null }));
             } else if (sessaoId) {
@@ -661,7 +665,8 @@ const DetalhesTCC = () => {
             carregarDetalhesTCC();
         } catch (error) {
             console.error('Erro ao excluir arquivo:', error);
-            toast.error('Erro ao excluir arquivo');
+            handleApiResponse(error.response);
+            //toast.error('Erro ao excluir arquivo');
         }
     };
 
@@ -684,10 +689,12 @@ const DetalhesTCC = () => {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            toast.success('Download do documento realizado com sucesso');
+            handleApiResponse(response);
+            //toast.success('Download do documento realizado com sucesso');
         } catch (error) {
+            handleApiResponse(error.response);
             console.error('Erro ao fazer download do arquivo:', error);
-            toast.error('Erro ao fazer download do arquivo');
+            //toast.error('Erro ao fazer download do arquivo');
         }
     };
 
@@ -702,10 +709,12 @@ const DetalhesTCC = () => {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            toast.success('Download do documento realizado com sucesso');
+            handleApiResponse(response);
+            //toast.success('Download do documento realizado com sucesso');
         } catch (error) {
+            handleApiResponse(error.response);
             console.error('Erro ao fazer download do arquivo:', error);
-            toast.error('Erro ao fazer download do arquivo');
+            //toast.error('Erro ao fazer download do arquivo');
         }
     };
 
