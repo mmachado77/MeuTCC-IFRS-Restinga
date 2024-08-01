@@ -15,15 +15,43 @@ from datetime import date
 # Create your views here.
 
 class GetProfessores(generics.ListCreateAPIView):
+    """
+    API para listar e criar professores.
+
+    Permissões:
+        Apenas usuários autenticados podem acessar esta API.
+
+    Métodos:
+        get(request): Lista todos os professores.
+        post(request): Cria um novo professor.
+    """
     permission_classes = [IsAuthenticated]
 
     queryset = Professor.objects.all()
     serializer_class = ProfessorSerializer
 
 class GetProfessoresInternos(generics.ListCreateAPIView):
+    """
+    API para listar professores internos.
+
+    Permissões:
+        Apenas usuários autenticados podem acessar esta API.
+
+    Métodos:
+        get(request): Lista todos os professores internos.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
+        """
+        Lista todos os professores internos.
+
+        Args:
+            request (Request): A requisição HTTP.
+
+        Retorna:
+            Response: Resposta HTTP com os dados dos professores internos ou mensagem de erro.
+        """
         usuario = ProfessorInterno.objects.all()
         serializer = UsuarioPolymorphicSerializer(usuario, many=True)
         return Response(serializer.data)
@@ -44,7 +72,22 @@ class GetProfessoresInternos(generics.ListCreateAPIView):
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class ObterTokenView(APIView):
+    """
+    API para obter o token de autenticação de um usuário.
+
+    Métodos:
+        post(request): Retorna o token de autenticação para o usuário especificado.
+    """
     def post(self, request, format=None):
+        """
+        Retorna o token de autenticação para o usuário especificado.
+
+        Args:
+            request (Request): A requisição HTTP contendo o email do usuário.
+
+        Retorna:
+            Response: Resposta HTTP com o token de autenticação ou mensagem de erro.
+        """
         username = request.data.get('username')
         
         try:
@@ -57,9 +100,27 @@ class ObterTokenView(APIView):
         
         
 class DetalhesEstudanteView(APIView):
+    """
+    API para obter os detalhes do estudante autenticado.
+
+    Permissões:
+        Apenas usuários autenticados podem acessar esta API.
+
+    Métodos:
+        get(request): Retorna os detalhes do estudante autenticado.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
+        """
+        Retorna os detalhes do estudante autenticado.
+
+        Args:
+            request (Request): A requisição HTTP.
+
+        Retorna:
+            Response: Resposta HTTP com os detalhes do estudante autenticado.
+        """
         estudante = Estudante.objects.get(user=request.user)
         data = {
             'nome': estudante.nome,

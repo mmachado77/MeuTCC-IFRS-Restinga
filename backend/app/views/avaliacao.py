@@ -10,9 +10,28 @@ from app.enums import StatusTccEnum
 from django.db.models import Sum
 
 class Avaliar(APIView):
+    """
+    API para avaliar um TCC.
+
+    Permissões:
+        Apenas usuários autenticados podem acessar esta API.
+
+    Métodos:
+        post(request, sessaoId): Avalia o TCC da sessão especificada.
+    """
     permission_classes = [IsAuthenticated]
     tccService = TccService()
     def post(self, request, sessaoId):
+        """
+        Avalia o TCC da sessão especificada.
+
+        Args:
+            request (Request): A requisição HTTP contendo os dados da avaliação.
+            sessaoId (int): ID da sessão a ser avaliada.
+
+        Retorna:
+            Response: Resposta HTTP com o status da avaliação.
+        """
         try:
             user = request.user
             sessao = SessaoFinal.objects.get(id=sessaoId)
@@ -84,9 +103,28 @@ class Avaliar(APIView):
         return Response({'status': 'success', 'message': 'Avaliação cadastrada com sucesso.'}, status=status.HTTP_201_CREATED)
 
 class AvaliarAjustes(APIView):
+    """
+    API para avaliar os ajustes de um TCC.
+
+    Permissões:
+        Apenas usuários autenticados podem acessar esta API.
+
+    Métodos:
+        post(request, avaliacaoId): Avalia os ajustes de um TCC.
+    """
     permission_classes = [IsAuthenticated]
     tccService = TccService()
     def post(self, request, avaliacaoId):
+        """
+        Avalia os ajustes de um TCC.
+
+        Args:
+            request (Request): A requisição HTTP contendo os dados da avaliação.
+            avaliacaoId (int): ID da avaliação a ser avaliada.
+
+        Retorna:
+            Response: Resposta HTTP com o status da avaliação.
+        """
         try:
             avaliacao = Avaliacao.objects.get(id=avaliacaoId)
             sessao = SessaoFinal.objects.get(avaliacao=avaliacao)

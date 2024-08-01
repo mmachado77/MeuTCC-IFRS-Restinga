@@ -8,7 +8,22 @@ from ..serializers import SemestreSerializer, SemestreCoordenadorSerializer, Sem
 from rest_framework.permissions import IsAuthenticated
 
 class SemestreDatasView(APIView):
+    """
+    API para obter as datas do semestre atual.
+
+    Métodos:
+        get(request): Retorna as datas do semestre atual.
+    """
     def get(self, request):
+        """
+        Retorna as datas do semestre atual.
+
+        Args:
+            request (Request): A requisição HTTP.
+
+        Retorna:
+            Response: Resposta HTTP com os dados do semestre atual ou mensagem de erro.
+        """
         semestre_atual = Semestre.semestre_atual()
 
         if semestre_atual:
@@ -18,7 +33,22 @@ class SemestreDatasView(APIView):
             return Response({"detail": "Semestre atual não disponível."}, status=status.HTTP_404_NOT_FOUND)
         
 class SemestreAtualView(APIView):
+    """
+    API para obter o semestre atual e seu coordenador.
+
+    Métodos:
+        get(request): Retorna o semestre atual e os dados do coordenador.
+    """
     def get(self, request):
+        """
+        Retorna o semestre atual e os dados do coordenador.
+
+        Args:
+            request (Request): A requisição HTTP.
+
+        Retorna:
+            Response: Resposta HTTP com os dados do semestre atual ou mensagem de erro.
+        """
         semestre_atual = Semestre.semestre_atual()
         
         if semestre_atual:
@@ -33,7 +63,22 @@ class SemestreAtualView(APIView):
             return Response({"detail": "Semestre atual não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
 class CoordenadorAtualView(APIView):
+    """
+    API para obter o coordenador do semestre atual.
+
+    Métodos:
+        get(request): Retorna o coordenador do semestre atual.
+    """
     def get(self, request):
+        """
+        Retorna o coordenador do semestre atual.
+
+        Args:
+            request (Request): A requisição HTTP.
+
+        Retorna:
+            Response: Resposta HTTP com os dados do coordenador ou mensagem de erro.
+        """
         semestre_atual = Semestre.semestre_atual()
 
         if semestre_atual:
@@ -52,7 +97,23 @@ class CoordenadorAtualView(APIView):
         
 
 class SemestreView(APIView):
+    """
+    API para obter informações de um semestre específico.
+
+    Métodos:
+        get(request, semestreid): Retorna os dados de um semestre específico.
+    """
     def get(self, request, semestreid):
+        """
+        Retorna os dados de um semestre específico.
+
+        Args:
+            request (Request): A requisição HTTP.
+            semestreid (int): ID do semestre.
+
+        Retorna:
+            Response: Resposta HTTP com os dados do semestre ou mensagem de erro.
+        """
         semestre = Semestre.objects.get(pk=semestreid)
         
         if semestre:
@@ -67,8 +128,23 @@ class SemestreView(APIView):
             return Response({"detail": "Semestre atual não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
 class SemestreAtualCoordenadoresView(APIView):
+    """
+    API para obter todos os coordenadores do semestre atual.
+
+    Métodos:
+        get(request): Retorna todos os coordenadores do semestre atual.
+    """
 
     def get(self, request):
+        """
+        Retorna todos os coordenadores do semestre atual.
+
+        Args:
+            request (Request): A requisição HTTP.
+
+        Retorna:
+            Response: Resposta HTTP com os dados dos coordenadores ou mensagem de erro.
+        """
         semestre_atual = Semestre.semestre_atual()
         
         if semestre_atual:
@@ -82,8 +158,23 @@ class SemestreAtualCoordenadoresView(APIView):
             return Response({"detail": "Semestre atual não encontrado."}, status=status.HTTP_404_NOT_FOUND)
         
 class SemestreCoordenadoresView(APIView):
+    """
+    API para obter todos os coordenadores de um semestre específico.
 
+    Métodos:
+        get(request, semestreid): Retorna todos os coordenadores de um semestre específico.
+    """
     def get(self, request, semestreid):
+        """
+        Retorna todos os coordenadores de um semestre específico.
+
+        Args:
+            request (Request): A requisição HTTP.
+            semestreid (int): ID do semestre.
+
+        Retorna:
+            Response: Resposta HTTP com os dados dos coordenadores ou mensagem de erro.
+        """
         semestre = Semestre.objects.get(pk=semestreid)
         
         if semestre:
@@ -97,9 +188,25 @@ class SemestreCoordenadoresView(APIView):
             return Response({"detail": "Semestre não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
 class AlterarCoordenadorSemestre(APIView):
+    """
+    API para alterar o coordenador do semestre atual.
+
+    Métodos:
+        put(request, format=None): Altera o coordenador do semestre atual.
+    """
     permission_classes = [IsAuthenticated]
 
     def put(self, request, format=None):
+        """
+        Altera o coordenador do semestre atual.
+
+        Args:
+            request (Request): A requisição HTTP.
+            format (str, opcional): O formato de resposta.
+
+        Retorna:
+            Response: Resposta HTTP confirmando a alteração ou mensagem de erro.
+        """
         try:
             id_professor = request.data.get('coordenador')
             semestre_atual = Semestre.semestre_atual()
@@ -116,7 +223,22 @@ class AlterarCoordenadorSemestre(APIView):
 
 
 class AtualizarDatasPropostasView(APIView):
+    """
+    API para atualizar as datas de abertura e fechamento de propostas do semestre atual.
+
+    Métodos:
+        put(request): Atualiza as datas de abertura e fechamento de propostas.
+    """
     def put(self, request):
+        """
+        Atualiza as datas de abertura e fechamento de propostas do semestre atual.
+
+        Args:
+            request (Request): A requisição HTTP.
+
+        Retorna:
+            Response: Resposta HTTP com os dados atualizados ou mensagem de erro.
+        """
         try:
             data = request.data
 
@@ -136,15 +258,49 @@ class AtualizarDatasPropostasView(APIView):
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 class SemestresView(APIView):
+    """
+    API para listar todos os semestres.
+
+    Métodos:
+        get(request): Retorna uma lista de todos os semestres.
+    """
     def get(self, request):
+        """
+        Retorna uma lista de todos os semestres.
+
+        Args:
+            request (Request): A requisição HTTP.
+
+        Retorna:
+            Response: Resposta HTTP com a lista de semestres.
+        """
         semestres = Semestre.objects.order_by('-dataAberturaSemestre', ).all()
         serializer = SemestreSerializer(semestres, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class CriarSemestreView(APIView):
+    """
+    API para criar um novo semestre.
+
+    Permissões:
+        Apenas usuários autenticados podem acessar esta API.
+
+    Métodos:
+        post(request, format=None): Cria um novo semestre.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
+        """
+        Cria um novo semestre.
+
+        Args:
+            request (Request): A requisição HTTP.
+            format (str, opcional): O formato de resposta.
+
+        Retorna:
+            Response: Resposta HTTP confirmando a criação ou mensagem de erro.
+        """
         # Extrair os dados do corpo da solicitação
         dados_semestre = request.data.get('semestre', {})
         coordenador_id = request.data.get('coordenador_id', None)

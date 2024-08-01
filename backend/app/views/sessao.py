@@ -13,7 +13,22 @@ from dateutil.parser import parse
 from app.enums import StatusTccEnum
 
 class SessoesFuturasView(APIView):
+    """
+    API para listar todas as sessões futuras.
+
+    Métodos:
+        get(request): Retorna todas as sessões futuras.
+    """
     def get(self, request):
+        """
+        Retorna todas as sessões futuras.
+
+        Args:
+            request (Request): A requisição HTTP.
+
+        Retorna:
+            Response: Resposta HTTP com as sessões futuras ou mensagem de erro.
+        """
         sessoes = Sessao.objects.filter(
                 data_inicio__gt=datetime.now(),
                 validacaoOrientador=True
@@ -23,9 +38,27 @@ class SessoesFuturasView(APIView):
         return Response(sessoes_serializer, status=status.HTTP_200_OK)
     
 class SessoesFuturasOrientadorView(APIView):
+    """
+    API para listar todas as sessões futuras de um orientador.
+
+    Permissões:
+        Apenas usuários autenticados podem acessar esta API.
+
+    Métodos:
+        get(request): Retorna todas as sessões futuras do orientador.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        """
+        Retorna todas as sessões futuras do orientador.
+
+        Args:
+            request (Request): A requisição HTTP.
+
+        Retorna:
+            Response: Resposta HTTP com as sessões futuras do orientador ou mensagem de erro.
+        """
         try:
             usuario = Usuario.objects.get(user=request.user)
             tccs_do_orientador = Tcc.objects.filter(orientador=usuario)
@@ -43,9 +76,24 @@ class SessoesFuturasOrientadorView(APIView):
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
     
 class SessaoEditView(APIView):
+    """
+    API para editar uma sessão.
+
+    Métodos:
+        put(request): Edita uma sessão.
+    """
     notificacaoService = notificacaoService()
     tccService = TccService()
     def put(self, request):
+        """
+        Edita uma sessão.
+
+        Args:
+            request (Request): A requisição HTTP.
+
+        Retorna:
+            Response: Resposta HTTP confirmando a edição ou mensagem de erro.
+        """
         try:
             data = request.data
             id_sessao = data.get('idSessao')
@@ -85,8 +133,23 @@ class SessaoEditView(APIView):
         return Response("Sessão atualizada com sucesso", status=status.HTTP_200_OK)
     
 class SessaoEditOrientadorView(APIView):
+    """
+    API para editar uma sessão pelo orientador.
+
+    Métodos:
+        put(request): Edita uma sessão pelo orientador.
+    """
     tccService = TccService()
     def put(self, request):
+        """
+        Edita uma sessão pelo orientador.
+
+        Args:
+            request (Request): A requisição HTTP.
+
+        Retorna:
+            Response: Resposta HTTP confirmando a edição ou mensagem de erro.
+        """
         try:
             data = request.data
             id_sessao = data.get('idSessao')
@@ -124,10 +187,25 @@ class SessaoEditOrientadorView(APIView):
         return Response("Sessão atualizada com sucesso", status=status.HTTP_200_OK)
 
 class SessaoCreateView(APIView):
+    """
+    API para criar uma nova sessão.
+
+    Métodos:
+        post(request): Cria uma nova sessão.
+    """
     notificacaoService = notificacaoService()
     tccService = TccService()
 
     def post(self, request):
+        """
+        Cria uma nova sessão.
+
+        Args:
+            request (Request): A requisição HTTP.
+
+        Retorna:
+            Response: Resposta HTTP confirmando a criação ou mensagem de erro.
+        """
         try:
             data = request.data
 

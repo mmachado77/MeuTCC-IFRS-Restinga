@@ -19,12 +19,27 @@ from django.db.models import Q
 
 
 class CriarUsuarioView(APIView):
+    """
+    API para criação de usuário.
+
+    Métodos:
+        post(request): Cria um novo usuário.
+    """
     permission_classes = [IsAuthenticated]
     parser_classes = (MultiPartParser, FormParser) 
     usuario_service = UsuarioService()
     notificacaoService = notificacaoService()
 
     def post(self, request):
+        """
+        Cria um novo usuário.
+
+        Args:
+            request (Request): A requisição HTTP contendo os dados do usuário.
+
+        Retorna:
+            Response: Resposta HTTP com o ID do usuário criado ou mensagens de erro.
+        """
         usuario = request.user
         serializer = CriarUsuarioSerializer(data=request.data)
         if serializer.is_valid():
@@ -37,10 +52,28 @@ class CriarUsuarioView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class FileUploadView(APIView):
+    """
+    API para upload de arquivos.
+
+    Permissões:
+        Apenas usuários autenticados podem acessar esta API.
+
+    Métodos:
+        post(request): Faz o upload de um arquivo.
+    """
     parser_classes = (MultiPartParser, FormParser)
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
+        """
+        Faz o upload de um arquivo.
+
+        Args:
+            request (Request): A requisição HTTP contendo o arquivo a ser carregado.
+
+        Retorna:
+            Response: Resposta HTTP com os dados do arquivo carregado ou mensagens de erro.
+        """
         file_serializer = FileSerializer(data=request.data)
         if file_serializer.is_valid():
             file_serializer.save()
@@ -51,9 +84,28 @@ class FileUploadView(APIView):
 logger = logging.getLogger(__name__)
 
 class AtualizarPerfil(APIView):
+    """
+    API para atualização do perfil de usuário.
+
+    Permissões:
+        Apenas usuários autenticados podem acessar esta API.
+
+    Métodos:
+        get(request): Retorna os dados do perfil do usuário autenticado.
+        put(request): Atualiza os dados do perfil do usuário autenticado.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
+        """
+        Retorna os dados do perfil do usuário autenticado.
+
+        Args:
+            request (Request): A requisição HTTP.
+
+        Retorna:
+            Response: Resposta HTTP com os dados do perfil do usuário ou mensagem de erro.
+        """
         try:
             usuario = Usuario.objects.get(user=request.user)
             serializer = UsuarioPolymorphicSerializer(usuario)
@@ -63,6 +115,15 @@ class AtualizarPerfil(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
     def put(self, request, format=None):
+        """
+        Atualiza os dados do perfil do usuário autenticado.
+
+        Args:
+            request (Request): A requisição HTTP contendo os dados a serem atualizados.
+
+        Retorna:
+            Response: Resposta HTTP com os dados atualizados do perfil do usuário ou mensagem de erro.
+        """
         try:
             usuario = Usuario.objects.get(user=request.user)
             if usuario.id != request.data.get('id'):
@@ -100,9 +161,30 @@ class AtualizarPerfil(APIView):
 
 
 class PerfilByIdView(APIView):
+    """
+    API para visualizar e atualizar o perfil de um usuário específico.
+
+    Permissões:
+        Usuários autenticados podem atualizar o próprio perfil.
+        Qualquer pessoa pode visualizar o perfil de um usuário específico.
+
+    Métodos:
+        get(request, id): Retorna os dados do perfil do usuário com o ID especificado.
+        put(request, id): Atualiza os dados do perfil do usuário com o ID especificado.
+    """
     permission_classes = [AllowAny]
 
     def get(self, request, id):
+        """
+        Retorna os dados do perfil do usuário com o ID especificado.
+
+        Args:
+            request (Request): A requisição HTTP.
+            id (int): ID do usuário.
+
+        Retorna:
+            Response: Resposta HTTP com os dados do perfil do usuário ou mensagem de erro.
+        """
         try:
             usuario = Usuario.objects.get(id=id)
             serializer = UsuarioSerializer(usuario)
@@ -113,6 +195,16 @@ class PerfilByIdView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def put(self, request, id):
+        """
+        Atualiza os dados do perfil do usuário com o ID especificado.
+
+        Args:
+            request (Request): A requisição HTTP contendo os dados a serem atualizados.
+            id (int): ID do usuário.
+
+        Retorna:
+            Response: Resposta HTTP com os dados atualizados do perfil do usuário ou mensagem de erro.
+        """
         if not request.user.is_authenticated:
             return Response({"detail": "Autenticação necessária para atualizar o perfil."}, status=status.HTTP_401_UNAUTHORIZED)
         try:
@@ -133,9 +225,28 @@ class PerfilByIdView(APIView):
             return Response({"error": "Usuário não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
 class TccsByUsuarioView(APIView):
+    """
+    API para listar os TCCs de um usuário específico.
+
+    Permissões:
+        Qualquer pessoa pode acessar esta API.
+
+    Métodos:
+        get(request, id, format=None): Retorna os TCCs do usuário com o ID especificado.
+    """
     permission_classes = [AllowAny]
 
     def get(self, request, id, format=None):
+        """
+        Retorna os TCCs do usuário com o ID especificado.
+
+        Args:
+            request (Request): A requisição HTTP.
+            id (int): ID do usuário.
+
+        Retorna:
+            Response: Resposta HTTP com os dados dos TCCs do usuário ou mensagem de erro.
+        """
         try:
             usuario = Usuario.objects.get(id=id)
             

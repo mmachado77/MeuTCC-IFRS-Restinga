@@ -3,8 +3,25 @@ from app.models import Professor, Estudante, Usuario, ProfessorInterno, Professo
 
 
 class UsuarioService:
+    """
+    Serviço para gerenciar usuários.
+
+    Métodos:
+        criarUsuario(usuario, serializer): Cria um novo usuário com base nos dados fornecidos.
+        IsInterno(email): Verifica se o email é de um domínio interno.
+    """
     
     def criarUsuario(self, usuario, serializer):
+        """
+        Cria um novo usuário com base nos dados fornecidos.
+
+        Args:
+            usuario (Usuario): A instância do usuário a ser criada.
+            serializer (Serializer): Serializer contendo os dados validados para criar o usuário.
+
+        Raises:
+            Exception: Para erros ao criar o usuário.
+        """
 
         if(serializer.validated_data['isProfessor']):
             status = StatusCadastro.objects.create(aprovacao = False)
@@ -52,6 +69,12 @@ class UsuarioService:
         )
 
     def IsInterno(self, email):
+        """
+        Verifica se o email é de um domínio interno.
+
+        Args:
+            email (str): O email a ser verificado.
+        """
         emailsInternos = ["@restinga.ifrs.edu.br", "@aluno.restinga.ifrs.edu.br"]
         return any(email.endswith(emails) for emails in emailsInternos)
         
