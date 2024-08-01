@@ -7,9 +7,28 @@ from app.models import Usuario, User
 from app.serializers import UsuarioPolymorphicSerializer
 
 class DetalhesUsuario(CustomAPIView):
+    """
+    API para obter os detalhes do usuário autenticado.
+
+    Permissões:
+        Apenas usuários autenticados podem acessar esta API.
+
+    Métodos:
+        get(request, format=None): Obtém os detalhes do usuário autenticado.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
+        """
+        Obtém os detalhes do usuário autenticado.
+
+        Args:
+            request (Request): A requisição HTTP.
+            format (str, opcional): O formato de resposta.
+
+        Retorna:
+            Response: Resposta HTTP com os detalhes do usuário ou status de erro.
+        """
         try:
             usuario = Usuario.objects.get(user=request.user)
             serializer = UsuarioPolymorphicSerializer(usuario)

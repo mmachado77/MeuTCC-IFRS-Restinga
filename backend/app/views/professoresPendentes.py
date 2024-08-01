@@ -7,18 +7,57 @@ from rest_framework.permissions import IsAuthenticated
 from app.services.notificacoes import notificacaoService
 
 class ProfessoresPendentesListAPIView(CustomAPIView):
+    """
+    API para listar todos os professores pendentes de aprovação.
+
+    Permissões:
+        Apenas usuários autenticados podem acessar esta API.
+
+    Métodos:
+        get(request, format=None): Retorna uma lista de todos os professores pendentes.
+    """
     permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None):
+        """
+        Retorna uma lista de todos os professores pendentes de aprovação.
+
+        Args:
+            request (Request): A requisição HTTP.
+            format (str, opcional): O formato de resposta.
+
+        Retorna:
+            Response: Resposta HTTP com a lista de professores pendentes.
+        """
         professores_pendentes = Professor.objects.filter(status__aprovacao=False, status__justificativa=None)
         serializer = UsuarioPolymorphicSerializer(professores_pendentes, many=True)
         return Response(serializer.data)
 
 class AprovarProfessorAPIView(CustomAPIView):
+    """
+    API para aprovar o cadastro de um professor.
+
+    Permissões:
+        Apenas usuários autenticados podem acessar esta API.
+
+    Métodos:
+        put(request, idProfessor, format=None): Aprova o cadastro de um professor.
+    """
     permission_classes = [IsAuthenticated]
     notificacaoService = notificacaoService()
 
     def put(self, request, idProfessor, format=None):
+        """
+        Aprova o cadastro de um professor.
+
+        Args:
+            request (Request): A requisição HTTP.
+            idProfessor (int): ID do professor.
+            format (str, opcional): O formato de resposta.
+
+        Retorna:
+            Response: Resposta HTTP confirmando a aprovação ou mensagem de erro.
+        """
         try:
             professor = Professor.objects.get(id=idProfessor)
             status_cadastro = professor.status
@@ -32,10 +71,30 @@ class AprovarProfessorAPIView(CustomAPIView):
             return Response({'status': 'error', 'message': 'Status de cadastro não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
 class RecusarProfessorAPIView(CustomAPIView):
+    """
+    API para recusar o cadastro de um professor.
+
+    Permissões:
+        Apenas usuários autenticados podem acessar esta API.
+
+    Métodos:
+        put(request, idProfessor, format=None): Recusa o cadastro de um professor.
+    """
     permission_classes = [IsAuthenticated]
     notificacaoService = notificacaoService()
 
     def put(self, request, idProfessor, format=None):
+        """
+        Recusa o cadastro de um professor.
+
+        Args:
+            request (Request): A requisição HTTP.
+            idProfessor (int): ID do professor.
+            format (str, opcional): O formato de resposta.
+
+        Retorna:
+            Response: Resposta HTTP confirmando a recusa ou mensagem de erro.
+        """
         try:
             justificativa = request.data.get('justificativa')
             if(not justificativa):

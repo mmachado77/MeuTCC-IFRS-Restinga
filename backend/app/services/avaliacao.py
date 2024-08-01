@@ -15,8 +15,24 @@ SUBTYPE_KEY = '/Subtype'
 WIDGET_SUBTYPE_KEY = '/Widget'
 
 class AvaliacaoService:
+    """
+    Service para preencher a ficha de avaliação de um TCC.
+
+    Métodos:
+        preencherFichaAvaliacao(avaliacao): Preenche a ficha de avaliação com os dados da avaliação.
+        write_pdf(data_dict): Escreve os dados no template PDF e retorna o arquivo preenchido.
+    """
 
     def preencherFichaAvaliacao(self, avaliacao):
+        """
+        Preenche a ficha de avaliação com os dados da avaliação.
+
+        Args:
+            avaliacao (Avaliacao): A instância do modelo Avaliacao.
+
+        Retorna:
+            HttpResponse: Resposta HTTP com o PDF preenchido.
+        """
         try:
             locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
             sessao = SessaoFinal.objects.get(avaliacao=avaliacao)
@@ -72,6 +88,15 @@ class AvaliacaoService:
         return self.write_pdf(data_dict)
 
     def write_pdf(self, data_dict):
+        """
+        Escreve os dados no template PDF e retorna o arquivo preenchido.
+
+        Args:
+            data_dict (dict): Dicionário contendo os dados a serem preenchidos no PDF.
+
+        Retorna:
+            HttpResponse: Resposta HTTP com o PDF preenchido.
+        """
         try:
             template_pdf = pdfrw.PdfReader(TEMPLATE_PATH)  # [1]
             template_pdf.keys()

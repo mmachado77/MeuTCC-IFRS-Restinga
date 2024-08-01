@@ -1,17 +1,39 @@
 from .custom_api_view import CustomAPIView
+import os
+import json
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from app.services.avaliacao import AvaliacaoService
 from app.models import Tcc, Sessao, SessaoFinal, Avaliacao
 from django.http import FileResponse
-from meutcc.services.google_drive import GoogleDriveService
+from meutcc.services import GoogleDriveService
+from meutcc import settings
+from app.models import Credenciais
+from google.oauth2.credentials import Credentials
 
 class UploadDocumentoTCCView(CustomAPIView):
+    """
+    API para upload de documentos do TCC.
+
+    Métodos:
+        post(request, tccId): Realiza o upload de um documento do TCC.
+    """
     parser_classes = [MultiPartParser, FormParser]
     googleDriveService = GoogleDriveService()
 
     def post(self, request, tccId):
+        """
+        Realiza o upload de um documento do TCC.
+
+        Args:
+            request (Request): A requisição HTTP contendo o arquivo para upload.
+            tccId (int): ID do TCC.
+
+        Retorna:
+            Response: Resposta HTTP com o link do documento no Google Drive ou mensagem de erro.
+        """
         try:
             tcc = Tcc.objects.get(id=tccId)
             tcc.documentoTCC = self.googleDriveService.upload_file(request.FILES['file'])
@@ -21,10 +43,28 @@ class UploadDocumentoTCCView(CustomAPIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
 class UploadDocumentoSessaoView(CustomAPIView):
+    """
+    API para upload de documentos de sessões.
+
+    Métodos:
+        post(request, sessaoId): Realiza o upload de um documento de sessão.
+    """
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, sessaoId):
+        """
+        Realiza o upload de um documento de sessão.
+
+        Args:
+            request (Request): A requisição HTTP contendo o arquivo para upload.
+            sessaoId (int): ID da sessão.
+
+        Retorna:
+            Response: Resposta HTTP com status de sucesso ou mensagem de erro.
+        """
         try:
             sessao = Sessao.objects.get(id=sessaoId)
             sessao.documentoTCCSessao = request.FILES['file']
@@ -40,9 +80,25 @@ class UploadDocumentoSessaoView(CustomAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class UploadFichaAvaliacaoView(CustomAPIView):
+    """
+    API para upload de fichas de avaliação.
+
+    Métodos:
+        post(request, avaliacaoId): Realiza o upload de uma ficha de avaliação.
+    """
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, avaliacaoId):
+        """
+        Realiza o upload de uma ficha de avaliação.
+
+        Args:
+            request (Request): A requisição HTTP contendo o arquivo para upload.
+            avaliacaoId (int): ID da avaliação.
+
+        Retorna:
+            Response: Resposta HTTP com status de sucesso ou mensagem de erro.
+        """
         try:
             avaliacao = Avaliacao.objects.get(id=avaliacaoId)
             avaliacao.ficha_avaliacao = request.FILES['file']
@@ -54,9 +110,25 @@ class UploadFichaAvaliacaoView(CustomAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class UploadDocumentoAjusteView(CustomAPIView):
+    """
+    API para upload de documentos ajustados do TCC.
+
+    Métodos:
+        post(request, avaliacaoId): Realiza o upload de um documento ajustado do TCC.
+    """
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, avaliacaoId):
+        """
+        Realiza o upload de um documento ajustado do TCC.
+
+        Args:
+            request (Request): A requisição HTTP contendo o arquivo para upload.
+            avaliacaoId (int): ID da avaliação.
+
+        Retorna:
+            Response: Resposta HTTP com status de sucesso ou mensagem de erro.
+        """
         try:
             avaliacao = Avaliacao.objects.get(id=avaliacaoId)
             avaliacao.tcc_definitivo = request.FILES['file']
@@ -73,7 +145,23 @@ class UploadDocumentoAjusteView(CustomAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ExcluirDocumentoTCCView(CustomAPIView):
+    """
+    API para exclusão de documentos do TCC.
+
+    Métodos:
+        delete(request, tccId): Exclui um documento do TCC.
+    """
     def delete(self, request, tccId):
+        """
+        Exclui um documento do TCC.
+
+        Args:
+            request (Request): A requisição HTTP.
+            tccId (int): ID do TCC.
+
+        Retorna:
+            Response: Resposta HTTP com status de sucesso ou mensagem de erro.
+        """
         try:
             tcc = Tcc.objects.get(id=tccId)
             if tcc.documentoTCC:
@@ -87,7 +175,23 @@ class ExcluirDocumentoTCCView(CustomAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ExcluirDocumentoSessaoView(CustomAPIView):
+    """
+    API para exclusão de documentos de sessões.
+
+    Métodos:
+        delete(request, sessaoId): Exclui um documento de sessão.
+    """
     def delete(self, request, sessaoId):
+        """
+        Exclui um documento de sessão.
+
+        Args:
+            request (Request): A requisição HTTP.
+            sessaoId (int): ID da sessão.
+
+        Retorna:
+            Response: Resposta HTTP com status de sucesso ou mensagem de erro.
+        """
         try:
             sessao = Sessao.objects.get(id=sessaoId)
             if sessao.documentoTCCSessao:
@@ -101,7 +205,23 @@ class ExcluirDocumentoSessaoView(CustomAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ExcluirFichaAvaliacaoView(CustomAPIView):
+    """
+    API para exclusão de fichas de avaliação.
+
+    Métodos:
+        delete(request, avaliacaoId): Exclui uma ficha de avaliação.
+    """
     def delete(self, request, avaliacaoId):
+        """
+        Exclui uma ficha de avaliação.
+
+        Args:
+            request (Request): A requisição HTTP.
+            avaliacaoId (int): ID da avaliação.
+
+        Retorna:
+            Response: Resposta HTTP com status de sucesso ou mensagem de erro.
+        """
         try:
             avaliacao = Avaliacao.objects.get(id=avaliacaoId)
             if avaliacao.ficha_avaliacao:
@@ -115,7 +235,23 @@ class ExcluirFichaAvaliacaoView(CustomAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ExcluirDocumentoAjusteView(CustomAPIView):
+    """
+    API para exclusão de documentos ajustados do TCC.
+
+    Métodos:
+        delete(request, avaliacaoId): Exclui um documento ajustado do TCC.
+    """
     def delete(self, request, avaliacaoId):
+        """
+        Exclui um documento ajustado do TCC.
+
+        Args:
+            request (Request): A requisição HTTP.
+            avaliacaoId (int): ID da avaliação.
+
+        Retorna:
+            Response: Resposta HTTP com status de sucesso ou mensagem de erro.
+        """
         try:
             avaliacao = Avaliacao.objects.get(id=avaliacaoId)
             if avaliacao.tcc_definitivo:
@@ -129,9 +265,25 @@ class ExcluirDocumentoAjusteView(CustomAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 class UploadAutorizacaoPublicacaoView(CustomAPIView):
+    """
+    API para upload de autorização de publicação do TCC.
+
+    Métodos:
+        post(request, tccId): Realiza o upload da autorização de publicação do TCC.
+    """
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request, tccId, *args, **kwargs):
+        """
+        Realiza o upload da autorização de publicação do TCC.
+
+        Args:
+            request (Request): A requisição HTTP contendo o arquivo para upload.
+            tccId (int): ID do TCC.
+
+        Retorna:
+            Response: Resposta HTTP com status de sucesso ou mensagem de erro.
+        """
         try:
             tcc = Tcc.objects.get(id=tccId)
             tcc.autorizacaoPublicacao = request.data['file']
@@ -143,9 +295,26 @@ class UploadAutorizacaoPublicacaoView(CustomAPIView):
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
         
 class DownloadDocumentoTCCView(CustomAPIView):
-    googleDriveService = GoogleDriveService()
+    """
+    API para download de documentos do TCC.
 
+    Métodos:
+        get(request, tccId): Realiza o download de um documento do TCC.
+    """
+    
+    googleDriveService = GoogleDriveService()
+    
     def get(self, request, tccId):
+        """
+        Realiza o download de um documento do TCC.
+
+        Args:
+            request (Request): A requisição HTTP.
+            tccId (int): ID do TCC.
+
+        Retorna:
+            FileResponse: Resposta HTTP com o arquivo para download ou mensagem de erro.
+        """
         try:
             tcc = Tcc.objects.get(id=tccId)
             if tcc.documentoTCC:
@@ -160,7 +329,23 @@ class DownloadDocumentoTCCView(CustomAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class DownloadDocumentoSessaoView(CustomAPIView):
+    """
+    API para download de documentos de sessões.
+
+    Métodos:
+        get(request, sessaoId): Realiza o download de um documento de sessão.
+    """
     def get(self, request, sessaoId):
+        """
+        Realiza o download de um documento de sessão.
+
+        Args:
+            request (Request): A requisição HTTP.
+            sessaoId (int): ID da sessão.
+
+        Retorna:
+            FileResponse: Resposta HTTP com o arquivo para download ou mensagem de erro.
+        """
         try:
             sessao = Sessao.objects.get(id=sessaoId)
             if sessao.documentoTCCSessao:
@@ -174,7 +359,23 @@ class DownloadDocumentoSessaoView(CustomAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class DownloadFichaAvaliacaoView(CustomAPIView):
+    """
+    API para download de fichas de avaliação.
+
+    Métodos:
+        get(request, avaliacaoId): Realiza o download de uma ficha de avaliação.
+    """
     def get(self, request, avaliacaoId):
+        """
+        Realiza o download de uma ficha de avaliação.
+
+        Args:
+            request (Request): A requisição HTTP.
+            avaliacaoId (int): ID da avaliação.
+
+        Retorna:
+            FileResponse: Resposta HTTP com o arquivo para download ou mensagem de erro.
+        """
         try:
             avaliacao = Avaliacao.objects.get(id=avaliacaoId)
             if avaliacao.ficha_avaliacao:
@@ -188,7 +389,24 @@ class DownloadFichaAvaliacaoView(CustomAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class DownloadDocumentoAjusteView(CustomAPIView):
+    """
+    API para download de documentos ajustados do TCC.
+
+    Métodos:
+        get(request, avaliacaoId): Realiza o download de um documento ajustado do TCC.
+    """
+
     def get(self, request, avaliacaoId):
+        """
+        Realiza o download de um documento ajustado do TCC.
+
+        Args:
+            request (Request): A requisição HTTP.
+            avaliacaoId (int): ID da avaliação.
+
+        Retorna:
+            FileResponse: Resposta HTTP com o arquivo para download ou mensagem de erro.
+        """
         try:
             avaliacao = Avaliacao.objects.get(id=avaliacaoId)
             if avaliacao.tcc_definitivo:
@@ -202,8 +420,24 @@ class DownloadDocumentoAjusteView(CustomAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class DownloadFichaAvaliacaoPreenchidaView(CustomAPIView):
+    """
+    API para download de fichas de avaliação preenchidas.
+
+    Métodos:
+        get(request, avaliacaoId): Realiza o download de uma ficha de avaliação preenchida.
+    """
     avaliacaoService = AvaliacaoService()
     def get(self, request, avaliacaoId):
+        """
+        Realiza o download de uma ficha de avaliação preenchida.
+
+        Args:
+            request (Request): A requisição HTTP.
+            avaliacaoId (int): ID da avaliação.
+
+        Retorna:
+            FileResponse: Resposta HTTP com o arquivo preenchido para download ou mensagem de erro.
+        """
         try:
             avaliacao = Avaliacao.objects.get(id=avaliacaoId)
             return self.avaliacaoService.preencherFichaAvaliacao(avaliacao)
