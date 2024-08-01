@@ -139,7 +139,7 @@ class AvaliarAjustes(CustomAPIView):
             return Response({'status': 'error', 'message': "Você não tem permissão para avaliar este TCC."}, status=status.HTTP_403_FORBIDDEN)
 
         avaliacao.parecer_orientador = request.data.get('parecer_orientador')
-        if request.data.get('ajuste_aprovado'):
+        if request.data.get('resultado_ajuste') == 'true':
             self.tccService.atualizarStatus(sessao.tcc.id, StatusTccEnum.APROVADO)
         else:
             self.tccService.atualizarStatus(sessao.tcc.id, StatusTccEnum.REPROVADO_FINAL, request.data.get('parecer_orientador'))

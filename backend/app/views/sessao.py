@@ -257,3 +257,35 @@ class SessaoCreateView(CustomAPIView):
         except Exception as e:
             print(e)
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
+class AvaliarPreviaView(CustomAPIView):
+    permission_classes = [IsAuthenticated]
+    tccService = TccService()
+    def post(self, request, sessaoId):
+        try:
+            sessao = SessaoPrevia.objects.get(id=sessaoId)
+            banca = Banca.objects.get(sessao=sessao)
+            orientador = sessao.tcc.orientador
+            user = request.user
+        except Sessao.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        if user == orientador.user:
+            if sessao.avaliado:
+                return Response({'status': 'error', 'message': "Você já avaliou esta sessão."},status=status.HTTP_400_BAD_REQUEST)
+            else:
+                sessao.parecer_orientador = request.data.get('parecer_orientador')
+                if request.data.get('resultado_previa') == 'true':
+                    self.tccService.atualizarStatus(sessao.tcc.id, StatusTccEnum.PREVIA_OK)
+                else:
+                    self.tccService.atualizarStatus(sessao.tcc.id, StatusTccEnum.REPROVADO_PREVIA, request.data.get('parecer_orientador'))
+                sessao.avaliado = True;
+        elif user == banca.professores.all()[0].user:
+            sessao.comentarios_avaliador1 = request.data.get('comentarios_adicionais')
+        elif user == banca.professores.all()[1].user:
+                sessao.comentarios_avaliador2 = request.data.get('comentarios_adicionais')
+        else:
+            return Response({'status': 'error', 'message': "Você não tem permissão para avaliar esta sessão prévia."}, status=status.HTTP_403_FORBIDDEN)
+
+        sessao.save()
+        return Response({'status': 'success', 'message': 'Avaliação cadastrada com sucesso.'}, status=status.HTTP_201_CREATED)

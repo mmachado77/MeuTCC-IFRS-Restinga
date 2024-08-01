@@ -24,6 +24,11 @@ async function getSessoesFuturas() {
     return apiClient.get(`/app/sessoes-futuras`).then((response) => response.data);
 }
 
+async function avaliarPrevia(sessaoId, data) {
+    return apiClient.post(`/app/avaliar-previa/${sessaoId}/`, data).then((response) => response.data);
+}
+
+
 export default {
     getSessoesPendentes,
     getSessoesPendentesOrientador,
@@ -31,4 +36,5 @@ export default {
     putEditarSessaoOrientador,
     postNovaSessao,
     getSessoesFuturas,
+    avaliarPrevia,
 }

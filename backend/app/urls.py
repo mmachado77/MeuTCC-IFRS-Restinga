@@ -57,6 +57,7 @@ urlpatterns = [
     path('download-ficha-avaliacao-preenchida/<int:avaliacaoId>/', views.DownloadFichaAvaliacaoPreenchidaView.as_view(), name='download-ficha-avaliacao-preenchida'),
     path('avaliar/<int:sessaoId>/', views.Avaliar.as_view(), name='avaliar'),
     path('avaliar-ajustes/<int:avaliacaoId>/', views.AvaliarAjustes.as_view(), name='avaliar-ajustes'),
+    path('avaliar-previa/<int:sessaoId>/', AvaliarPreviaView.as_view(), name='avaliar-previa'),
     path('semestre-datas', SemestreDatasView.as_view(), name='semestre-datas'),
     path('nova-sessao', SessaoCreateView.as_view(), name='nova-sessao'),
     path('tccs-publicados', views.TCCsPublicadosView.as_view(), name='tccs-publicados'),

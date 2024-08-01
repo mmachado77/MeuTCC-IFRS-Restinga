@@ -116,6 +116,5 @@ export default {
     createTema,
     updateTema,
     deleteTema,
-    getTccsPublicados,
     getTccsByUsuario
 }
