@@ -6,6 +6,7 @@ from datetime import datetime, date
 from ..models import Semestre, SemestreCoordenador, ProfessorInterno
 from ..serializers import SemestreSerializer, SemestreCoordenadorSerializer, SemestreDatasSerializer, CriarSemestreSerializer
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import NotFound
 
 class SemestreDatasView(CustomAPIView):
     def get(self, request):
@@ -14,8 +15,8 @@ class SemestreDatasView(CustomAPIView):
         if semestre_atual:
             serializer = SemestreDatasSerializer(semestre_atual)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response({"error": "Não foi possível recuperar as datas do semestre atual. Por favor, tente novamente mais tarde."}, status=status.HTTP_404_NOT_FOUND)
+        else:     
+            return Response({'status': 'error', 'message': "Não há um semestre ativo."}, status=status.HTTP_404_NOT_FOUND)
         
 class SemestreAtualView(CustomAPIView):
     def get(self, request):
@@ -30,7 +31,7 @@ class SemestreAtualView(CustomAPIView):
             
             return Response(semestre_serializer, status=status.HTTP_200_OK)
         else:
-            return Response({"error": "Não foi possível recuperar as informações do semestre atual. Por favor, tente novamente mais tarde."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'error', 'message': "Não foi possível recuperar as informações do semestre atual. Por favor, tente novamente mais tarde."}, status=status.HTTP_404_NOT_FOUND)
 
 class CoordenadorAtualView(CustomAPIView):
     def get(self, request):
@@ -48,7 +49,7 @@ class CoordenadorAtualView(CustomAPIView):
                 semestre_coordenador_serializer = SemestreCoordenadorSerializer(semestre_coordenador).data
                 return Response(semestre_coordenador_serializer, status=status.HTTP_200_OK)
             else:
-                return Response({"error": "Não foi possível recuperar as informações do coordenador do semestre atual."}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'status': 'error', 'message': "Não foi possível recuperar as informações do coordenador do semestre atual."}, status=status.HTTP_404_NOT_FOUND)
         
 
 class SemestreView(CustomAPIView):
@@ -64,7 +65,7 @@ class SemestreView(CustomAPIView):
             
             return Response(semestre_serializer, status=status.HTTP_200_OK)
         else:
-            return Response({"error": "Não foi possível recuperar as informações do semestre solicitado."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'error', 'message': "Não foi possível recuperar as informações do semestre solicitado."}, status=status.HTTP_404_NOT_FOUND)
 
 class SemestreAtualCoordenadoresView(CustomAPIView):
 
@@ -77,9 +78,9 @@ class SemestreAtualCoordenadoresView(CustomAPIView):
                 semestre_coordenadores_serialized = SemestreCoordenadorSerializer(semestre_coordenadores, many=True).data
                 return Response(semestre_coordenadores_serialized, status=status.HTTP_200_OK)
             else:
-                return Response({"error": "Não foi possível recuperar a lista de coordenadores do semestre atual."}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'status': 'error', 'message': "Não foi possível recuperar a lista de coordenadores do semestre atual."}, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({"error": "Semestre atual não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'error', 'message': "Semestre atual não encontrado."}, status=status.HTTP_404_NOT_FOUND)
         
 class SemestreCoordenadoresView(CustomAPIView):
 
@@ -92,9 +93,9 @@ class SemestreCoordenadoresView(CustomAPIView):
                 semestre_coordenadores_serialized = SemestreCoordenadorSerializer(semestre_coordenadores, many=True).data
                 return Response(semestre_coordenadores_serialized, status=status.HTTP_200_OK)
             else:
-                return Response({"error": "Não foi possível recuperar a lista de coordenadores do semestre solicitado."}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'status': 'error', 'message': "Não foi possível recuperar a lista de coordenadores do semestre solicitado."}, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({"error": "Semestre não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'error', 'message': "Semestre não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
 class AlterarCoordenadorSemestre(CustomAPIView):
     permission_classes = [IsAuthenticated]
@@ -108,11 +109,11 @@ class AlterarCoordenadorSemestre(CustomAPIView):
                 professor = ProfessorInterno.objects.get(id=id_professor)
                 semestre_coordenador = SemestreCoordenador.objects.create(semestre=semestre_atual, coordenador=professor, dataAlteracao=datetime.now())
                 semestre_coordenador.save()
-                return Response({'message': 'Coordenador atualizado com sucesso!'}, status=status.HTTP_200_OK)
+                return Response({'status': 'success', 'message': 'Coordenador atualizado com sucesso!'}, status=status.HTTP_200_OK)
             else:
-                return Response({'error': 'Semestre atual não encontrado para alterar coordenador.'}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'status': 'error', 'message': 'Semestre atual não encontrado para alterar coordenador.'}, status=status.HTTP_404_NOT_FOUND)
         except ProfessorInterno.DoesNotExist:
-            return Response({'error': 'Professor não encontrado ao alterar coordenador.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'error', 'message': 'Professor não encontrado ao alterar coordenador.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class AtualizarDatasPropostasView(CustomAPIView):
@@ -133,7 +134,7 @@ class AtualizarDatasPropostasView(CustomAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
-            return Response({'error': 'Não foi possível atualizar as datas de proposta do semestre atual.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 'error', 'message': 'Não foi possível atualizar as datas de proposta do semestre atual.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class SemestresView(CustomAPIView):
     def get(self, request):
@@ -160,7 +161,7 @@ class CriarSemestreView(CustomAPIView):
                 Q(dataFechamentoSemestre__range=[novo_semestre['dataAberturaSemestre'], novo_semestre['dataFechamentoSemestre']])
             )
             if semestres_sobrepostos.exists():
-                return Response({'error': 'As datas do semestre estão sobrepostas com semestres existentes.'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'status': 'error', 'message': 'As datas do semestre estão sobrepostas com semestres existentes.'}, status=status.HTTP_400_BAD_REQUEST)
 
             # Verificar se o coordenador existe
             coordenador = ProfessorInterno.objects.filter(id=coordenador_id).first()
@@ -173,6 +174,6 @@ class CriarSemestreView(CustomAPIView):
                 )
                 return Response(serializer_semestre.data, status=status.HTTP_201_CREATED)
             else:
-                return Response({'error': 'O coordenador especificado não foi encontrado.'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'status': 'error', 'message': 'O coordenador especificado não foi encontrado.'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer_semestre.errors, status=status.HTTP_400_BAD_REQUEST)
