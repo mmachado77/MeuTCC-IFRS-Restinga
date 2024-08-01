@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import AuthService from 'meutcc/services/AuthService';
 import { Dropdown } from 'primereact/dropdown';
 import UsuarioService from 'meutcc/services/UsuarioService';
+import { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
 
 const AuthPage = () => {
     const [username, setUsername] = React.useState('');
@@ -19,8 +20,10 @@ const AuthPage = () => {
                 error: 'Erro ao conectar',
             });
             localStorage.setItem('token', data.token);
-            window.location.href = ('/submeter-proposta');
+            //window.location.href = ('/submeter-proposta');
+            window.location.href = ('/home');
         } catch (error) {
+            handleApiResponse(error.response);
             console.error(error);
         }
     }
@@ -45,6 +48,7 @@ const AuthPage = () => {
             const { data } = await UsuarioService.listarUsuarios();
             setUsuarios(data.map((usuario) => ({ name: `${usuario.nome} (${usuario.resourcetype})`, code: usuario.email })));
         } catch (error) {
+            handleApiResponse(error.response);
             console.error(error);
         }
     };
