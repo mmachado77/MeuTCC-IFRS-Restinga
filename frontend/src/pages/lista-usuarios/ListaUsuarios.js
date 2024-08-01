@@ -10,6 +10,7 @@ import { SelectButton } from 'primereact/selectbutton';
 import { useRouter } from 'next/router';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
+import { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
 
 export default function ListaUsuarios() {
     const [usuarios, setUsuarios] = useState([]);
@@ -39,6 +40,7 @@ export default function ListaUsuarios() {
             console.log('Usuários recebidos:', response.data);
             setUsuarios(response.data);
             setFilteredUsuarios(response.data);
+            handleApiResponse(response);
         } catch (error) {
             toast.current.show({ severity: 'error', summary: 'Erro', detail: 'Erro ao obter a lista de usuários', life: 3000 });
             console.error('Erro ao obter a lista de usuários:', error);
