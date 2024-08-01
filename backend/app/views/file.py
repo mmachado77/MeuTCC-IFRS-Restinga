@@ -145,6 +145,7 @@ class UploadDocumentoAjusteView(CustomAPIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ExcluirDocumentoTCCView(CustomAPIView):
+    googleDriveService = GoogleDriveService()
     """
     API para exclusão de documentos do TCC.
 
@@ -165,7 +166,8 @@ class ExcluirDocumentoTCCView(CustomAPIView):
         try:
             tcc = Tcc.objects.get(id=tccId)
             if tcc.documentoTCC:
-                tcc.documentoTCC.delete(save=True)
+                self.googleDriveService.delete_file(tcc.documentoTCC)
+                # tcc.documentoTCC.delete(save=True)
             tcc.documentoTCC = None
             tcc.save()
             return Response({'status': 'alert', 'message': 'Documento excluido!'}, status=status.HTTP_200_OK)

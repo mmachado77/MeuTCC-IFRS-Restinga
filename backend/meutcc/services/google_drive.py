@@ -119,4 +119,15 @@ class GoogleDriveService:
 
         except Exception as e:
             return None
+        
+    def delete_file(self, file_id):
+        try:
+            credentials = self.get_credentials()
+            service = build("drive", "v3", credentials=credentials)
+            
+            service.files().delete(fileId=file_id).execute()
+
+            return True
+        except Exception as e:
+            return None
 

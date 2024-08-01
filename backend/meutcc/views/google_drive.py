@@ -34,7 +34,7 @@ class GoogleDriveCallbackView(APIView):
                 credencial.save()
             else:
                 Credenciais.objects.create(
-                    access_token = json.dumps(credentials),
+                    access_token = credentials.to_json(),
                 )
 
 
