@@ -59,7 +59,7 @@ class AtualizarPerfil(CustomAPIView):
             return Response(serializer.data)
         except Usuario.DoesNotExist:
             logger.error("User does not exist: %s", request.user)
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'error', 'message': 'Usuário não existe.'}, status=status.HTTP_404_NOT_FOUND)
 
     def put(self, request, format=None):
         try:
@@ -87,15 +87,15 @@ class AtualizarPerfil(CustomAPIView):
                 return Response(serializer.data)
             
             logger.error("Invalid data: %s", serializer.errors)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 'error', 'message': 'Data inválida'},serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         except Usuario.DoesNotExist:
             logger.error("User does not exist: %s", request.user)
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'error', 'message': 'Usuário não existe'}, status=status.HTTP_404_NOT_FOUND)
         
         except Exception as e:
             logger.error("Unexpected error: %s", str(e))
-            return Response({"detail": "An unexpected error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'status': 'error', 'message': 'Erro inesperado. Tente novamente mais tarde'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class PerfilByIdView(CustomAPIView):
@@ -107,17 +107,17 @@ class PerfilByIdView(CustomAPIView):
             serializer = UsuarioSerializer(usuario)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Usuario.DoesNotExist:
-            return Response({"error": "Usuário não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'error', 'message': "Usuário não encontrado."}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def put(self, request, id):
         if not request.user.is_authenticated:
-            return Response({"detail": "Autenticação necessária para atualizar o perfil."}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'status': 'error', 'message': "Autenticação necessária para atualizar o perfil."}, status=status.HTTP_401_UNAUTHORIZED)
         try:
             usuario = Usuario.objects.get(id=id)
             if usuario.user != request.user:
-                return Response({"detail": "Permissão negada. Você só pode atualizar seu próprio perfil."}, status=status.HTTP_403_FORBIDDEN)
+                return Response({'status': 'error', 'message': "Permissão negada. Você só pode atualizar seu próprio perfil."}, status=status.HTTP_403_FORBIDDEN)
             
             data = request.data
             if 'area_interesse' in data and isinstance(data['area_interesse'], list):
@@ -148,6 +148,6 @@ class TccsByUsuarioView(CustomAPIView):
             serializer = TccSerializer(tccs, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Usuario.DoesNotExist:
-            return Response({"error": "Usuário não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'error', 'message': "Usuário não encontrado."}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
