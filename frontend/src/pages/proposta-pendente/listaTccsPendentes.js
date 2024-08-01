@@ -9,6 +9,7 @@ import { format } from 'date-fns';
 import FormularioJustificativa from './formularioJustificativa'
 import TccService from 'meutcc/services/TccService';
 import { STATUS_TCC } from 'meutcc/core/constants';
+import { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
 
 export default function ListaTccsPendentes() {
     let emptyTcc = {
@@ -30,9 +31,10 @@ export default function ListaTccsPendentes() {
     const fetchTccsPendentes = async () => {
         try {
             const tccsPendentes = await TccService.getListarTccsPendente();
-
             setTccs(tccsPendentes);
+            handleApiResponse(response);
         } catch (error) {
+            handleApiResponse(error.response);
             console.error('Erro ao obter convites pendentes:', error);
             // Exiba uma mensagem de erro se necessário
         }
