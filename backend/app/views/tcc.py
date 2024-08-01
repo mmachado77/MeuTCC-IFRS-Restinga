@@ -100,9 +100,9 @@ class CriarTCCView(CustomAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         except Estudante.DoesNotExist:
-            return Response({'message': 'Usuário não é um estudante!'}, status=403)
+            return Response({'status': 'error', 'message': 'Usuário não é um estudante!'}, status=403)
         except Exception as e:
-            return Response({'message': str(e)}, status=400)
+            return Response({'status': 'error', 'message': str(e)}, status=400)
         
 
 class TccStatusResponderPropostaView(CustomAPIView):
@@ -119,7 +119,7 @@ class TccStatusResponderPropostaView(CustomAPIView):
 
         self.propostaService.responderProposta(tccId, usuario, serializer)
         
-        return Response({'message': 'Status atualizado com sucesso!'})
+        return Response({'status': 'success', 'message': 'Status atualizado com sucesso!'})
 
 
 class EditarTCCView(CustomAPIView):
@@ -137,17 +137,17 @@ class EditarTCCView(CustomAPIView):
             tcc.tema = request.data.get('tema', tcc.tema)
             tcc.resumo = request.data.get('resumo', tcc.resumo)
             tcc.save()
-            return Response({'message': 'TCC atualizado com sucesso.'})
+            return Response({'status': 'success', 'message': 'TCC atualizado com sucesso.'})
 
         if user.is_superuser or Coordenador.objects.filter(user=user).exists():
             tcc.orientador = Professor.objects.get(id=request.data.get('orientador', tcc.orientador))
             if request.data.get('coorientador', tcc.coorientador) is not None:
                 tcc.coorientador = Professor.objects.get(id=request.data.get('coorientador', tcc.coorientador))
             tcc.save()
-            return Response({'message': 'TCC atualizado com sucesso.'})
+            return Response({'status': 'success', 'message': 'TCC atualizado com sucesso.'})
 
         # Se o usuário não tiver permissão
-        return Response({"error": "Você não tem permissão para editar este TCC."}, status=status.HTTP_403_FORBIDDEN)
+        return Response({'status': 'error', "message": "Você não tem permissão para editar este TCC."}, status=status.HTTP_403_FORBIDDEN)
 
 
 class DetalhesTCCView(CustomAPIView):
@@ -159,7 +159,7 @@ class DetalhesTCCView(CustomAPIView):
         try:
             tcc = Tcc.objects.get(id=tccid)
         except Tcc.DoesNotExist:
-            return Response({"error": "TCC não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'error', "message": "TCC não encontrado."}, status=status.HTTP_404_NOT_FOUND)
         if Sessao.objects.filter(tcc=tcc).exists():
             sessoes = Sessao.objects.filter(tcc=tcc)
             for sessao in sessoes:
@@ -175,7 +175,7 @@ class DetalhesTCCView(CustomAPIView):
             serializer = TccSerializer(tcc)
             return Response(serializer.data)
         else:
-            return Response({"error": "Você não tem permissão para visualizar este TCC."},
+            return Response({'status': 'alert', "message": "Você não tem permissão para visualizar este TCC."},
                             status=status.HTTP_403_FORBIDDEN)
             
 class TCCsPublicadosView(CustomAPIView):
@@ -211,7 +211,7 @@ class CriarTemaView(CustomAPIView):
         if isinstance(perfil, Coordenador) or isinstance(perfil, Professor):
             usuario_id = request.user.id
         else:
-            return Response({"error": "Usuário não autorizado para criar um tema."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': 'error', "message": "Usuário não autorizado para criar um tema."}, status=status.HTTP_400_BAD_REQUEST)
 
         data = request.data
         data['professor'] = usuario_id
@@ -229,10 +229,10 @@ class AtualizarTemaView(CustomAPIView):
         try:
             tema = Tema.objects.get(pk=pk)
         except Tema.DoesNotExist:
-            return Response({"error": "Erro no servidor ao tentar encontrar tema."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'error', "message": "Erro no servidor ao tentar encontrar tema."}, status=status.HTTP_404_NOT_FOUND)
 
         if tema.professor.user != request.user and not isinstance(request.user.perfil, Coordenador):
-            return Response({"error": "Usuário não autorizado.", "usuario": request.user}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'status': 'error', "message": "Usuário não autorizado.", "usuario": request.user}, status=status.HTTP_401_UNAUTHORIZED)
 
         serializer = TemaSerializer(tema, data=request.data)
         if serializer.is_valid():
@@ -248,10 +248,10 @@ class ExcluirTemaView(CustomAPIView):
         try:
             tema = Tema.objects.get(pk=pk)
         except Tema.DoesNotExist:
-            return Response({"error": "Tema não encontrado no sistema."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'error', "message": "Tema não encontrado no sistema."}, status=status.HTTP_404_NOT_FOUND)
 
         if tema.professor.user != request.user and not isinstance(request.user.perfil, Coordenador):
-            return Response({"error": "Usuário não autorizado."}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'status': 'error', "message": "Usuário não autorizado."}, status=status.HTTP_401_UNAUTHORIZED)
 
         tema.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
