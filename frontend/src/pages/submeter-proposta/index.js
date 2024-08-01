@@ -12,7 +12,7 @@ import { useRouter } from 'next/router';
 import { GUARDS } from 'meutcc/core/constants';
 import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
 import { set } from 'date-fns';
-import getClassForStatus, { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
+import { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
 
 const SubmeterPropostaPage = () => {
 

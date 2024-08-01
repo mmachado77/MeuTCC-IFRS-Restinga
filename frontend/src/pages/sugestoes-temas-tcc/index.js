@@ -6,7 +6,7 @@ import { FilterMatchMode } from 'primereact/api';
 import { GUARDS } from 'meutcc/core/constants';
 import TccService from 'meutcc/services/TccService';
 import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
-import getClassForStatus, { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
+import { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
 
 const SugestoesTemasTccPage = () => {
 
