@@ -12,6 +12,7 @@ import { useRouter } from 'next/router';
 import { GUARDS } from 'meutcc/core/constants';
 import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
 import { set } from 'date-fns';
+import getClassForStatus, { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
 
 const SubmeterPropostaPage = () => {
 
@@ -43,8 +44,9 @@ const SubmeterPropostaPage = () => {
                 }else{
                     setLoading(false);
                 }
+                handleApiResponse(response);
             } catch (error) {
-                console.error('Erro ao buscar propostas existentes', error);
+                handleApiResponse(error.response);
                 setLoading(false);
             }
         }
@@ -60,24 +62,31 @@ const SubmeterPropostaPage = () => {
     
                 setOrientadores(professores);
                 setCoorientadores(professores);
+                handleApiResponse(response);
 
             } catch (error) {
-                console.error('Erro ao buscar professores', error);
+                handleApiResponse(error.response);
             }
         };
 
         fetchProfessores();
 
         const verificarPrazoEnvioProposta = async () => {
-            const data = await SemestreService.getPrazoEnvioProposta();
-            const hoje = new Date();
-            const dataAbertura = new Date(data.dataAberturaPrazoPropostas);
-            const dataFechamento = new Date(data.dataFechamentoPrazoPropostas);
+            try{
+                const data = await SemestreService.getPrazoEnvioProposta();
+                const hoje = new Date();
+                const dataAbertura = new Date(data.dataAberturaPrazoPropostas);
+                const dataFechamento = new Date(data.dataFechamentoPrazoPropostas);
+    
+                if (hoje >= dataAbertura && hoje <= dataFechamento) {
+                    setEstaNoPrazo(true);
+                } else {
+                    setEstaNoPrazo(false);
+                }
+                handleApiResponse(response);
 
-            if (hoje >= dataAbertura && hoje <= dataFechamento) {
-                setEstaNoPrazo(true);
-            } else {
-                setEstaNoPrazo(false);
+            }catch(error){
+                handleApiResponse(error.response);
             }
         };
 
