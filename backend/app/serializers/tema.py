@@ -6,7 +6,7 @@ from ..models import Tema, Professor, Usuario
 #        model = Professor
 #        fields = ['id', 'nome'] 
         
-class UsuarioSerializer(serializers.ModelSerializer):
+class UsuarioSerializerTema(serializers.ModelSerializer):
     """
     Serializer para o modelo Usuario.
     """
@@ -31,7 +31,7 @@ class TemaSerializer(serializers.ModelSerializer):
         update(instance, validated_data): Atualiza a instância do tema com os dados validados.
     """
 
-    professor_detail = UsuarioSerializer(source='professor', read_only=True)
+    professor_detail = UsuarioSerializerTema(source='professor', read_only=True)
 
     class Meta:
         model = Tema
@@ -46,7 +46,7 @@ class TemaSerializer(serializers.ModelSerializer):
             instance (Tema): A instância do modelo Tema.
         """
         representation = super().to_representation(instance)
-        representation['professor'] = UsuarioSerializer(instance.professor).data
+        representation['professor'] = UsuarioSerializerTema(instance.professor).data
         return representation
 
     def update(self, instance, validated_data):
