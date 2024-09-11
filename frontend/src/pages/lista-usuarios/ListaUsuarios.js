@@ -2,10 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
-import { format } from 'date-fns';
+import { Button } from 'primereact/button';
+import { InputText } from 'primereact/inputtext';
 import UsuarioService from 'meutcc/services/UsuarioService';
 import { Toast } from 'primereact/toast';
 import { SelectButton } from 'primereact/selectbutton';
+import { useRouter } from 'next/router';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
+import { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
 
 export default function ListaUsuarios() {
     const [usuarios, setUsuarios] = useState([]);
@@ -13,7 +18,21 @@ export default function ListaUsuarios() {
     const [rows, setRows] = useState(10);
     const [first, setFirst] = useState(0);
     const [statusFilter, setStatusFilter] = useState('Todos');
+    const [globalFilter, setGlobalFilter] = useState(null);
     const toast = useRef(null);
+    const router = useRouter();
+
+    const rowsPerPageOptions = [
+        { label: '5', value: 5 },
+        { label: '10', value: 10 },
+        { label: '20', value: 20 }
+    ];
+
+    const statusOptions = [
+        { label: 'Todos', value: 'Todos' },
+        { label: 'Aprovados', value: 'Aprovados' },
+        { label: 'Outros', value: 'Outros' }
+    ];
 
     const fetchUsuarios = async () => {
         try {
@@ -21,11 +40,12 @@ export default function ListaUsuarios() {
             console.log('Usuários recebidos:', response.data);
             setUsuarios(response.data);
             setFilteredUsuarios(response.data);
+            handleApiResponse(response);
         } catch (error) {
             toast.current.show({ severity: 'error', summary: 'Erro', detail: 'Erro ao obter a lista de usuários', life: 3000 });
             console.error('Erro ao obter a lista de usuários:', error);
         }
-    }
+    };
 
     useEffect(() => {
         fetchUsuarios();
@@ -43,15 +63,11 @@ export default function ListaUsuarios() {
         } else if (status === 'Aprovados') {
             setFilteredUsuarios(usuarios.filter(user => !user.status_cadastro || user.status_cadastro.status_text === 'Aprovado'));
         }
-    }
-
-    const dataCadastroTemplate = (rowData) => {
-        return format(new Date(rowData.dataCadastro), 'dd/MM/yyyy');
-    }
+    };
 
     const tipoUsuarioTemplate = (rowData) => {
         return rowData.tipo || 'Tipo desconhecido';
-    }
+    };
 
     const statusCadastroTemplate = (rowData) => {
         if (rowData.status_cadastro && rowData.status_cadastro.status_text) {
@@ -69,31 +85,37 @@ export default function ListaUsuarios() {
             return <Tag severity={severity} value={statusText} />;
         }
         return <Tag severity='success' value='Cadastrado' />;
-    }
+    };
+
+    const perfilButtonTemplate = (rowData) => {
+        return <Button label="Ver Perfil" icon="pi pi-user" onClick={() => router.push(`/perfil/${rowData.id}`)} />;
+    };
 
     const onPageChange = (e) => {
         setFirst(e.first);
         setRows(e.rows);
-    }
+    };
 
-    const rowsPerPageOptions = [
-        { label: '5', value: 5 },
-        { label: '10', value: 10 },
-        { label: '20', value: 20 }
-    ];
+    const onGlobalFilterChange = (e) => {
+        setGlobalFilter(e.target.value);
+    };
 
-    const statusOptions = [
-        { label: 'Todos', value: 'Todos' },
-        { label: 'Aprovados', value: 'Aprovados' },
-        { label: 'Outros', value: 'Outros' }
-    ];
+    const header = (
+        <div className="table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+                <SelectButton value={statusFilter} onChange={(e) => setStatusFilter(e.value)} options={statusOptions} />
+            </div>
+            <IconField iconPosition="left">
+                    <InputIcon className="pi pi-search" />
+                    <InputText type="search" onInput={onGlobalFilterChange} placeholder="Buscar..." className=''/>
+                </IconField>
+            
+        </div>
+    );
 
     return (
         <div className="card">
             <Toast ref={toast} />
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
-                <SelectButton value={statusFilter} onChange={(e) => setStatusFilter(e.value)} options={statusOptions} />
-            </div>
             <DataTable
                 value={filteredUsuarios}
                 paginator
@@ -101,13 +123,14 @@ export default function ListaUsuarios() {
                 first={first}
                 onPage={onPageChange}
                 rowsPerPageOptions={[5, 10, 20]}
+                globalFilter={globalFilter}
+                header={header}
             >
-                <Column field="nome" header="Nome" sortable style={{ width: '20%' }}></Column>
-                <Column field="cpf" header="CPF" sortable style={{ width: '20%' }}></Column>
-                <Column field="email" header="Email" sortable style={{ width: '20%' }}></Column>
-                <Column field="dataCadastro" header="Data de Cadastro" body={dataCadastroTemplate} sortable style={{ width: '15%' }}></Column>
+                <Column field="nome" header="Nome" sortable style={{ width: '30%' }}></Column>
+                <Column field="email" header="Email" sortable style={{ width: '30%' }}></Column>
                 <Column field="tipo" header="Tipo de Usuário" body={tipoUsuarioTemplate} sortable style={{ width: '15%' }}></Column>
-                <Column field="status_cadastro.aprovacao" header="Status de Cadastro" body={statusCadastroTemplate} sortable style={{ width: '10%' }}></Column>
+                <Column field="status_cadastro.status_text" header="Status" body={statusCadastroTemplate} sortable style={{ width: '10%' }}></Column>
+                <Column body={perfilButtonTemplate} header="Ações" style={{ width: '20%' }}></Column>
             </DataTable>
         </div>
     );

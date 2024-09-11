@@ -30,7 +30,7 @@ async function responderProposta(tccId, data) {
 
 async function getPossuiTcc() {
     return apiClient.get('/app/possui-proposta').then((response) => response.data);
-}   
+}
 
 async function editarTCC(tccId, data) {
     return apiClient.put(`/app/editar-tcc/${tccId}/`, data).then((response) => response.data);
@@ -64,6 +64,33 @@ async function downloadDocumentoSessao(sessaoId) {
     return apiClient.get(`/app/download-documento-sessao/${sessaoId}/`, { responseType: 'blob' }).then((response) => response.data);
 }
 
+async function getTccsPublicados() {
+    return apiClient.get('/app/tccs-publicados').then((response) => response.data);
+}
+
+async function getTccsByUsuario() {
+    return apiClient.get('/app/user-tccs').then((response) => response.data);
+}
+
+async function getSugestoes() {
+    return apiClient.get('/app/temas-sugeridos').then((response) => response.data);
+}
+
+async function getMinhasSugestoes() {
+    return apiClient.get('/app/meus-temas-sugeridos').then((response) => response.data);
+}
+
+async function createTema(data) {
+    return apiClient.post('/app/criar-tema', data).then((response) => response.data);
+}
+
+async function updateTema(id, data) {
+    return apiClient.put(`/app/atualizar-tema/${id}/`, data).then((response) => response.data);
+}
+
+async function deleteTema(id) {
+    return apiClient.delete(`/app/excluir-tema/${id}/`).then((response) => response.data);
+}
 
 
 export default {
@@ -82,5 +109,12 @@ export default {
     excluirDocumentoTCC,
     uploadDocumentoSessao,
     excluirDocumentoSessao,
-    downloadDocumentoSessao
+    downloadDocumentoSessao,
+    getTccsPublicados,
+    getSugestoes,
+    getMinhasSugestoes,
+    createTema,
+    updateTema,
+    deleteTema,
+    getTccsByUsuario
 }

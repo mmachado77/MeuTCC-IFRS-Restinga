@@ -1,3 +1,5 @@
-import SugestoesTemasTcc from './sugestoes-temas-tcc'
+import MainPage, { getServerSideProps } from './home'
 
-export default SugestoesTemasTcc;
+export default MainPage;
+
+export { getServerSideProps };

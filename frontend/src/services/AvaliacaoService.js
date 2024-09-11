@@ -32,6 +32,9 @@ async function downloadDocumentoAjuste(avaliacaoId) {
     return apiClient.get(`/app/download-documento-ajuste/${avaliacaoId}/`, { responseType: 'blob' }).then((response) => response.data);
 }
 
+async function downloadFichaAvaliacaoPreenchida(avaliacaoId) {
+    return apiClient.get(`/app/download-ficha-avaliacao-preenchida/${avaliacaoId}/`, { responseType: 'blob' }).then((response) => response.data);
+}
 
 export default {
     avaliar,
@@ -41,5 +44,6 @@ export default {
     downloadFichaAvaliacao,
     uploadDocumentoAjuste,
     excluirDocumentoAjuste,
-    downloadDocumentoAjuste
+    downloadDocumentoAjuste,
+    downloadFichaAvaliacaoPreenchida,
 }

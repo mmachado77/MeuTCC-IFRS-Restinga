@@ -11,3 +11,4 @@ from .semestre import *
 from .semestreCoordenador import *
 from .tcc import *
 from .notificacoes import *
+from .tema import *

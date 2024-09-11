@@ -22,6 +22,8 @@ import { Toast } from 'primereact/toast';
 import { Checkbox } from "primereact/checkbox";
 import FormSessao from 'meutcc/components/ui/FormSessao';
 import SessoesService from 'meutcc/services/SessoesService';
+import { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
+import { ToggleButton } from 'primereact/togglebutton';
 
 const FileItem = ({ file, sessaoId, prazoEntrega, user, onFileUpload, onFileDelete, onFileDownload, avaliacaoAjusteId, avaliacaoId, orientador }) => {
     const toast = useRef(null);
@@ -156,7 +158,7 @@ const FileItem = ({ file, sessaoId, prazoEntrega, user, onFileUpload, onFileDele
     );
 };
 
-const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBancaSessaoPreviaClick, onSugerirBancaSessaoFinalClick, onAvaliacaoClick, onAvaliacaoAjusteClick, onFileUpload, onFileDelete, onFileDownload }) => {
+const SessoesComponent = ({ estudante, orientador, sessoes, status, user, onSugerirBancaSessaoPreviaClick, onSugerirBancaSessaoFinalClick, onAvaliacaoClick, onAvaliacaoAjusteClick, onAvaliacaoPreviaClick, onFileUpload, onFileDelete, onFileDownload, onFichaAvaliacaoPreenchidaDownload }) => {
     return (
         <Accordion multiple activeIndex={[0]}>
             {sessoes.map((sessao, index) => (
@@ -197,28 +199,40 @@ const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBanca
                                 </>
                             )}
                             <p className="mb-7"><b>Prazo Para Entrega do Documento:</b> {format(sessao.prazoEntregaDocumento || new Date(), 'dd/MM/yyyy HH:mm')}</p>
-                            {(sessao.tipo === 'Sessão Final' && new Date(sessao.data_inicio) < new Date() && sessao.avaliacao.ficha_avaliacao.url == null && (user.id === orientador.id || sessao.banca.professores.map(professor => professor.id).includes(user.id))) && (
+                            {(sessao.validacaoCoordenador == true && sessao.tipo === 'Sessão Final' && new Date(sessao.data_inicio) < new Date() && sessao.avaliacao.ficha_avaliacao.url == null && (user.id === orientador.id || sessao.banca.professores.map(professor => professor.id).includes(user.id))) && (
                                 <div>
-                                    {sessao.avaliacao.nota_orientador !== null && sessao.avaliacao.nota_avaliador1 !== null && sessao.avaliacao.nota_avaliador2 !== null ? (
+                                    {sessao.avaliacao.avaliado_orientador == true && sessao.avaliacao.avaliado_avaliador1 == true && sessao.avaliacao.avaliado_avaliador2 == true ? (
                                         <div className='flex flex-column'>
                                             <Button className="w-1/5" label="Avaliado" icon="pi pi-check" severity="info" />
-                                            <a className="flex items-center w-full ml-10" href="#">
-                                                Clique aqui para fazer o download da ficha de avaliação preenchida
-                                            </a>
+                                            <a className="ml-10 flex items-center w-full"
+                                            href="#"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                onFichaAvaliacaoPreenchidaDownload(sessao.avaliacao.id);
+                                            }}
+                                        >
+                                            Clique aqui para fazer o download da ficha de avaliação preenchida
+                                        </a>
                                         </div>
-                                    ) : ((user.id === orientador.id && sessao.avaliacao.nota_orientador !== null) || (user.id === sessao.banca.professores[0].id && sessao.avaliacao.nota_avaliador1 !== null) || (user.id === sessao.banca.professores[1].id && sessao.avaliacao.nota_avaliador2 !== null)) ? (
+                                    ) : ((user.id === orientador.id && sessao.avaliacao.avaliado_orientador == true) || (user.id === sessao.banca.professores[0].id && sessao.avaliacao.avaliado_avaliador1 == true) || (user.id === sessao.banca.professores[1].id && sessao.avaliacao.avaliado_avaliador2 == true)) ? (
                                         <Button label="Aguardando Avaliações" icon="pi pi-clock" severity="warning" />
                                     ) : (
                                         <Button label="Avaliar" icon="pi pi-file-edit" style={{ backgroundColor: '#2F9E41' }} onClick={() => onAvaliacaoClick(sessao.id)} />
                                     )}
                                 </div>
                             )}
+                            {(sessao.validacaoCoordenador == true && sessao.tipo === 'Sessão Prévia' && new Date(sessao.data_inicio) < new Date() && (user.id === orientador.id || sessao.banca.professores.map(professor => professor.id).includes(user.id))) && (
+                                <div>
+                                    {sessao.avaliado == true ? (
+                                        <div className='flex flex-column'>
+                                            <Button className="w-1/5" label="Avaliado" icon="pi pi-check" severity="info" />
+                                        </div>
+                                    ) : (
+                                        <Button label="Avaliar" icon="pi pi-file-edit" style={{ backgroundColor: '#2F9E41' }} onClick={() => onAvaliacaoPreviaClick(sessao.id)} />
+                                    )}
+                                </div>
+                            )}
                         </div>
-                        {(user.resourcetype == 'Coordenador' || user.id == orientador.id) && (
-                            <div>
-                                <Button label="Editar" icon="pi pi-pencil" style={{ backgroundColor: '#2F9E41' }} />
-                            </div>
-                        )}
                     </div>
                 </AccordionTab>
             ))}
@@ -229,7 +243,7 @@ const SessoesComponent = ({ estudante, orientador, sessoes, user, onSugerirBanca
                         : <Button style={{ width: '100%', backgroundColor: '#2F9E41' }} label="Agendar Sessão Prévia" onClick={() => console.log("Adicionar sessão prévia")} />}
                 </AccordionTab>
             )}
-            {sessoes.some(sessao => sessao.tipo === 'Sessão Prévia') && !sessoes.some(sessao => sessao.tipo === 'Sessão Final') && (
+            {sessoes.some(sessao => (sessao.tipo === 'Sessão Prévia' && sessao.avaliado == true)) && status.some(stat => stat.status === 'PREVIA_OK') && !sessoes.some(sessao => sessao.tipo === 'Sessão Final') && (
                 <AccordionTab key="sessao-final" header={"Sessão Final"}>
                     {user.resourcetype === 'Estudante' || user.resourcetype === 'ProfessorInterno' ?
                         <Button style={{ width: '100%', backgroundColor: '#2F9E41' }} label="Sugerir Banca" onClick={() => onSugerirBancaSessaoFinalClick(true)} />
@@ -272,8 +286,13 @@ const getClassForStatus = (status) => {
         case 'PROPOSTA_ANALISE_PROFESSOR':
         case 'PROPOSTA_ANALISE_COORDENADOR':
         case 'DESENVOLVIMENTO':
-        case 'PREVIA':
-        case 'FINAL':
+        case 'PREVIA_ORIENTADOR':
+        case 'PREVIA_COORDENADOR':
+        case 'PREVIA_AGENDADA':
+        case 'PREVIA_OK':
+        case 'FINAL_ORIENTADOR':
+        case 'FINAL_COORDENADOR':
+        case 'FINAL_AGENDADA':
         case 'AJUSTE':
             return '#FFBF00';
         case 'PROPOSTA_RECUSADA_PROFESSOR':
@@ -300,6 +319,7 @@ const DetalhesTCC = () => {
     const [visibleFormTCC, setVisibleFormTCC] = useState(false);
     const [visibleStatus, setVisibleStatus] = useState(false);
     const [visibleAvaliarAjuste, setVisibleAvaliarAjuste] = useState(false);
+    const [visibleAvaliarPrevia, setVisibleAvaliarPrevia] = useState(false);
     const [orientadores, setOrientadores] = useState([]);
     const [coorientadores, setCoorientadores] = useState([]);
     const [temaMensagemErro, setTemaMensagemErro] = useState('');
@@ -309,11 +329,12 @@ const DetalhesTCC = () => {
     const [datetime24h, setDateTime24h] = useState(null);
     const [documentoTCC, setDocumentoTCC] = useState(null);
     const [necessarioAdequacoes, setNecessarioAdequacoes] = React.useState(false);
-    const [ajusteAprovado, setAjusteAprovado] = React.useState(false);
-    const [ajusteReprovado, setAjusteReprovado] = React.useState(false);
+    const [ajuste, setAjuste] = React.useState(false);
+    const [previa, setPrevia] = React.useState(false);
     const [autorizacaoPublicacao, setAutorizacaoPublicacao] = useState(null);
     const [sessaoId, setSessaoId] = useState(0);
     const [avaliacaoId, setAvaliacaoId] = useState(0);
+    const [sessaoPreviaId, setSessaoPreviaId] = useState(0);
     const [adequacoesMensagemErro, setAdequacoesMensagemErro] = useState('');
     const [notaEstruturaMensagemErro, setNotaEstruturaMensagemErro] = useState('');
     const [notaRelevanciaMensagemErro, setNotaRelevanciaMensagemErro] = useState('');
@@ -353,6 +374,11 @@ const DetalhesTCC = () => {
         setVisibleAvaliarAjuste(true);
     };
 
+    const handleAvaliacaoPrevia = (sessaoPreviaId) => {
+        setSessaoPreviaId(sessaoPreviaId)
+        setVisibleAvaliarPrevia(true);
+    };
+
     const carregarDetalhesTCC = async () => {
         try {
             const tccId = router.query.tccId;
@@ -360,6 +386,7 @@ const DetalhesTCC = () => {
             const data = await TccService.getDetalhesTCC(tccId);
             setTCCData(data);
         } catch (error) {
+            handleApiResponse(error.response);
             console.error('Erro ao carregar detalhes:', error);
         }
     };
@@ -373,6 +400,7 @@ const DetalhesTCC = () => {
                 setCoorientadores(professores);
                 setAvaliadores(data.map((professor) => ({ ...professor, name: professor.nome, value: professor.id })));
             } catch (error) {
+                handleApiResponse(error.response);
                 console.error('Erro ao buscar professores', error);
             }
         };
@@ -484,6 +512,7 @@ const DetalhesTCC = () => {
         event.preventDefault();
         setLoading(true);
         const formData = new FormData(event.currentTarget);
+        formData.append('resultado_ajuste', ajuste);
         const jsonData = Object.fromEntries(formData);
 
 
@@ -493,22 +522,6 @@ const DetalhesTCC = () => {
             return;
         } else {
             setParecerOrientadorErro('');
-        }
-
-        if (!ajusteReprovado && !ajusteAprovado) {
-            setAvaliarAjusteErro('É necessário marcar uma das opções de avaliação');
-            setLoading(false);
-            return;
-        } else {
-            setAvaliarAjusteErro('');
-        }
-
-        if (ajusteReprovado && ajusteAprovado) {
-            setAvaliarAjusteErro('É possível marcar apenas uma das opções de avaliação');
-            setLoading(false);
-            return;
-        } else {
-            setAvaliarAjusteErro('');
         }
 
         const response = await AvaliacaoService.avaliarAjustes(avaliacaoId, jsonData);
@@ -522,6 +535,35 @@ const DetalhesTCC = () => {
         setLoading(false);
         carregarDetalhesTCC();
         setVisibleAvaliarAjuste(false);
+    };
+
+     const onSubmitAvaliacaoPrevia = async (event) => {
+        event.preventDefault();
+        setLoading(true);
+        const formData = new FormData(event.currentTarget);
+        formData.append('resultado_previa', previa);
+        const jsonData = Object.fromEntries(formData);
+
+
+        if (jsonData.parecer_orientador == '') {
+            setParecerOrientadorErro('O Parecer do Orientador é obrigatório');
+            setLoading(false);
+            return;
+        } else {
+            setParecerOrientadorErro('');
+        }
+
+        const response = await SessoesService.avaliarPrevia(sessaoPreviaId, jsonData);
+
+        if (response) {
+            toast.success('Avaliação realizada com sucesso');
+        } else {
+            toast.error('Erro ao realizar avaliação');
+        }
+
+        setLoading(false);
+        carregarDetalhesTCC();
+        setVisibleAvaliarPrevia(false);
     };
 
     const onSubmit = async (event) => {
@@ -621,8 +663,9 @@ const DetalhesTCC = () => {
             }
             carregarDetalhesTCC();
         } catch (error) {
+            handleApiResponse(error.response);
             console.error('Erro ao fazer upload do arquivo:', error);
-            toast.error('Erro ao fazer upload do arquivo');
+            //toast.error('Erro ao fazer upload do arquivo');
         }
     };
 
@@ -633,7 +676,7 @@ const DetalhesTCC = () => {
                 toast.success('Ficha de avaliação excluída com sucesso');
             } else if (avaliacaoAjusteId) {
                 await AvaliacaoService.excluirDocumentoAjuste(avaliacaoAjusteId);
-                toast.success('Documento da ajuste excluído com sucesso');
+                toast.success('Documento de ajuste excluído com sucesso');
                 setDocumentoTCC(null); // Atualiza o documento principal para null
                 setTCCData(prevData => ({ ...prevData, documentoTCC: null }));
             } else if (sessaoId) {
@@ -650,7 +693,8 @@ const DetalhesTCC = () => {
             carregarDetalhesTCC();
         } catch (error) {
             console.error('Erro ao excluir arquivo:', error);
-            toast.error('Erro ao excluir arquivo');
+            handleApiResponse(error.response);
+            //toast.error('Erro ao excluir arquivo');
         }
     };
 
@@ -673,10 +717,32 @@ const DetalhesTCC = () => {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            toast.success('Download do documento realizado com sucesso');
+            handleApiResponse(response);
+            //toast.success('Download do documento realizado com sucesso');
         } catch (error) {
+            handleApiResponse(error.response);
             console.error('Erro ao fazer download do arquivo:', error);
-            toast.error('Erro ao fazer download do arquivo');
+            //toast.error('Erro ao fazer download do arquivo');
+        }
+    };
+
+    const handleFichaAvaliacaoPrrenchidaDownload = async (avaliacaoId) => {
+        try {
+            let response;
+            response = await AvaliacaoService.downloadFichaAvaliacaoPreenchida(avaliacaoId);
+            const url = window.URL.createObjectURL(new Blob([response]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'documento.pdf'); // or extract the file name from response
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            handleApiResponse(response);
+            //toast.success('Download do documento realizado com sucesso');
+        } catch (error) {
+            handleApiResponse(error.response);
+            console.error('Erro ao fazer download do arquivo:', error);
+            //toast.error('Erro ao fazer download do arquivo');
         }
     };
 
@@ -777,14 +843,17 @@ const DetalhesTCC = () => {
                             estudante={TCCData?.autor}
                             orientador={TCCData?.orientador}
                             sessoes={TCCData?.sessoes}
+                            status={TCCData?.status}
                             user={user}
                             onSugerirBancaSessaoPreviaClick={handleSugerirBancaSessaoPreviaClick}
                             onSugerirBancaSessaoFinalClick={handleSugerirBancaSessaoFinalClick}
                             onAvaliacaoClick={handleAvaliacao}
                             onAvaliacaoAjusteClick={handleAvaliacaoAjuste}
+                            onAvaliacaoPreviaClick={handleAvaliacaoPrevia}
                             onFileUpload={handleFileUpload}
                             onFileDelete={handleFileDelete}
                             onFileDownload={handleFileDownload}
+                            onFichaAvaliacaoPreenchidaDownload={handleFichaAvaliacaoPrrenchidaDownload}
                         />
                     )}
                 </div>
@@ -919,17 +988,63 @@ const DetalhesTCC = () => {
                         <InputTextarea id='parecer_orientador' name='parecer_orientador' placeholder='Escreva seu parecer quanto aos ajustes realizados' rows={6} className={'w-full ' + (parecerOrientadorErro ? 'p-invalid' : '')} />
                         {parecerOrientadorErro && <small id='parecer-orientador-help' className='px-2 py-1 text-red-500'>{parecerOrientadorErro}</small>}
                     </div>
-                    <div className="flex flex-wrap gap-1 pt-2 mb-3 align-items-center">
-                        <Checkbox inputId="ajuste-aprovado" name='ajuste_aprovado' onChange={handleAprovacaoAjusteChange} checked={ajusteAprovado} />
-                        <label htmlFor="ajuste_aprovado" className="ml-2">Os ajustes estão de acordo com o solicitado e o Trabalho de Conclusão de Curso (TCC) está aprovado</label>
-                    </div>
-                    <div className="flex flex-wrap gap-1 pt-2 mb-3 align-items-center">
-                        <Checkbox inputId="ajuste_reprovado" name='ajuste_reprovado' onChange={handleReprovacaoAjusteChange} checked={ajusteReprovado} />
-                        <label htmlFor="ajuste_reprovado" className="ml-2">Os ajustes não estão de acordo com o solicitado e o Trabalho de Conclusão de Curso (TCC) está reprovado</label>
+                    <div className="flex flex-col items-center gap-1 pt-2 mb-3">
+                                    <label htmlFor="resultado_ajuste" className="ml-2 text-center">
+                                        Após a análise dos ajustes realizados, concluo que o Trabalho de Conclusão de Curso (TCC) está
+                                    </label>
+                                    <ToggleButton
+                                        id='resultado_ajuste'
+                                        name='resultado_ajuste'
+                                        onLabel="Aprovado"
+                                        offLabel="Reprovado"
+                                        onIcon="pi pi-check"
+                                        offIcon="pi pi-times"
+                                        checked={ajuste}
+                                        onChange={(e) => setAjuste(e.value)}
+                                    />
                     </div>
                     <div className="flex flex-wrap gap-2 mb-3 align-items-center">
                         {avaliarAjusteErro && <small id='avaliar-ajuste-help' className='px-2 py-1 text-red-500'>{avaliarAjusteErro}</small>}
-                        <Button label={loading ? "Avaliando Ajustes" : "Avaliar Ajustes"} loading={loading} className="w-full" />
+                        <Button label={loading ? "Avaliando Ajustes" : "Avaliar Ajustes"} loading={loading} className="w-full mt-5"  />
+                    </div>
+                </form>
+            </Dialog>
+            <Dialog header="Avaliar Sessão Prévia" visible={visibleAvaliarPrevia} style={{ width: '50vw' }} onHide={() => setVisibleAvaliarPrevia(false)}>
+                <form onSubmit={onSubmitAvaliacaoPrevia}>
+                    {
+                        ( user.id === TCCData?.orientador.id ? (
+                            <>
+                                <div className='flex flex-wrap gap-2 mb-3 align-items-center'>
+                                    <label htmlFor="parecer_orientador" className="ml-2"><b>Parecer Orientador</b></label>
+                                    <InputTextarea id='parecer_orientador' name='parecer_orientador' placeholder='Escreva seu parecer quanto aos ajustes realizados' rows={6} className={'w-full ' + (parecerOrientadorErro ? 'p-invalid' : '')} />
+                                    {parecerOrientadorErro && <small id='parecer-orientador-help' className='px-2 py-1 text-red-500'>{parecerOrientadorErro}</small>}
+                                </div>
+                                <div className="flex flex-col items-center gap-1 pt-2 mb-3">
+                                    <label htmlFor="resultado_previa" className="ml-2 text-center">
+                                        Após a apresentação, concluo que a Sessão Prévia deste trabalho está
+                                    </label>
+                                    <ToggleButton
+                                        className="mt-2"
+                                        id='resultado_previa'
+                                        name='resultado_previa'
+                                        onLabel="Aprovada"
+                                        offLabel="Reprovada"
+                                        onIcon="pi pi-check"
+                                        offIcon="pi pi-times"
+                                        checked={previa}
+                                        onChange={(e) => setPrevia(e.value)}
+                                    />
+                                </div>
+                            </>
+                        ) : (
+                            <div className='flex flex-wrap gap-2 mb-3 align-items-center'>
+                                <label htmlFor="comentarios_adicionais" className="ml-2"><b>Comentários Adicionais</b></label>
+                                <InputTextarea id='comentarios_adicionais' name='comentarios_adicionais' placeholder='Escreva comentários que achar pertinente quanto ao do trabalho de conclusão de curso (TCC) apresentado' rows={6} className={'w-full '} />
+                            </div>
+                        ))
+                    }
+                    <div className="flex flex-wrap gap-2 mb-3 align-items-center">
+                        <Button label={loading ? "Avaliando Sessão Prévia" : "Avaliar Sessão Prévia"} loading={loading} className="w-full mt-5" />
                     </div>
                 </form>
             </Dialog>

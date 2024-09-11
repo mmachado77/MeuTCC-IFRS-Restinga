@@ -5,6 +5,15 @@ from app.enums import AreaInteresseEnum
 from django.core.exceptions import ValidationError
 
 class StatusCadastroSerializer(serializers.ModelSerializer):
+    """
+    Serializer para o modelo StatusCadastro.
+
+    Atributos:
+        status_text (SerializerMethodField): Campo que utiliza um método para obter o texto de status.
+
+    Métodos:
+        get_status_text(obj): Retorna o texto de status com base na aprovação e justificativa.
+    """
     status_text = serializers.SerializerMethodField()
 
     class Meta:
@@ -12,6 +21,12 @@ class StatusCadastroSerializer(serializers.ModelSerializer):
         fields = ['aprovacao', 'justificativa', 'dataStatus', 'status_text']
 
     def get_status_text(self, obj):
+        """
+        Retorna o texto de status com base na aprovação e justificativa.
+
+        Args:
+            obj (StatusCadastro): A instância do modelo StatusCadastro.
+        """
         if not obj.aprovacao:
             if not obj.justificativa:
                 return "Pendente"
@@ -20,25 +35,78 @@ class StatusCadastroSerializer(serializers.ModelSerializer):
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
+    """
+    Serializer para o modelo Usuario.
+
+    Atributos:
+        tipo (CharField): Tipo de usuário.
+        status_cadastro (StatusCadastroSerializer): Serializer aninhado para o status de cadastro.
+        area_interesse (JSONField): Campo JSON para áreas de interesse.
+    """
     tipo = serializers.CharField(source='tipoString', read_only=True)
     status_cadastro = StatusCadastroSerializer(source='status', read_only=True)
+    area_interesse = serializers.JSONField(required=False, allow_null=True)
 
     class Meta:
         model = Usuario
         fields = '__all__'
+        read_only_fields = ['email', 'user']
 
 
 class EstudanteSerializer(UsuarioSerializer):
+    """
+    Serializer para o modelo Estudante.
+
+    Atributos:
+        area_interesse (JSONField): Campo JSON para áreas de interesse.
+
+    Métodos:
+        validate_area_interesse(value): Valida se a área de interesse é uma lista e contém escolhas válidas.
+    """
+    area_interesse = serializers.JSONField(required=False, allow_null=True)
+
+    def validate_area_interesse(self, value):
+        """
+        Valida se a área de interesse é uma lista e contém escolhas válidas.
+
+        Args:
+            value (list): Valor da área de interesse.
+
+        Raises:
+            serializers.ValidationError: Se a área de interesse não for uma lista ou contiver escolhas inválidas.
+        """
+        if not isinstance(value, list):
+            raise serializers.ValidationError("A área de interesse deve ser uma lista.")
+        choices = {choice.name for choice in AreaInteresseEnum}  # Ensure using the name part of the enum
+        if not all(item in choices for item in value):
+            raise serializers.ValidationError("Uma ou mais áreas de interesse são inválidas.")
+        return value
+
     class Meta:
         model = Estudante
         fields = '__all__'
 
+
 class EstudanteNomeSerializer(UsuarioSerializer):
+    """
+    Serializer para nome do Estudante.
+    """
     class Meta:
         model = Estudante
         fields = ['id', 'nome']
 
 class ProfessorSerializer(UsuarioSerializer):
+    """
+    Serializer para o modelo Professor.
+
+    Atributos:
+        area_interesse (JSONField): Campo JSON para áreas de interesse.
+        status (StatusCadastroSerializer): Serializer aninhado para o status de cadastro.
+
+    Métodos:
+        get_status_details(obj): Retorna os detalhes do status de cadastro.
+        validate_area_interesse(value): Valida se a área de interesse é uma lista e contém escolhas válidas.
+    """
     area_interesse = serializers.JSONField(required=False, allow_null=True)
     status = StatusCadastroSerializer(read_only=True)
 
@@ -47,39 +115,72 @@ class ProfessorSerializer(UsuarioSerializer):
         fields = '__all__'
 
     def get_status_details(self, obj):
+        """
+        Retorna os detalhes do status de cadastro.
+
+        Args:
+            obj (Professor): A instância do modelo Professor.
+        """
         if obj.status:
             return StatusCadastroSerializer(obj.status).data
         return None
 
     def validate_area_interesse(self, value):
+        """
+        Valida se a área de interesse é uma lista e contém escolhas válidas.
+
+        Args:
+            value (list): Valor da área de interesse.
+
+        Raises:
+            serializers.ValidationError: Se a área de interesse não for uma lista ou contiver escolhas inválidas.
+        """
         if not isinstance(value, list):
             raise serializers.ValidationError("A área de interesse deve ser uma lista.")
-        choices = {choice.value for choice in AreaInteresseEnum.choices}
+        choices = {choice.name for choice in AreaInteresseEnum}  # Ensure using the name part of the enum
         if not all(item in choices for item in value):
             raise serializers.ValidationError("Uma ou mais áreas de interesse são inválidas.")
         return value
 
 class ProfessorNomeSerializer(UsuarioSerializer):
+    """
+    Serializer para nome do Professor.
+    """
     class Meta:
         model = Professor
         fields = ['id', 'nome']
 
 class ProfessorInternoSerializer(UsuarioSerializer):
+    """
+    Serializer para o modelo ProfessorInterno.
+    """
     class Meta:
         model = ProfessorInterno
         fields = '__all__'
 
 class ProfessorExternoSerializer(UsuarioSerializer):
+    """
+    Serializer para o modelo ProfessorExterno.
+    """
     class Meta:
         model = ProfessorExterno
         fields = '__all__'
 
 class CoordenadorSerializer(UsuarioSerializer):
+    """
+    Serializer para o modelo Coordenador.
+    """
     class Meta:
         model = Coordenador
         fields = '__all__'
 
 class UsuarioPolymorphicSerializer(PolymorphicSerializer):
+    """
+    Serializer polimórfico para os modelos de usuário.
+
+    Atributos:
+        model_serializer_mapping (dict): Mapeamento dos serializers para cada modelo.
+    """
     model_serializer_mapping = {
         Usuario: UsuarioSerializer,
         Estudante: EstudanteSerializer,
@@ -91,7 +192,15 @@ class UsuarioPolymorphicSerializer(PolymorphicSerializer):
 
 
 def validate_cpf(value):
-    """ Valida CPF, garantindo que ele seja válido segundo o algoritmo de dígitos verificadores. """
+    """
+    Valida CPF, garantindo que ele seja válido segundo o algoritmo de dígitos verificadores.
+
+    Args:
+        value (str): Valor do CPF.
+
+    Raises:
+        ValidationError: Se o CPF for inválido.
+    """
     if not value.isdigit():
         raise ValidationError("CPF deve conter apenas números.")
 
@@ -102,7 +211,12 @@ def validate_cpf(value):
         raise ValidationError("CPF inválido.")
 
     def calculate_digit(digs):
-        """ Calcula um dígito verificador com base em uma sequência de dígitos. """
+        """
+        Calcula um dígito verificador com base em uma sequência de dígitos.
+
+        Args:
+            digs (str): Sequência de dígitos.
+        """
         s = 0
         qtd = len(digs) + 1
         for i in range(len(digs)):
@@ -124,10 +238,28 @@ def validate_cpf(value):
 
 
 def validate_unique_email(value):
+    """
+    Valida se o email é único no banco de dados.
+
+    Args:
+        value (str): Valor do email.
+
+    Raises:
+        serializers.ValidationError: Se o email já estiver registrado.
+    """
     if Usuario.objects.filter(email=value).exists():
         raise serializers.ValidationError("Um usuário com este email já está registrado.")
     
 def validate_file_extension(value):
+    """
+    Valida a extensão do arquivo.
+
+    Args:
+        value (File): Arquivo a ser validado.
+
+    Raises:
+        ValidationError: Se a extensão do arquivo não for suportada.
+    """
     import os
     ext = os.path.splitext(value.name)[1]  # Captura a extensão do arquivo
     valid_extensions = ['.pdf', '.png', '.jpg', '.jpeg']
@@ -137,6 +269,26 @@ def validate_file_extension(value):
 
 
 class CriarUsuarioSerializer(serializers.Serializer):
+    """
+    Serializer para criação de usuário.
+
+    Atributos:
+        nome (CharField): Nome do usuário.
+        cpf (CharField): CPF do usuário.
+        email (EmailField): Email do usuário.
+        avatar (CharField): Avatar do usuário.
+        isProfessor (BooleanField): Indica se o usuário é professor.
+        IsInterno (BooleanField): Indica se o professor é interno.
+        matricula (CharField): Matrícula do usuário.
+        area_atuacao (CharField): Área de atuação do professor.
+        titulo (CharField): Título acadêmico do professor.
+        area_interesse (CharField): Área de interesse do usuário.
+        identidade (FileField): Arquivo de identidade.
+        diploma (FileField): Arquivo de diploma.
+
+    Métodos:
+        validate(data): Valida os campos com base nas regras de negócio.
+    """
     nome = serializers.CharField()
     cpf = serializers.CharField(validators=[validate_cpf])
     email = serializers.EmailField(validators=[validate_unique_email])
@@ -152,6 +304,15 @@ class CriarUsuarioSerializer(serializers.Serializer):
 
 
     def validate(self, data):
+        """
+        Valida os campos com base nas regras de negócio.
+
+        Args:
+            data (dict): Dados a serem validados.
+
+        Raises:
+            serializers.ValidationError: Se as validações não forem bem-sucedidas.
+        """
         is_interno = data.get('IsInterno', False)  # Usa get com um valor padrão False
         is_professor = data.get('isProfessor', False)
 
@@ -184,6 +345,9 @@ class CriarUsuarioSerializer(serializers.Serializer):
 
 
 class FileSerializer(serializers.ModelSerializer):
+    """
+    Serializer para arquivos.
+    """
     class Meta:
         model = ProfessorExterno  # O modelo que você usa para armazenar arquivos
         fields = "__all__"

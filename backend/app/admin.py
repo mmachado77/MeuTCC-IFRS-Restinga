@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Avaliacao, Banca, Coordenador, Estudante, Professor, HorarioAtendimento, ProfessorExterno, ProfessorInterno, Sessao, SessaoFinal, SessaoPrevia, StatusCadastro, TccStatus, Tcc, Tema, Usuario, Semestre, Convite, SemestreCoordenador, Mensagem, Nota
+from .models import Avaliacao, Banca, Coordenador, Estudante, Professor, HorarioAtendimento, ProfessorExterno, ProfessorInterno, Sessao, SessaoFinal, SessaoPrevia, StatusCadastro, TccStatus, Tcc, Tema, Usuario, Semestre, SemestreCoordenador, Mensagem, Nota
 
 # Register your models here.
 admin.site.register((
@@ -21,7 +21,6 @@ admin.site.register((
     TccStatus,
     Tema,
     Semestre,
-    Convite,
     SemestreCoordenador,
     Mensagem,
     Nota

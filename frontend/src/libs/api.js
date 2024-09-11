@@ -8,9 +8,13 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-        config.headers.Authorization = `Token ${token}`;
+    try {
+        const token = 'localStorage' in self && localStorage.getItem('token') || null;
+        if (token) {
+            config.headers.Authorization = `Token ${token}`;
+        }
+    } catch (error) {
+        // OK to ignore
     }
 
     // Verifica se os dados enviados são uma instância de FormData
