@@ -11,6 +11,7 @@ import Image from "next/image";
 import NotificacoesService from "meutcc/services/NotificacoesService";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import WidgetManualVLibras from "meutcc/libs/widgetVLibras";
 
 
 export const AppLayout = ({ children, guards }) => {
@@ -122,6 +123,7 @@ export const AppLayout = ({ children, guards }) => {
 
             <div style={{ minHeight: '500px' }}>
                 {children}
+                <WidgetManualVLibras/>
             </div>
 
             <footer className='bg-green-900 text-white' style={{ background: 'rgb(0 49 21)' }}>
