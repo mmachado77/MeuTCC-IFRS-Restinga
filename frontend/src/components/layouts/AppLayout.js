@@ -22,12 +22,15 @@ export const AppLayout = ({ children, guards }) => {
     const [coordenadorNome, setCoordenadorNome] = useState('');
 
     const menuItemTemplate = (item) => {
-        return <Link href={item.url} className="p-menuitem-link" aria-hidden="true">
-            <span className={'p-menuitem-icon ' + item.icon || ''}></span>
-            <span className="p-menuitem-text">{item.label}</span>
-        </Link>;
-
+        return (
+            <a className="p-menuitem-link" aria-hidden="true" onClick={(e) => e.preventDefault()}>
+                {item.icon && <span className={'p-menuitem-icon ' + item.icon}></span>}
+                <span className="p-menuitem-text">{item.label}</span>
+            </a>
+        );
     };
+    
+    
 
     const typesMenu = {
         Todos: [
@@ -39,7 +42,7 @@ export const AppLayout = ({ children, guards }) => {
         ],
         Coordenador: [
             {
-                label: 'Validar', icon: 'pi pi-fw pi-check', url: '',
+                label: 'Validar', icon: 'pi pi-fw pi-check',
                 items: [
                     { label: 'Validar Cadastros', icon: 'pi pi-fw pi-users', url: '/atualizar-permissoes' },
                     { label: 'Validar Propostas', icon: 'pi pi-fw pi-book', url: '/proposta-pendente' },
