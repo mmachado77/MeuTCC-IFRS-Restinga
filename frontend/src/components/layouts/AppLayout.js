@@ -22,11 +22,22 @@ export const AppLayout = ({ children, guards }) => {
     const [coordenadorNome, setCoordenadorNome] = useState('');
 
     const menuItemTemplate = (item) => {
+        // Verifica se o item tem uma URL para habilitar a navegação
+        if (item.url) {
+            return (
+                <Link href={item.url} className="p-menuitem-link">
+                    {item.icon && <span className={'p-menuitem-icon ' + item.icon}></span>}
+                    <span className="p-menuitem-text">{item.label}</span>
+                </Link>
+            );
+        }
+    
+        // Caso não tenha URL, apenas renderiza o item como expansível
         return (
-            <a className="p-menuitem-link" aria-hidden="true" onClick={(e) => e.preventDefault()}>
+            <span className="p-menuitem-link" aria-hidden="true">
                 {item.icon && <span className={'p-menuitem-icon ' + item.icon}></span>}
                 <span className="p-menuitem-text">{item.label}</span>
-            </a>
+            </span>
         );
     };
     
