@@ -1,33 +1,33 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { fetchDetalhesTCC } from '../services/TccService';
+import { useAuth } from '../../../core/context/AuthContext'; // Importa o AuthContext
 
 const TccContext = createContext();
 
 export const TccProvider = ({ tccId, children }) => {
     const [tccData, setTccData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const { user } = useAuth(); // Obtém o usuário diretamente do AuthContext
 
     useEffect(() => {
-        const carregarDetalhes = async () => {
+        const fetchData = async () => {
             try {
-                setLoading(true);
                 const data = await fetchDetalhesTCC(tccId);
                 setTccData(data);
-            } catch (err) {
-                setError(err.message);
+            } catch (error) {
+                console.error(error);
             } finally {
                 setLoading(false);
             }
         };
 
-        if (tccId) carregarDetalhes();
+        if (tccId) {
+            fetchData();
+        }
     }, [tccId]);
 
-    const currentStatus = tccData?.status?.[tccData.status.length - 1];
-
     return (
-        <TccContext.Provider value={{ tccData, currentStatus, loading, error }}>
+        <TccContext.Provider value={{ tccData, user, loading }}>
             {children}
         </TccContext.Provider>
     );
