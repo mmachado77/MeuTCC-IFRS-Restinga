@@ -5,7 +5,7 @@ from rest_framework import status
 from django.db.models import Max, F, Q
 from app.enums import StatusTccEnum, UsuarioTipoEnum
 from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre, Professor, Coordenador, Sessao, Banca, Tema
-from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer, TemaSerializer
+from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer, TemaSerializer, TccEditSerializer 
 from app.services.proposta import PropostaService
 from app.services.tcc import TccService
 from app.services.notificacoes import notificacaoService
@@ -231,45 +231,51 @@ class TccStatusResponderPropostaView(CustomAPIView):
 class EditarTCCView(CustomAPIView):
     """
     API para editar um TCC existente.
-
-    Métodos:
-        put(request, tccid): Edita um TCC existente.
     """
+
     permission_classes = [IsAuthenticated]
 
     def put(self, request, tccid):
         """
         Edita um TCC existente.
-
-        Args:
-            request (Request): A requisição HTTP.
-            tccid (int): ID do TCC.
-
-        Retorna:
-            Response: Resposta HTTP confirmando a edição ou mensagem de erro.
         """
         try:
+            # Recupera o TCC pelo ID
             tcc = Tcc.objects.get(id=tccid)
         except Tcc.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'TCC não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
-        user = request.user
+        # Obtém o perfil do usuário logado
+        try:
+            usuario = Usuario.objects.get(user=request.user)
+        except Usuario.DoesNotExist:
+            return Response(
+                {'detail': 'Perfil de usuário não encontrado.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        if user == tcc.autor.user:
-            tcc.tema = request.data.get('tema', tcc.tema)
-            tcc.resumo = request.data.get('resumo', tcc.resumo)
-            tcc.save()
-            return Response({'status': 'success', 'message': 'TCC atualizado com sucesso.'})
+        # Verifica permissões de edição
+        if not (
+            usuario.id == tcc.autor.id or
+            usuario.id == tcc.orientador.id or
+            usuario.tipo == UsuarioTipoEnum.COORDENADOR
+        ):
+            return Response(
+                {'detail': 'Você não tem permissão para editar este TCC.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
-        if user.is_superuser or Coordenador.objects.filter(user=user).exists():
-            tcc.orientador = Professor.objects.get(id=request.data.get('orientador', tcc.orientador))
-            if request.data.get('coorientador', tcc.coorientador) is not None:
-                tcc.coorientador = Professor.objects.get(id=request.data.get('coorientador', tcc.coorientador))
-            tcc.save()
-            return Response({'status': 'success', 'message': 'TCC atualizado com sucesso.'})
+        # Serializa os dados recebidos
+        serializer = TccEditSerializer(instance=tcc, data=request.data, context={'request': request})
 
-        # Se o usuário não tiver permissão
-        return Response({'status': 'error', "message": "Você não tem permissão para editar este TCC."}, status=status.HTTP_403_FORBIDDEN)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {'status': 'success', 'message': 'TCC atualizado com sucesso.', 'data': serializer.data},
+                status=status.HTTP_200_OK,
+            )
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DetalhesTCCView(CustomAPIView):

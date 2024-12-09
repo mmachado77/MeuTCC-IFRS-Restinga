@@ -6,10 +6,11 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Checkbox } from 'primereact/checkbox';
 import { useTccContext } from '../context/TccContext';
 import DropdownProfessores from '../../../components/ui/DropdownProfessores';
+import TccService from '../services/TccService';
 import toast from 'react-hot-toast';
 
 const EditarForm = ({ buttonLabel = "Editar TCC", buttonClassName = "p-button-rounded p-button-success", isCoordenador }) => {
-    const { tccData, updateTccData } = useTccContext();
+    const { tccData, fetchTccDetails, updateTccDetails } = useTccContext();
     const [isDialogVisible, setIsDialogVisible] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -70,12 +71,32 @@ const EditarForm = ({ buttonLabel = "Editar TCC", buttonClassName = "p-button-ro
     // Submissão do formulário
     const handleSave = async () => {
         if (!validarFormulario()) return;
-
+    
         setLoading(true);
         try {
-            await updateTccData(formData); // Chama o service de atualização
+            let payload = {};
+    
+            if (isCoordenador) {
+                // Coordenador pode atualizar todos os campos
+                payload = {
+                    tema: formData.tema,
+                    resumo: formData.resumo,
+                    orientador: formData.orientador,
+                    coorientador: formData.temCoorientador ? formData.coorientador : null,
+                };
+            } else {
+                // Autor e Orientador podem atualizar apenas tema e resumo
+                payload = {
+                    tema: formData.tema,
+                    resumo: formData.resumo,
+                };
+            }
+    
+            console.log('Payload enviado:', payload); // Depuração: Verificar os dados enviados
+    
+            await updateTccDetails(payload); // Chama o contexto para atualizar o TCC
             toast.success('Dados do TCC atualizados com sucesso!');
-            setIsDialogVisible(false);
+            setIsDialogVisible(false); // Fecha o modal
         } catch (error) {
             console.error('Erro ao atualizar o TCC:', error);
             toast.error('Erro ao atualizar os dados do TCC.');
@@ -83,6 +104,8 @@ const EditarForm = ({ buttonLabel = "Editar TCC", buttonClassName = "p-button-ro
             setLoading(false);
         }
     };
+    
+    
 
     // Manipulação de alterações no formulário
     const handleInputChange = (e) => {
