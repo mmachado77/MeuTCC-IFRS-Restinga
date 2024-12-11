@@ -22,9 +22,9 @@ export async function fetchDetalhesTCC(tccId) {
  */
 export async function updateDetalhesTCC(tccId, data) {
     try {
-        const response = await apiClient.put(`/app/editar-tcc/${tccId}/`, data);
-        return response.data;
+        const response = await apiClient.patch(`/app/editar-tcc/${tccId}/`, data);
+        return response.data; // Retorna os dados apenas em caso de sucesso
     } catch (error) {
-        throw new Error(error.response?.data?.message || 'Erro ao atualizar detalhes do TCC');
+        throw error.response?.data || error.message; // Propaga o erro
     }
 }

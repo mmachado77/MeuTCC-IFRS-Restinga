@@ -12,7 +12,7 @@ const DetalhesTCCPage = () => {
 
     return (
         <TccProvider tccId={tccId}>
-            <div className="detalhes-tcc-page">
+            <div className="detalhes-tcc-page mt-6">
                 <DetalhesHeader />
 
             </div>

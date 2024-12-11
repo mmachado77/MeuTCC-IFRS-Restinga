@@ -71,11 +71,11 @@ const EditarForm = ({ buttonLabel = "Editar TCC", buttonClassName = "p-button-ro
     // Submissão do formulário
     const handleSave = async () => {
         if (!validarFormulario()) return;
-    
+
         setLoading(true);
         try {
             let payload = {};
-    
+
             if (isCoordenador) {
                 // Coordenador pode atualizar todos os campos
                 payload = {
@@ -91,21 +91,20 @@ const EditarForm = ({ buttonLabel = "Editar TCC", buttonClassName = "p-button-ro
                     resumo: formData.resumo,
                 };
             }
-    
-            console.log('Payload enviado:', payload); // Depuração: Verificar os dados enviados
-    
             await updateTccDetails(payload); // Chama o contexto para atualizar o TCC
             toast.success('Dados do TCC atualizados com sucesso!');
             setIsDialogVisible(false); // Fecha o modal
         } catch (error) {
-            console.error('Erro ao atualizar o TCC:', error);
-            toast.error('Erro ao atualizar os dados do TCC.');
+            const mensagemErro = typeof error === 'object' && error !== null
+                ? Object.values(error).flat().join(' | ') // Combina todas as mensagens do erro
+                : 'Erro desconhecido'; // Caso o erro não seja um objeto esperado
+            toast.error(`Erro ao Atualizar TCC: ${mensagemErro}`);
         } finally {
             setLoading(false);
         }
     };
-    
-    
+
+
 
     // Manipulação de alterações no formulário
     const handleInputChange = (e) => {

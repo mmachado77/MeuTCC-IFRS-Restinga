@@ -38,7 +38,7 @@ export const TccProvider = ({ tccId, children }) => {
             const updatedTccData = await fetchDetalhesTCC(tccId); // Recarrega os dados atualizados
             setTccData(updatedTccData); // Atualiza o estado local
         } catch (error) {
-            console.error('Erro ao atualizar detalhes do TCC:', error);
+            throw error; // Propaga o erro para o componente que chamou a função
         } finally {
             setLoading(false);
         }

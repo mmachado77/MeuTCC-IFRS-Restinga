@@ -230,14 +230,14 @@ class TccStatusResponderPropostaView(CustomAPIView):
 
 class EditarTCCView(CustomAPIView):
     """
-    API para editar um TCC existente.
+    API para editar um TCC existente com suporte a PATCH.
     """
 
     permission_classes = [IsAuthenticated]
 
-    def put(self, request, tccid):
+    def patch(self, request, tccid):
         """
-        Edita um TCC existente.
+        Edita parcialmente um TCC existente.
         """
         try:
             # Recupera o TCC pelo ID
@@ -255,18 +255,24 @@ class EditarTCCView(CustomAPIView):
             )
 
         # Verifica permissões de edição
-        if not (
-            usuario.id == tcc.autor.id or
-            usuario.id == tcc.orientador.id or
-            usuario.tipo == UsuarioTipoEnum.COORDENADOR
-        ):
+        if usuario.id == tcc.autor.id or usuario.id == tcc.orientador.id:
+            # Permite apenas edição de "tema" e "resumo" para autores e orientadores
+            allowed_fields = {"tema", "resumo"}
+        elif usuario.tipo == UsuarioTipoEnum.COORDENADOR:
+            # Coordenadores podem editar todos os campos
+            allowed_fields = {"tema", "resumo", "orientador", "coorientador"}
+        else:
+            # Caso não seja autor, orientador ou coordenador
             return Response(
                 {'detail': 'Você não tem permissão para editar este TCC.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
+        # Filtra o payload para incluir apenas os campos permitidos
+        filtered_data = {key: value for key, value in request.data.items() if key in allowed_fields}
+
         # Serializa os dados recebidos
-        serializer = TccEditSerializer(instance=tcc, data=request.data, context={'request': request})
+        serializer = TccEditSerializer(instance=tcc, data=filtered_data, partial=True, context={'request': request})
 
         if serializer.is_valid():
             serializer.save()
@@ -276,6 +282,7 @@ class EditarTCCView(CustomAPIView):
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class DetalhesTCCView(CustomAPIView):

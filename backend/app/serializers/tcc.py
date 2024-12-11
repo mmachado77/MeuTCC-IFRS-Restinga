@@ -66,33 +66,39 @@ class TccEditSerializer(serializers.ModelSerializer):
     """
     Serializer para a edição de um TCC.
 
-    Este serializer é usado para validar os campos que podem ser editados por
-    diferentes tipos de usuários. Ele inclui lógica de validação para garantir
-    que apenas os campos permitidos sejam modificados de acordo com as permissões do usuário.
+    Este serializer valida os campos que podem ser editados por diferentes tipos de usuários.
     """
+
     class Meta:
         model = Tcc
         fields = ["tema", "resumo", "orientador", "coorientador"]
 
     def validate(self, data):
-        try:
-            usuario = Usuario.objects.get(user=self.context['request'].user)
-        except Usuario.DoesNotExist:
-            raise serializers.ValidationError("Perfil de usuário não encontrado.")
+        """
+        Valida se o usuário tem permissão para editar os campos fornecidos.
+        """
+        request = self.context.get('request')
+        if not request:
+            raise serializers.ValidationError({"erro_permissao": ["Requisição não encontrada no contexto."]})
 
-        # Recupera o objeto TCC sendo editado
+        try:
+            usuario = Usuario.objects.get(user=request.user)
+        except Usuario.DoesNotExist:
+            raise serializers.ValidationError({"erro_permissao": ["Perfil de usuário não encontrado."]})
+
         tcc = self.instance
 
         # Autores e Orientadores podem editar apenas "tema" e "resumo"
         if usuario.id == tcc.autor.id or usuario.id == tcc.orientador.id:
+            # Verifica se apenas os campos permitidos estão sendo enviados
             restricted_fields = [field for field in data.keys() if field not in ["tema", "resumo"]]
             if restricted_fields:
-                raise serializers.ValidationError("Você não tem permissão para editar esses campos.")
+                raise serializers.ValidationError({"erro_permissao": ["Você não tem permissão para editar esses campos."]})
+            return data  # Retorna os dados se tudo estiver correto
 
         # Coordenadores podem editar todos os campos
-        if usuario.tipo == UsuarioTipoEnum.COORDENADOR:
+        elif usuario.tipo == UsuarioTipoEnum.COORDENADOR:
             return data
 
-        # Caso não seja autor, orientador ou coordenador
-        raise serializers.ValidationError("Você não tem permissão para editar este TCC.")
-
+        # Caso o usuário não tenha permissão
+        raise serializers.ValidationError({"erro_permissao": ["Você não tem permissão para editar este TCC."]})
