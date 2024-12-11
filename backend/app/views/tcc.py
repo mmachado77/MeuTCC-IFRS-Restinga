@@ -5,7 +5,7 @@ from rest_framework import status
 from django.db.models import Max, F, Q
 from app.enums import StatusTccEnum, UsuarioTipoEnum
 from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre, Professor, Coordenador, Sessao, Banca, Tema
-from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer, TemaSerializer, TccEditSerializer 
+from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer, TemaSerializer, TccEditSerializer, TccPublicSerializer
 from app.services.proposta import PropostaService
 from app.services.tcc import TccService
 from app.services.notificacoes import notificacaoService
@@ -333,24 +333,51 @@ class TCCsPublicadosView(CustomAPIView):
     """
     API para listar todos os TCCs aprovados.
 
+    Esta view retorna apenas os dados públicos dos TCCs que foram aprovados
+    para exibição na página inicial ou em outras áreas públicas do sistema.
+
+    Permissões:
+        - Qualquer usuário (autenticado ou não) pode acessar esta view.
+
     Métodos:
-        get(request): Retorna todos os TCCs aprovados.
+        get(request): Retorna uma lista de TCCs aprovados com dados públicos.
+
+    Args:
+        request (Request): A requisição HTTP.
+
+    Retorna:
+        Response: Uma lista de TCCs aprovados com os campos especificados no
+        serializer público (TccPublicSerializer).
     """
-    permission_classes = [AllowAny]
+
+    permission_classes = [AllowAny]  # Permite acesso público
 
     def get(self, request):
         """
-        Retorna todos os TCCs aprovados.
+        Retorna uma lista de TCCs aprovados.
 
-        Args:
-            request (Request): A requisição HTTP.
+        Recupera os TCCs que possuem o status de "Aprovado" no sistema e os serializa
+        utilizando o TccPublicSerializer, que retorna apenas os campos públicos.
 
         Retorna:
-            Response: Resposta HTTP com todos os TCCs aprovados ou mensagem de erro.
+            Response: JSON com os dados públicos dos TCCs aprovados.
         """
-        tccs = Tcc.objects.filter(tccstatus__status=StatusTccEnum.APROVADO)
-        serializer = TccSerializer(tccs, many=True)
-        return Response(serializer.data)
+        try:
+            # Filtra os TCCs com status "Aprovado"
+            tccs = Tcc.objects.filter(tccstatus__status=StatusTccEnum.APROVADO)
+            
+            # Serializa os TCCs utilizando o serializer público
+            serializer = TccPublicSerializer(tccs, many=True)
+            
+            # Retorna a resposta com os dados serializados
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            # Trata possíveis erros na execução
+            return Response(
+                {'detail': 'Erro ao listar os TCCs aprovados.', 'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
 
 class TemasSugeridosView(CustomAPIView):
     """

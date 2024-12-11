@@ -54,6 +54,46 @@ class TccSerializer(serializers.ModelSerializer):
         model = Tcc
         fields = '__all__'
 
+class TccPublicSerializer(serializers.ModelSerializer):
+    """
+    Serializer público para o modelo Tcc.
+
+    Este serializer é usado para retornar apenas os dados públicos dos TCCs
+    que foram aprovados. Ele não inclui informações sensíveis ou detalhes
+    relacionados às bancas e arquivos do TCC.
+
+    Atributos:
+        autor (CharField): Retorna o nome do autor do TCC.
+        orientador (CharField): Retorna o nome do orientador do TCC.
+        coorientador (SerializerMethodField): Retorna o nome do coorientador, se existir.
+        tema (CharField): O tema do TCC.
+        id (IntegerField): O identificador único do TCC.
+    
+    Métodos:
+        get_coorientador(obj): Retorna o nome do coorientador, se existir. Caso contrário, retorna None.
+    """
+
+    autor = serializers.CharField(source='autor.nome')
+    orientador = serializers.CharField(source='orientador.nome')
+    coorientador = serializers.SerializerMethodField()
+
+    def get_coorientador(self, obj):
+        """
+        Retorna o nome do coorientador, se existir.
+
+        Args:
+            obj (Tcc): A instância do modelo Tcc.
+
+        Retorna:
+            str ou None: O nome do coorientador, ou None se o TCC não tiver um coorientador.
+        """
+        return obj.coorientador.nome if obj.coorientador else None
+
+    class Meta:
+        model = Tcc
+        fields = ['id', 'tema', 'autor', 'orientador', 'coorientador']
+
+
 class TccCreateSerializer(serializers.ModelSerializer):
     """
     Serializer para a criação de um TCC.
