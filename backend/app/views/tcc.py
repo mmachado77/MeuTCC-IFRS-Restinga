@@ -5,7 +5,7 @@ from rest_framework import status
 from django.db.models import Max, F, Q
 from app.enums import StatusTccEnum, UsuarioTipoEnum
 from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre, Professor, Coordenador, Sessao, Banca, Tema
-from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer, TemaSerializer, TccEditSerializer, TccPublicSerializer
+from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer, TemaSerializer, TccEditSerializer, TccPublicSerializer, DetalhesTccPublicSerializer
 from app.services.proposta import PropostaService
 from app.services.tcc import TccService
 from app.services.notificacoes import notificacaoService
@@ -289,10 +289,12 @@ class DetalhesTCCView(CustomAPIView):
     """
     API para visualizar os detalhes de um TCC.
 
+    Permite acesso público com dados limitados e acesso completo para usuários relacionados.
+
     Métodos:
         get(request, tccid, format=None): Retorna os detalhes de um TCC.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request, tccid, format=None):
         """
@@ -303,14 +305,19 @@ class DetalhesTCCView(CustomAPIView):
             tccid (int): ID do TCC.
 
         Retorna:
-            Response: Resposta HTTP com os detalhes do TCC ou mensagem de erro.
+            Response: Resposta HTTP com os detalhes do TCC (completo para usuários relacionados,
+                      limitado para demais usuários).
         """
         bancas = []
         users_banca = []
+
         try:
+            # Busca o TCC pelo ID
             tcc = Tcc.objects.get(id=tccid)
         except Tcc.DoesNotExist:
             return Response({'status': 'error', "message": "TCC não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Verifica se existem sessões associadas ao TCC e recupera os usuários da banca
         if Sessao.objects.filter(tcc=tcc).exists():
             sessoes = Sessao.objects.filter(tcc=tcc)
             for sessao in sessoes:
@@ -318,16 +325,32 @@ class DetalhesTCCView(CustomAPIView):
                     bancas.append(Banca.objects.get(sessao=sessao))
             for banca in bancas:
                 for professor in banca.professores.all():
-                        users_banca.append(professor.user)
+                    users_banca.append(professor.user)
+
         user = request.user
-        coord = Coordenador.objects.filter(user=user)
-        if (str(user) == 'admin') or (user == tcc.autor.user) or (user == tcc.orientador.user) or (
+        if user.is_authenticated:
+            coord = Coordenador.objects.filter(user=user)
+
+            # Verifica se o usuário está relacionado ao TCC
+            if (str(user) == 'admin') or (user == tcc.autor.user) or (user == tcc.orientador.user) or (
                 tcc.coorientador and user == tcc.coorientador.user) or (coord.exists()) or (user in users_banca):
-            serializer = TccSerializer(tcc)
-            return Response(serializer.data)
-        else:
-            return Response({'status': 'alert', "message": "Você não tem permissão para visualizar este TCC."},
-                            status=status.HTTP_403_FORBIDDEN)
+                # Usuário relacionado ao TCC - retorna detalhes completos
+                serializer = TccSerializer(tcc)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+        # Verifica se o último status permite acesso público
+        ultimo_status = TccStatus.objects.filter(tcc=tcc).order_by('-dataStatus').first()
+        if ultimo_status and ultimo_status.status in [StatusTccEnum.FINAL_AGENDADA, StatusTccEnum.APROVADO]:
+            # Usuário não relacionado - retorna apenas dados públicos
+            serializer = DetalhesTccPublicSerializer(tcc)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+        # Caso contrário, retorna uma mensagem de permissão negada
+        return Response({'status': 'alert', "message": "Você não tem permissão para visualizar este TCC."},
+                        status=status.HTTP_403_FORBIDDEN)
+
+
             
 class TCCsPublicadosView(CustomAPIView):
     """

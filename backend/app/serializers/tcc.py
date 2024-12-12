@@ -93,6 +93,85 @@ class TccPublicSerializer(serializers.ModelSerializer):
         model = Tcc
         fields = ['id', 'tema', 'autor', 'orientador', 'coorientador']
 
+class DetalhesTccPublicSerializer(serializers.ModelSerializer):
+    """
+    Serializer público para o modelo Tcc.
+
+    Este serializer retorna dados básicos e limitados dos TCCs, incluindo informações adicionais,
+    como o resumo, o período do semestre, a data da sessão final e o último status.
+
+    Atributos:
+        id (IntegerField): Identificador único do TCC.
+        tema (CharField): Tema do TCC.
+        autor (CharField): Nome do autor do TCC.
+        orientador (CharField): Nome do orientador do TCC.
+        coorientador (SerializerMethodField): Nome do coorientador, se existir.
+        resumo (CharField): Resumo do TCC.
+        documentoTCC (FileDetailSerializer): Detalhes do documento do TCC.
+        semestre (CharField): Período do semestre em que o TCC foi desenvolvido.
+        sessao_final (SerializerMethodField): Data da sessão final do TCC.
+        status (SerializerMethodField): Último status do TCC.
+    """
+
+    autor = serializers.CharField(source='autor.nome')
+    orientador = serializers.CharField(source='orientador.nome')
+    coorientador = serializers.SerializerMethodField()
+    semestre = serializers.CharField(source='semestre.periodo')
+    sessao_final = serializers.SerializerMethodField()
+    documentoTCC = FileDetailSerializer()
+    status = serializers.SerializerMethodField()
+
+    def get_coorientador(self, obj):
+        """
+        Retorna o nome do coorientador, se existir.
+
+        Args:
+            obj (Tcc): A instância do modelo Tcc.
+
+        Retorna:
+            str ou None: Nome do coorientador ou None se não houver.
+        """
+        return obj.coorientador.nome if obj.coorientador else None
+
+    def get_sessao_final(self, obj):
+        """
+        Retorna a data da sessão final associada ao TCC.
+
+        Args:
+            obj (Tcc): A instância do modelo Tcc.
+
+        Retorna:
+            str ou None: Data da sessão final ou None se não houver.
+        """
+        sessao_final = Sessao.objects.filter(tcc=obj).order_by('-data_inicio').first()
+        return sessao_final.data_inicio if sessao_final else None
+
+    def get_status(self, obj):
+        """
+        Retorna o último status do TCC.
+
+        Args:
+            obj (Tcc): A instância do modelo Tcc.
+
+        Retorna:
+            dict ou None: Último status do TCC, incluindo status, mensagem e data.
+        """
+        ultimo_status = TccStatus.objects.filter(tcc=obj).order_by('-dataStatus').first()
+        if ultimo_status:
+            return {
+                'status': ultimo_status.status,
+                'statusMensagem': ultimo_status.statusMensagem,
+                'dataStatus': ultimo_status.dataStatus,
+            }
+        return None
+
+    class Meta:
+        model = Tcc
+        fields = [
+            'id', 'tema', 'autor', 'orientador', 'coorientador',
+            'resumo', 'documentoTCC', 'semestre', 'sessao_final', 'status'
+        ]
+
 
 class TccCreateSerializer(serializers.ModelSerializer):
     """
