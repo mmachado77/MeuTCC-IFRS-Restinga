@@ -18,3 +18,6 @@ from .tema import *
 from .semestreCoordenador import *
 from .mensagem import *
 from .credenciais import *
+from .curso import *
+from .templateAvaliacao import *
+from .criterioAvaliacao import *
