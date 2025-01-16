@@ -2,7 +2,7 @@
 # >>> exec(open('script_inicial.py').read())
 
 from django.contrib.auth.models import User
-from app.models import TccStatus, Tcc, Semestre, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno, SemestreCoordenador, Mensagem, Tema
+from app.models import TccStatus, Tcc, Semestre, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno, SemestreCoordenador, Mensagem, Tema, Curso
 from datetime import datetime
 
 
@@ -25,17 +25,28 @@ status3 = StatusCadastro.objects.create(
     aprovacao = False,
     justificativa="Justificativa exemplo"
 )
-
 status4 = StatusCadastro.objects.create(
     aprovacao = True
 )
-
 status6 = StatusCadastro.objects.create(
     aprovacao = True
 )
 status5 = StatusCadastro.objects.create(
     aprovacao = False,
     justificativa="Justificativa exemplo"
+)
+
+#Cria um curso
+ads = Curso.objects.create(
+    nome="Análise e Desenvolvimento de Sistemas",
+    sigla = "ADS",
+    descricao = "analise bla bla bla bla bla blabla bla blabla bla blabla bla blabla bla bla",
+    ultima_atualizacao = datetime.today(),
+    data_criacao = datetime.today(),
+    limite_orientacoes = 3,
+    regra_sessao_publica = "OBRIGATORIO",
+    prazo_propostas_inicio = datetime.today(),
+    prazo_propostas_fim = datetime.today()
 )
 
 # Cria um professor interno
@@ -51,6 +62,7 @@ andre = ProfessorInterno.objects.create(nome="André Schneider",
                          user = andreUser,
                          avatar="https://primefaces.org/cdn/primereact/images/organization/walter.jpg"
                         )
+andre.cursos.set([ads])
 
 ProfInterUser = User.objects.create_user("cleitin@restinga.ifrs.edu.br", "cleitin@restinga.ifrs.edu.br", "05156413231")
 cleitin = ProfessorInterno.objects.create(nome="Cleitin da Silva", 
@@ -93,11 +105,12 @@ iuri = ProfessorInterno.objects.create(nome="Iuri",
 estudanteUser = User.objects.create_user("estudante@gmail.com", "estudante@gmail.com", "12345678912")
 estudante = Estudante.objects.create(nome="Estudante", 
                       cpf="12345678912", 
+                      curso=ads,
                       email="estudante@gmail.com",
                       user=estudanteUser)
 
 coordenadorUser = User.objects.create_user("coordenador@gmail.com", "coordenador@gmail.com", "151515")
-coordenador = Coordenador.objects.create(nome="Coordenador", cpf="151515", email="coordenador@gmail.com", user = coordenadorUser)
+coordenador = Coordenador.objects.create(nome="Coordenador", cpf="151515", email="coordenador@gmail.com", user = coordenadorUser, curso=ads)
 
 ProfExternoUser = User.objects.create_user("externo@gmail.com", "externo@gmail.com", "98765432153")
 ProfExterno = ProfessorExterno.objects.create(
@@ -145,6 +158,7 @@ coordSemestre = SemestreCoordenador.objects.create(
 )
 
 tcc = Tcc.objects.create(
+        curso=ads,
         autor= estudante,
         orientador= cleitin,
         semestre= semestre1,
@@ -153,6 +167,7 @@ tcc = Tcc.objects.create(
     )
 
 tcc2 = Tcc.objects.create(
+        curso=ads,
         autor= estudante,
         orientador= cleitin,
         semestre= semestre2,
