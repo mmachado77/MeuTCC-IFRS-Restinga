@@ -35,19 +35,85 @@ status5 = StatusCadastro.objects.create(
     aprovacao = False,
     justificativa="Justificativa exemplo"
 )
+from datetime import datetime
+from app.models import Curso
 
-#Cria um curso
+# Criação do curso ADS armazenado no objeto `ads`
 ads = Curso.objects.create(
-    nome="Análise e Desenvolvimento de Sistemas",
-    sigla = "ADS",
-    descricao = "analise bla bla bla bla bla blabla bla blabla bla blabla bla blabla bla bla",
-    ultima_atualizacao = datetime.today(),
-    data_criacao = datetime.today(),
-    limite_orientacoes = 3,
-    regra_sessao_publica = "OBRIGATORIO",
-    prazo_propostas_inicio = datetime.today(),
-    prazo_propostas_fim = datetime.today()
+    nome="Tecnologia em Análise e Desenvolvimento de Sistemas",
+    sigla="ADS",
+    descricao="Curso técnico focado no desenvolvimento de sistemas computacionais.",
+    ultima_atualizacao=datetime.today(),
+    data_criacao=datetime.today(),
+    limite_orientacoes=3,
+    regra_sessao_publica="OBRIGATORIO",
+    prazo_propostas_inicio=datetime.today(),
+    prazo_propostas_fim=datetime.today()
 )
+
+# Criação dos outros cursos
+cursos = [
+    {
+        "nome": "Licenciatura em Letras Português e Espanhol",
+        "sigla": "LPE",
+        "descricao": "Curso voltado à formação de professores de Língua Portuguesa e Espanhol.",
+    },
+    {
+        "nome": "Tecnologia em Agroecologia",
+        "sigla": "TAG",
+        "descricao": "Curso voltado ao desenvolvimento de técnicas sustentáveis na agroecologia.",
+    },
+    {
+        "nome": "Tecnologia em Eletrônica Industrial",
+        "sigla": "TEI",
+        "descricao": "Curso técnico voltado à eletrônica aplicada no setor industrial.",
+    },
+    {
+        "nome": "Tecnologia em Gestão Desportiva e de Lazer",
+        "sigla": "GDL",
+        "descricao": "Curso voltado à gestão de atividades esportivas e de lazer.",
+    },
+    {
+        "nome": "Tecnologia em Processos Gerenciais",
+        "sigla": "TPG",
+        "descricao": "Curso técnico voltado à administração e gerenciamento de processos.",
+    },
+    {
+        "nome": "Engenharia de Software",
+        "sigla": "ESW",
+        "descricao": "Curso voltado ao desenvolvimento de softwares de alta qualidade.",
+    },
+    {
+        "nome": "Ciência da Computação",
+        "sigla": "CCO",
+        "descricao": "Curso voltado ao estudo dos fundamentos teóricos e práticos da computação.",
+    },
+    {
+        "nome": "Banco de Dados",
+        "sigla": "BD",
+        "descricao": "Curso especializado em gerenciamento e administração de bancos de dados.",
+    },
+    {
+        "nome": "Inteligência Artificial",
+        "sigla": "IA",
+        "descricao": "Curso voltado ao estudo de algoritmos e tecnologias de inteligência artificial.",
+    },
+]
+
+# Cria os outros cursos no banco de dados
+for curso in cursos:
+    Curso.objects.create(
+        nome=curso["nome"],
+        sigla=curso["sigla"],
+        descricao=curso["descricao"],
+        ultima_atualizacao=datetime.today(),
+        data_criacao=datetime.today(),
+        limite_orientacoes=3,
+        regra_sessao_publica="OBRIGATORIO",
+        prazo_propostas_inicio=datetime.today(),
+        prazo_propostas_fim=datetime.today()
+    )
+
 
 # Cria um professor interno
 andreUser = User.objects.create_user("andre@restinga.ifrs.edu.br", "andre@restinga.ifrs.edu.br", "151515")

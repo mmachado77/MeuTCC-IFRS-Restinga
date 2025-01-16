@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from app.models import Usuario, Estudante, Professor, ProfessorInterno, ProfessorExterno, Coordenador, StatusCadastro
+from app.models import Usuario, Estudante, Professor, ProfessorInterno, ProfessorExterno, Coordenador, StatusCadastro, Curso
 from rest_polymorphic.serializers import PolymorphicSerializer
 from app.enums import AreaInteresseEnum
 from django.core.exceptions import ValidationError
@@ -285,6 +285,7 @@ class CriarUsuarioSerializer(serializers.Serializer):
         area_interesse (CharField): Área de interesse do usuário.
         identidade (FileField): Arquivo de identidade.
         diploma (FileField): Arquivo de diploma.
+        curso (IntegerField): ID do curso (apenas para estudantes).
 
     Métodos:
         validate(data): Valida os campos com base nas regras de negócio.
@@ -301,7 +302,7 @@ class CriarUsuarioSerializer(serializers.Serializer):
     area_interesse = serializers.CharField(required=False, allow_blank=True)
     identidade = serializers.FileField(required=False, validators=[validate_file_extension])
     diploma = serializers.FileField(required=False, validators=[validate_file_extension])
-
+    curso = serializers.IntegerField(required=False)  # Adicionado para o campo curso
 
     def validate(self, data):
         """
@@ -340,6 +341,17 @@ class CriarUsuarioSerializer(serializers.Serializer):
         elif is_interno and not is_professor:
             if not data.get('matricula'):
                 raise serializers.ValidationError({"matricula": "Matrícula deve ser preenchida para estudantes."})
+
+            # Validação do curso para estudantes
+            curso_id = data.get('curso')
+            if not curso_id:
+                raise serializers.ValidationError({"curso": "Curso deve ser selecionado para estudantes."})
+            
+            try:
+                curso = Curso.objects.get(pk=curso_id)
+                data['curso'] = curso  # Substitui o ID pelo objeto Curso
+            except Curso.DoesNotExist:
+                raise serializers.ValidationError({"curso": "Curso não encontrado."})
 
         return data
 

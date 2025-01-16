@@ -1,5 +1,5 @@
 from app.enums import StatusTccEnum
-from app.models import Professor, Estudante, Usuario, ProfessorInterno, ProfessorExterno, StatusCadastro
+from app.models import Professor, Estudante, Usuario, ProfessorInterno, ProfessorExterno, StatusCadastro, Curso
 
 
 class UsuarioService:
@@ -59,12 +59,23 @@ class UsuarioService:
                 user = usuario
             )
         
+        # Adiciona o campo curso ao criar estudantes
+        curso_id = serializer.validated_data.get('curso')  # Obtém o ID do curso
+        if curso_id:
+            try:
+                curso = Curso.objects.get(pk=curso_id)  # Busca a instância do curso
+            except Curso.DoesNotExist:
+                raise ValueError(f"Curso com ID {curso_id} não encontrado.")
+        else:
+            curso = None
+        
         return Estudante.objects.create(
             nome = serializer.validated_data['nome'],
             cpf = serializer.validated_data['cpf'], 
             email = usuario.email,
             avatar = serializer.validated_data['avatar'], 
             matricula = serializer.validated_data['matricula'],
+            curso = curso,  # Atribui a instância do curso
             user = usuario
         )
 

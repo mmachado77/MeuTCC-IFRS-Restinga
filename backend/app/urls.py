@@ -2,11 +2,16 @@ from django.urls import path, include
 from . import views
 from .views.semestre import *
 from .views.sessao import *
+from .views.curso import *
 from django.conf import settings
 from django.conf.urls.static import static
 from .views.search import SearchView
 
 urlpatterns = [
+    path('cursos-simplificados', CursosSimplificadosView.as_view(), name='listar-cursos-simplificados'),
+    path('cursos', CursosView.as_view(), name='listar-cursos'),
+    path('gerenciar-curso/<int:curso_id>/', GerenciarCursosView.as_view(), name='gerenciar-curso'),
+    path('gerenciar-curso', GerenciarCursosView.as_view(), name='criar-curso'),
     path('professores', views.GetProfessores.as_view(), name='professor-list-create'),
     path('professores-internos', views.GetProfessoresInternos.as_view(), name='professores-internos'),
     path('criar-tcc', views.CriarTCCView.as_view(), name='criar-tcc'),

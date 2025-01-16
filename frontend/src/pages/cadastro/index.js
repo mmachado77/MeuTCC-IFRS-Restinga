@@ -20,7 +20,8 @@ const CadastroPage = () => {
         diploma: null,
         isProfessor: false,
         IsInterno: false,
-        avatar: ''
+        avatar: '',
+        curso: null
     });
 
     React.useEffect(() => {
