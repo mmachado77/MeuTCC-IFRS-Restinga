@@ -1,6 +1,8 @@
 from django.contrib import admin
-
-from .models import Avaliacao, Banca, Coordenador, Estudante, Professor, HorarioAtendimento, ProfessorExterno, ProfessorInterno, Sessao, SessaoFinal, SessaoPrevia, StatusCadastro, TccStatus, Tcc, Tema, Usuario, Semestre, SemestreCoordenador, Mensagem, Nota
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from .models import Avaliacao, Banca, Coordenador, Estudante, Professor, HorarioAtendimento, ProfessorExterno, ProfessorInterno, Sessao, SessaoFinal, SessaoPrevia, StatusCadastro, TccStatus, Tcc, Tema, Usuario, Semestre, SemestreCoordenador, Mensagem, Nota, SuperAdmin
 
 # Register your models here.
 admin.site.register((
@@ -23,5 +25,6 @@ admin.site.register((
     Semestre,
     SemestreCoordenador,
     Mensagem,
-    Nota
+    Nota,
+    SuperAdmin
 ))

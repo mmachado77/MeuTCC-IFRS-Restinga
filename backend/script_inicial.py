@@ -2,9 +2,14 @@
 # >>> exec(open('script_inicial.py').read())
 
 from django.contrib.auth.models import User
-from app.models import TccStatus, Tcc, Semestre, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno, SemestreCoordenador, Mensagem, Tema, Curso
+from app.models import TccStatus, Tcc, Semestre, ProfessorInterno, Estudante, StatusCadastro, Coordenador, ProfessorExterno, SemestreCoordenador, Mensagem, Tema, Curso, SuperAdmin
 from datetime import datetime
 
+# Criação de um SuperAdmin de teste
+superadmin = SuperAdmin.objects.create_superuser(
+    email="matheusmachado77@gmail.com",
+    password="admin123"
+)
 
 # Criando usuário admin
 superuser = User.objects.create_superuser("admin", "admin@admin.com", "123")

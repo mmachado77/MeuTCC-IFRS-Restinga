@@ -23,9 +23,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('app/', include('app.urls')),
+    path('superadmin/', include('app.superadmin_urls')),  # Inclui as rotas de SuperAdmin
     path('auth-google', GoogleAuthView.as_view(), name='auth_google'),
     path('oauth2callback', GoogleAuthCallbackView.as_view(), name='google_callback'),
-
     path('auth-google-drive', GoogleDriveView.as_view(), name='auth_google_drive'),
     path('drive_oauth2callback', GoogleDriveCallbackView.as_view(), name='google_drive_callback'),
     path('upload_basic', GoogleDriveUploadBasicView.as_view(), name='upload_basic'),

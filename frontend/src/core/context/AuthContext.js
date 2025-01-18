@@ -26,6 +26,12 @@ export const AuthProvider = ({ children, guards }) => {
         const fetchUsuario = async () => {
             const accessToken = localStorage.getItem('token');
 
+            // Exceção para rotas que começam com "/superadmin"
+            if (router.pathname.startsWith('/superadmin')) {
+                setLoading(false);
+                return;
+            }
+
             if (guards && guards.length > 0 && !accessToken) {
                 window.location.href = ('/auth');
             }
