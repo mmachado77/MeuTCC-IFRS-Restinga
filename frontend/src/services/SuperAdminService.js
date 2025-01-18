@@ -10,6 +10,15 @@
 import { apiClient } from "meutcc/libs/api" // Importa a configuração global da API (baseURL configurada)
 
 /**
+ * Salva tokens no localStorage específico do SuperAdmin.
+ * @param {Object} tokens - Tokens recebidos da API.
+ */
+const saveSuperAdminTokens = (tokens) => {
+  localStorage.setItem("superadminAccessToken", tokens.access);
+  localStorage.setItem("superadminRefreshToken", tokens.refresh);
+};
+
+/**
  * Realiza o login do SuperAdmin.
  *
  * @param {Object} credentials - As credenciais do SuperAdmin.
@@ -21,6 +30,7 @@ const login = async (credentials) => {
   try {
       const response = await apiClient.post("/superadmin/login/", credentials);
       console.info("Resposta do backend:", response.data);
+      saveSuperAdminTokens(response.data);
       return response.data;
   } catch (error) {
       console.error("Erro ao realizar login do SuperAdmin:", error.response?.data || error.message);

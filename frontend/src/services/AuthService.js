@@ -17,10 +17,15 @@ async function detalhesUsuarioPorEmail(email) {
         .then(response => response.data);
 }
 
+async function logout() {
+    return apiClient.post('/logout').then((response) => response.data); // Certifique-se que o endpoint existe.
+}
+
 
 export default {
     autenticar,
     detalhesUsuario,
     googleCallback,
-    detalhesUsuarioPorEmail
+    detalhesUsuarioPorEmail,
+    logout
 }

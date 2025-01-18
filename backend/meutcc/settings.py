@@ -53,14 +53,14 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Deve vir antes
-    'app.middleware.superadmin_middleware.SuperAdminMiddleware',  # Middleware do SuperAdmin
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'axes.middleware.AxesMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
+    'app.middleware.superadmin_middleware.SuperAdminMiddleware',  # Certifique-se que está nesta posição
 ]
+
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000", 

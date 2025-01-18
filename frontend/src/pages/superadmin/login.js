@@ -22,36 +22,33 @@ const SuperAdminLogin = () => {
     const router = useRouter();
 
     const handleLogin = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+    e.preventDefault();
+    setLoading(true);
 
-        const credentials = { email, password };
-        console.log("Tentando login com payload:", credentials);
+    const credentials = { email, password };
+    console.log("Tentando login com payload:", credentials);
 
-        try {
-            const response = await SuperAdminService.login(credentials);
-            localStorage.setItem("accessToken", response.access);
-            localStorage.setItem("refreshToken", response.refresh);
-            toast.current.show({
-                severity: "success",
-                summary: "Login bem-sucedido",
-                detail: "Bem-vindo ao sistema, SuperAdmin!",
-                life: 3000,
-            });
-            setTimeout(() => router.push("/superadmin/dashboard"), 1000);
-        } catch (error) {
-            const errorMessage =
-                error.response?.data?.message || "Erro ao realizar login. Verifique suas credenciais.";
-            toast.current.show({
-                severity: "error",
-                summary: "Erro no Login",
-                detail: errorMessage,
-                life: 3000,
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
+    try {
+        const response = await SuperAdminService.login(credentials);
+        toast.current.show({
+            severity: "success",
+            summary: "Login bem-sucedido",
+            detail: "Bem-vindo ao sistema SuperAdmin!",
+        });
+        setTimeout(() => router.push("/superadmin/dashboard"), 1000);
+    } catch (error) {
+        const errorMessage =
+            error.response?.data?.message || "Erro ao realizar login. Verifique suas credenciais.";
+        toast.current.show({
+            severity: "error",
+            summary: "Erro no Login",
+            detail: errorMessage,
+        });
+    } finally {
+        setLoading(false);
+    }
+};
+
 
     return (
         <div className="flex items-center justify-center bg-gray-100 pt-16">
