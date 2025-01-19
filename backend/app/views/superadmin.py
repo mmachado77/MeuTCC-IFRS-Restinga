@@ -13,6 +13,20 @@ from rest_framework.authtoken.models import Token
 import logging
 logger = logging.getLogger(__name__)
 
+class SuperAdminDetailsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if hasattr(user, 'superadmin'):
+            return Response({
+                "id": user.id,
+                "email": user.email,
+                "resourcetype": "SuperAdmin",
+                "isSuperAdmin": hasattr(user, 'superadmin'),  # Retorna true/false
+            })
+        return Response({"error": "Usuário não autorizado."}, status=403)
+    
 class SuperAdminLoginView(APIView):
     """
     View para autenticação de SuperAdmins.
@@ -42,15 +56,30 @@ class SuperAdminLoginView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
+         # Verifica se há uma sessão ativa de outro tipo de usuário e realiza logout
         if request.user.is_authenticated and not isinstance(request.user, SuperAdmin):
-            return Response({"error": "Sessão existente de outro tipo de usuário."}, status=403)
+            # Invalida o token JWT, se aplicável
+            if hasattr(request.user, 'auth_token'):
+                request.user.auth_token.delete()
+
+            # Para JWT, blacklist o token atual (se aplicável)
+            auth_header = request.headers.get('Authorization')
+            if auth_header and auth_header.startswith('Bearer '):
+                token = auth_header.split(' ')[1]
+                try:
+                    RefreshToken(token).blacklist()
+                except Exception as e:
+                    logger.warning(f"Erro ao blacklist token: {e}")
+
+            # Prossegue com a tentativa de autenticação após logout do usuário anterior
+            logger.info("Sessão anterior invalidada. Prosseguindo com login.")
 
 
         # Autenticar usuário usando o backend personalizado
         user = authenticate(request, username=email, password=password)
 
         # Verificar se o usuário é válido
-        if user is not None and user.is_superuser:
+        if isinstance(user, SuperAdmin) and user.is_superuser:
             # Gerar token JWT
             refresh = RefreshToken.for_user(user)
             return Response(
@@ -58,6 +87,7 @@ class SuperAdminLoginView(APIView):
                     "message": "Login bem-sucedido!",
                     "refresh": str(refresh),
                     "access": str(refresh.access_token),
+                    "isSuperAdmin": True,  # Agora retornamos explicitamente True
                 },
                 status=status.HTTP_200_OK
             )

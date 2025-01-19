@@ -6,4 +6,11 @@ const CursoService = {
     },
 };
 
+const AdminCursoService = {
+    getCursos: () => {
+        return apiClient.get('/superadmin/cursos/').then(response => response.data); // Endpoint para superadmin
+    },
+};
+
+export { AdminCursoService };
 export default CursoService;

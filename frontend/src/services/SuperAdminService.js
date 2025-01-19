@@ -16,6 +16,7 @@ import { apiClient } from "meutcc/libs/api" // Importa a configuração global d
 const saveSuperAdminTokens = (tokens) => {
   localStorage.setItem("superadminAccessToken", tokens.access);
   localStorage.setItem("superadminRefreshToken", tokens.refresh);
+  localStorage.setItem("isSuperAdmin", tokens.isSuperAdmin); // Salva o status de SuperAdmin
 };
 
 /**

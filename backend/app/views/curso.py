@@ -1,8 +1,9 @@
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from app.models import Curso
-from app.serializers.curso import CursoCreateEditSerializer, CursoSerializer, CursoSimplificadoSerializer
+from app.serializers.curso import CursoCreateEditSerializer, CursoSerializer, CursoSimplificadoSerializer, CursoListSerializer
 from .custom_api_view import CustomAPIView
 
 class CursosSimplificadosView(CustomAPIView):
@@ -32,6 +33,18 @@ class CursosSimplificadosView(CustomAPIView):
         cursos = Curso.objects.all().order_by('nome')
         serializer = CursoSimplificadoSerializer(cursos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class CursoListView(APIView):
+    """
+    View para listar todos os cursos disponíveis.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        cursos = Curso.objects.all()
+        serializer = CursoListSerializer(cursos, many=True)
+        return Response(serializer.data)
+
 
 class CursosView(CustomAPIView):
     """

@@ -1,5 +1,8 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 
 
 class SuperAdminManager(BaseUserManager):
@@ -55,7 +58,6 @@ class SuperAdminManager(BaseUserManager):
             raise ValueError('Superuser deve ter is_superuser=True.')
 
         return self.create_user(email, password, **extra_fields)
-
 
 class SuperAdmin(AbstractUser):
     """

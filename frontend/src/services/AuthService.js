@@ -18,7 +18,17 @@ async function detalhesUsuarioPorEmail(email) {
 }
 
 async function logout() {
-    return apiClient.post('/logout').then((response) => response.data); // Certifique-se que o endpoint existe.
+    try {
+        // Tenta notificar o backend sobre o logout
+        await apiClient.post('/logout');
+    } catch (error) {
+        console.error('Erro ao realizar logout no backend:', error);
+        // Opcional: pode decidir exibir mensagens ao usuário ou ignorar silenciosamente
+    } finally {
+        // Limpa sempre o estado local do usuário
+        localStorage.removeItem('token');
+        localStorage.removeItem('isSuperAdmin');
+    }
 }
 
 

@@ -31,6 +31,29 @@ class CursoSerializer(serializers.ModelSerializer):
             'data_criacao',
         ]
 
+class CoordenadorNomeSerializer(serializers.Serializer):
+    """
+    Serializer para retornar apenas o nome e o ID do coordenador.
+    """
+    id = serializers.IntegerField()
+    nome = serializers.CharField()
+
+class CursoListSerializer(serializers.ModelSerializer):
+    """
+    Serializer para listar cursos com sigla, nome e coordenador atual.
+    """
+    coordenador_atual = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Curso
+        fields = ['id', 'sigla', 'nome', 'coordenador_atual']
+
+    def get_coordenador_atual(self, obj):
+        coordenador = obj.get_coordenador_atual()
+        if coordenador:
+            return CoordenadorNomeSerializer(coordenador).data
+        return None 
+
 
 class CursoCreateEditSerializer(serializers.ModelSerializer):
     """

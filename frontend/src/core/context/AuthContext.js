@@ -25,16 +25,25 @@ export const AuthProvider = ({ children, guards }) => {
     React.useEffect(() => {
         const fetchUsuario = async () => {
             const accessToken = localStorage.getItem('token');
+            const isSuperAdmin = localStorage.getItem('isSuperAdmin') === 'true'; 
 
            // Exceção para rotas que começam com "/superadmin"
-           if (router.pathname.startsWith('/superadmin')) {
-                if (accessToken) {
-                    await AuthService.logout(); // Realiza o logout
-                    localStorage.removeItem('token');
+            if (router.pathname.startsWith('/superadmin')) {
+            if (accessToken && !isSuperAdmin) {
+                await AuthService.logout(); // Realiza o logout
+                localStorage.removeItem('token');
+                localStorage.removeItem('isSuperAdmin');
+                window.location.href = '/superadmin/login'; // Redireciona para a página de autenticação
+                return; // Impede a execução do restante da lógica
+            } else if (!accessToken){
+                if (router.pathname !== '/superadmin/login') {
+                    window.location.href = '/superadmin/login'; // Redireciona para a página de autenticação
                 }
+                return; // Impede a execução do restante da lógica
+            }
             setLoading(false);
             return;
-            }           
+            }          
 
             if (guards && guards.length > 0 && !accessToken) {
                 window.location.href = ('/auth');
