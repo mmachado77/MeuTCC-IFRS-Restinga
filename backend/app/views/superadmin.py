@@ -6,7 +6,6 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from app.models.superadmin import SuperAdmin
 from app.models.curso import Curso
-from app.serializers.curso import CursoCreateEditSerializer
 from app.permissions import IsSuperAdmin
 from app.views.custom_api_view import CustomAPIView
 from rest_framework.authtoken.models import Token

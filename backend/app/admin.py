@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
-from .models import Avaliacao, Banca, Coordenador, Estudante, Professor, HorarioAtendimento, ProfessorExterno, ProfessorInterno, Sessao, SessaoFinal, SessaoPrevia, StatusCadastro, TccStatus, Tcc, Tema, Usuario, Semestre, SemestreCoordenador, Mensagem, Nota, SuperAdmin
+from .models import Avaliacao, Banca, Coordenador, Curso, Estudante, Professor, HorarioAtendimento, ProfessorExterno, ProfessorInterno, Sessao, SessaoFinal, SessaoPrevia, StatusCadastro, TccStatus, Tcc, Tema, Usuario, Semestre, SemestreCoordenador, Mensagem, Nota, SuperAdmin, HistoricoCoordenadorCurso
 
 # Register your models here.
 admin.site.register((
@@ -26,5 +26,7 @@ admin.site.register((
     SemestreCoordenador,
     Mensagem,
     Nota,
-    SuperAdmin
+    SuperAdmin,
+    Curso,
+    HistoricoCoordenadorCurso
 ))

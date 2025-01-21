@@ -22,3 +22,4 @@ from .semestreCoordenador import *
 from .mensagem import *
 from .credenciais import *
 from .superadmin import SuperAdmin, SuperAdminManager
+from .historicoCoordenadorCurso import *

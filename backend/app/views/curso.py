@@ -3,7 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from app.models import Curso
-from app.serializers.curso import CursoCreateEditSerializer, CursoSerializer, CursoSimplificadoSerializer, CursoListSerializer
+from app.permissions import IsSuperAdmin
+from app.serializers.curso import CursoDetailSerializer, CursoSerializer, CursoSimplificadoSerializer, CursoListSerializer
 from .custom_api_view import CustomAPIView
 
 class CursosSimplificadosView(CustomAPIView):
@@ -38,7 +39,7 @@ class CursoListView(APIView):
     """
     View para listar todos os cursos disponíveis.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsSuperAdmin]
 
     def get(self, request):
         cursos = Curso.objects.all()
@@ -53,7 +54,7 @@ class CursosView(CustomAPIView):
     Métodos:
         GET: Retorna todos os cursos cadastrados.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = []
 
     def get(self, request):
         """
@@ -74,88 +75,44 @@ class CursosView(CustomAPIView):
                 {'status': 'error', 'message': f'Erro ao listar cursos: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-class GerenciarCursosView(CustomAPIView):
+class CursoDetailView(APIView):
     """
-    API para criação e edição de cursos.
-
-    Métodos:
-        POST: Cria um novo curso (somente para superusers).
-        PUT: Edita um curso existente (somente para superusers).
+    View para obter e editar todos os campos de um curso.
+    Apenas acessível para SuperAdmins.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsSuperAdmin]
 
-    def has_permission(self, usuario):
-        """
-        Verifica se o usuário tem permissão para acessar esta view.
-
-        Args:
-            usuario (Usuario): Usuário autenticado no sistema.
-
-        Retorna:
-            bool: True se o usuário for superuser, False caso contrário.
-        """
-        return usuario.user.is_superuser
-
-    def post(self, request):
-        """
-        Cria um novo curso.
-
-        Args:
-            request (Request): A requisição HTTP contendo os dados do curso.
-
-        Retorna:
-            Response: Dados do curso criado ou mensagem de erro.
-        """
-        if not self.has_permission(request.user):
-            return Response(
-                {'status': 'error', 'message': 'Você não tem permissão para executar esta ação.'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
+    def get(self, request, pk):
         try:
-            serializer = CursoCreateEditSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response(
-                {'status': 'error', 'message': f'Erro ao criar curso: {str(e)}'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-    def put(self, request, curso_id):
-        """
-        Edita um curso existente.
-
-        Args:
-            request (Request): A requisição HTTP contendo os dados atualizados do curso.
-            curso_id (int): ID do curso a ser editado.
-
-        Retorna:
-            Response: Dados do curso atualizado ou mensagem de erro.
-        """
-        if not self.has_permission(request.user):
-            return Response(
-                {'status': 'error', 'message': 'Você não tem permissão para executar esta ação.'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
-        try:
-            curso = Curso.objects.get(id=curso_id)
-            serializer = CursoCreateEditSerializer(curso, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            # Obtém o curso pelo ID
+            curso = Curso.objects.get(pk=pk)
         except Curso.DoesNotExist:
             return Response(
-                {'status': 'error', 'message': 'Curso não encontrado.'},
+                {"error": "Curso não encontrado."},
                 status=status.HTTP_404_NOT_FOUND
             )
-        except Exception as e:
+
+        # Serializa os dados do curso
+        serializer = CursoDetailSerializer(curso)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, pk):
+        try:
+            # Obtém o curso pelo ID
+            curso = Curso.objects.get(pk=pk)
+        except Curso.DoesNotExist:
             return Response(
-                {'status': 'error', 'message': f'Erro ao editar curso: {str(e)}'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"error": "Curso não encontrado."},
+                status=status.HTTP_404_NOT_FOUND
             )
+
+        # Atualiza os dados do curso com os dados fornecidos
+        serializer = CursoDetailSerializer(curso, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"message": "Curso atualizado com sucesso!", "curso": serializer.data},
+                status=status.HTTP_200_OK
+            )
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

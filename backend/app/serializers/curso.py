@@ -1,5 +1,8 @@
 from rest_framework import serializers
 from app.models import Curso
+from app.models.professor import *
+from app.models.historicoCoordenadorCurso import *
+from app.models.coordenador import *
 from app.enums import RegraSessaoPublicaEnum
 
 class CursoSimplificadoSerializer(serializers.ModelSerializer):
@@ -54,11 +57,51 @@ class CursoListSerializer(serializers.ModelSerializer):
             return CoordenadorNomeSerializer(coordenador).data
         return None 
 
-
-class CursoCreateEditSerializer(serializers.ModelSerializer):
+class ProfessorSerializer(serializers.ModelSerializer):
     """
-    Serializer para criação e edição de cursos.
+    Serializa os professores associados ao curso.
     """
     class Meta:
+        model = ProfessorInterno
+        fields = ['nome', 'email']  # Retorna apenas nome e email
+
+class HistoricoCoordenadorSerializer(serializers.ModelSerializer):
+    """
+    Serializa os coordenadores anteriores do curso.
+    """
+    coordenador = serializers.CharField(source='coordenador.nome')  # Nome do coordenador
+    data_alteracao = serializers.DateTimeField(format='%d/%m/%Y')  # Formata a data
+
+    class Meta:
+        model = HistoricoCoordenadorCurso
+        fields = ['coordenador', 'data_alteracao']
+
+class CursoDetailSerializer(serializers.ModelSerializer):
+    """
+    Serializa todos os dados de um curso, incluindo coordenador, professores e histórico.
+    """
+    coordenador_atual = serializers.SerializerMethodField()
+    historico_coordenadores = HistoricoCoordenadorSerializer(many=True, source='historico_coordenadores.all')
+    professores = ProfessorSerializer(many=True)
+
+    class Meta:
         model = Curso
-        fields = '__all__'
+        fields = [
+            'id', 'nome', 'sigla', 'descricao', 'ultima_atualizacao', 'data_criacao',
+            'limite_orientacoes', 'regra_sessao_publica', 'prazo_propostas_inicio',
+            'prazo_propostas_fim', 'coordenador_atual', 'historico_coordenadores', 'professores'
+        ]
+
+    def get_coordenador_atual(self, obj):
+        # Obtém o professor coordenador (nome)
+        professor_coordenador = obj.get_coordenador_atual()
+
+        # Obtém o email do coordenador relacionado ao curso
+        coordenador = Coordenador.objects.filter(curso=obj).first()
+
+        if coordenador and professor_coordenador:
+            return {
+                "nome": professor_coordenador.nome,
+                "email": coordenador.email
+            }
+        return None
