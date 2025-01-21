@@ -7,16 +7,16 @@
  * @module services/SuperAdminService
  */
 
-import { apiClient } from "meutcc/libs/api" // Importa a configuração global da API (baseURL configurada)
+import { apiClient } from "meutcc/libs/api"; // Importa a configuração global da API (baseURL configurada)
 
 /**
  * Salva tokens no localStorage específico do SuperAdmin.
- * @param {Object} tokens - Tokens recebidos da API.
+ * @param {Object} data - Dados recebidos da API.
  */
-const saveSuperAdminTokens = (tokens) => {
-  localStorage.setItem("superadminAccessToken", tokens.access);
-  localStorage.setItem("superadminRefreshToken", tokens.refresh);
-  localStorage.setItem("isSuperAdmin", tokens.isSuperAdmin); // Salva o status de SuperAdmin
+const saveSuperAdminTokens = (data) => {
+  // Salva o token no localStorage
+  localStorage.setItem("superadminAccessToken", data.token);
+  localStorage.setItem("isSuperAdmin", data.isSuperAdmin); // Salva o status de SuperAdmin
 };
 
 /**
@@ -25,17 +25,20 @@ const saveSuperAdminTokens = (tokens) => {
  * @param {Object} credentials - As credenciais do SuperAdmin.
  * @param {string} credentials.email - O email do SuperAdmin.
  * @param {string} credentials.password - A senha do SuperAdmin.
- * @returns {Promise<Object>} Resposta da API com o token JWT ou erro.
+ * @returns {Promise<Object>} Resposta da API com o token ou erro.
  */
 const login = async (credentials) => {
   try {
-      const response = await apiClient.post("/superadmin/login/", credentials);
-      console.info("Resposta do backend:", response.data);
-      saveSuperAdminTokens(response.data);
-      return response.data;
+    const response = await apiClient.post("/superadmin/login/", credentials);
+    console.info("Resposta do backend:", response.data);
+    saveSuperAdminTokens(response.data);
+    return response.data;
   } catch (error) {
-      console.error("Erro ao realizar login do SuperAdmin:", error.response?.data || error.message);
-      throw error;
+    console.error(
+      "Erro ao realizar login do SuperAdmin:",
+      error.response?.data || error.message
+    );
+    throw error;
   }
 };
 

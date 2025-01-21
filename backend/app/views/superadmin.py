@@ -27,70 +27,52 @@ class SuperAdminDetailsView(APIView):
             })
         return Response({"error": "Usuário não autorizado."}, status=403)
     
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
+
 class SuperAdminLoginView(APIView):
     """
-    View para autenticação de SuperAdmins.
-
-    Métodos:
-        post(request): Autentica um SuperAdmin com base em email e senha.
+    View para autenticação de SuperAdmins com Tokens.
     """
 
     def post(self, request):
-        logger.info(f"Dados recebidos: {request.data}")
-        """
-        Autentica um SuperAdmin com base em email e senha.
-
-        Args:
-            request (Request): Requisição HTTP contendo os campos 'email' e 'password'.
-
-        Retorna:
-            Response: Resposta HTTP com token de autenticação ou mensagem de erro.
-        """
         email = request.data.get("email")
         password = request.data.get("password")
 
-        # Validar entrada
         if not email or not password:
             return Response(
                 {"error": "Email e senha são obrigatórios."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-         # Verifica se há uma sessão ativa de outro tipo de usuário e realiza logout
-        if request.user.is_authenticated and not isinstance(request.user, SuperAdmin):
-            # Invalida o token JWT, se aplicável
-            if hasattr(request.user, 'auth_token'):
-                request.user.auth_token.delete()
 
-            # Para JWT, blacklist o token atual (se aplicável)
-            auth_header = request.headers.get('Authorization')
-            if auth_header and auth_header.startswith('Bearer '):
-                token = auth_header.split(' ')[1]
-                try:
-                    RefreshToken(token).blacklist()
-                except Exception as e:
-                    logger.warning(f"Erro ao blacklist token: {e}")
+        # Autenticar o superadmin
+        superadmin = authenticate(request=request, username=email, password=password)
 
-            # Prossegue com a tentativa de autenticação após logout do usuário anterior
-            logger.info("Sessão anterior invalidada. Prosseguindo com login.")
+        if superadmin:
+            try:
+                # Tentar localizar o SuperAdmin relacionado ao usuário
+                user = superadmin.user
 
+                # Gerar ou obter o token
+                token, created = Token.objects.get_or_create(user=user)
 
-        # Autenticar usuário usando o backend personalizado
-        user = authenticate(request, username=email, password=password)
-
-        # Verificar se o usuário é válido
-        if isinstance(user, SuperAdmin) and user.is_superuser:
-            # Gerar token JWT
-            refresh = RefreshToken.for_user(user)
-            return Response(
-                {
-                    "message": "Login bem-sucedido!",
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token),
-                    "isSuperAdmin": True,  # Agora retornamos explicitamente True
-                },
-                status=status.HTTP_200_OK
-            )
+                return Response(
+                    {
+                        "message": "Login bem-sucedido!",
+                        "token": token.key,
+                        "isSuperAdmin": True,
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            except SuperAdmin.DoesNotExist:
+                # O usuário não está relacionado a um SuperAdmin
+                return Response(
+                    {"error": "Este usuário não tem permissões de SuperAdmin."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
 
         # Retornar erro caso a autenticação falhe
         return Response(

@@ -24,23 +24,34 @@ export const AuthProvider = ({ children, guards }) => {
 
     React.useEffect(() => {
         const fetchUsuario = async () => {
-            const accessToken = localStorage.getItem('token');
+            const accessToken = localStorage.getItem('superadminAccessToken') || localStorage.getItem('token');
             const isSuperAdmin = localStorage.getItem('isSuperAdmin') === 'true'; 
 
            // Exceção para rotas que começam com "/superadmin"
             if (router.pathname.startsWith('/superadmin')) {
-            if (accessToken && !isSuperAdmin) {
-                await AuthService.logout(); // Realiza o logout
-                localStorage.removeItem('token');
-                localStorage.removeItem('isSuperAdmin');
-                window.location.href = '/superadmin/login'; // Redireciona para a página de autenticação
-                return; // Impede a execução do restante da lógica
-            } else if (!accessToken){
-                if (router.pathname !== '/superadmin/login') {
-                    window.location.href = '/superadmin/login'; // Redireciona para a página de autenticação
+            // Caso 1: Usuário está logado via Google, mas não como SuperAdmin
+                if (accessToken && !isSuperAdmin) {
+                    await AuthService.logout(); // Desloga o usuário Google
+                    localStorage.removeItem('superadminAccessToken');
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('isSuperAdmin');
+                    window.location.href = '/superadmin/login'; // Redireciona para o login de SuperAdmin
+                    return; // Impede a execução do restante da lógica
                 }
-                return; // Impede a execução do restante da lógica
-            }
+
+                // Caso 2: Usuário não tem token de autenticação
+                if (!accessToken) {
+                    if (router.pathname !== '/superadmin/login') {
+                        window.location.href = '/superadmin/login'; // Redireciona para o login de SuperAdmin
+                    }
+                    return; // Impede a execução do restante da lógica
+                }
+
+                // Caso 3: Usuário já é SuperAdmin
+                if (isSuperAdmin && router.pathname === '/superadmin/login') {
+                    window.location.href = '/superadmin/dashboard'; // Redireciona para o dashboard de SuperAdmin
+                    return; // Impede a execução do restante da lógica
+                }
             setLoading(false);
             return;
             }          
@@ -96,6 +107,7 @@ export const AuthProvider = ({ children, guards }) => {
 }
 
 export const handleUserLogout = async () => {
+    localStorage.removeItem('superadminAccessToken');
     localStorage.removeItem('token');
     window.location.href = '/auth';
 }

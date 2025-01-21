@@ -1,8 +1,5 @@
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser, BaseUserManager, User
 from django.db import models
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
 
 
 class SuperAdminManager(BaseUserManager):
@@ -59,10 +56,11 @@ class SuperAdminManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+
 class SuperAdmin(AbstractUser):
     """
     Modelo para SuperAdmins, herdando do modelo AbstractUser do Django.
-    O identificador principal é o email.
+    O identificador principal é o email. Um objeto User relacionado é criado automaticamente.
     """
 
     email = models.EmailField(
@@ -78,6 +76,7 @@ class SuperAdmin(AbstractUser):
         help_text='Relacionado ao email. Não é usado diretamente para login.'
     )
 
+    # Permissões e grupos adaptados para evitar conflitos
     groups = models.ManyToManyField(
         'auth.Group',
         related_name='superadmin_groups',  # Evita conflito com o modelo User padrão
@@ -93,6 +92,15 @@ class SuperAdmin(AbstractUser):
         verbose_name='Permissões'
     )
 
+    # Relacionamento com User
+    user = models.OneToOneField(
+        User,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name='superadmin',
+        help_text='Relação com o modelo User para autenticação e tokens.'
+    )
+
     objects = SuperAdminManager()
 
     USERNAME_FIELD = 'email'  # Define o email como identificador principal
@@ -104,10 +112,24 @@ class SuperAdmin(AbstractUser):
 
     def save(self, *args, **kwargs):
         """
-        Salva a instância do SuperAdmin. Relaciona o username ao email.
+        Salva a instância do SuperAdmin.
+        Garante que o username seja associado ao email e que um objeto User relacionado seja criado.
         """
         if not self.username:
             self.username = self.email
+
+        # Criar ou atualizar o User relacionado
+        if not self.pk:  # Se o SuperAdmin ainda não existir no banco
+            user = User.objects.create_user(
+                username=self.email,
+                email=self.email,
+                password=self.password
+            )
+            self.user = user
+        else:
+            self.user.username = self.email
+            self.user.save()
+
         super().save(*args, **kwargs)
 
     def __str__(self):
