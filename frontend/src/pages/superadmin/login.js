@@ -35,6 +35,7 @@ const SuperAdminLogin = () => {
             summary: "Login bem-sucedido",
             detail: "Bem-vindo ao sistema SuperAdmin!",
         });
+        localStorage.setItem('token', response.token);
         setTimeout(() => router.push("/superadmin/dashboard"), 1000);
     } catch (error) {
         const errorMessage =

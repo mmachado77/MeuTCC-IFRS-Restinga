@@ -4,24 +4,21 @@ import { Toast } from 'primereact/toast';
 import { Dropdown } from 'primereact/dropdown';
 import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
-import { parseISO } from 'date-fns';
+import { parseISO, format } from 'date-fns';
+import { useRouter } from 'next/router';
+import {AdminCursoService} from '../../../services/CursoService';
 
-const DetalhesCurso = ({ curso, setCurso, handleUpdateCurso, router }) => {
+const DetalhesCurso = ({ curso }) => {
+    const router = useRouter();
     const toast = useRef(null);
+    const [formData, setFormData] = useState({});
     const [originalCurso, setOriginalCurso] = useState({});
 
-    // Função para popular os campos com os dados originais ou do curso atualizado
-    const populateFields = (data) => {
-        if (data) {
-            setCurso({ ...data });
-        }
-    };
-
-    // Inicializa os dados originais no primeiro carregamento
+    // Atualiza os campos do formulário com os valores recebidos
     useEffect(() => {
         if (curso) {
-            setOriginalCurso({ ...curso });
-            populateFields(curso);
+            setOriginalCurso(curso);
+            setFormData(curso);
         }
     }, [curso]);
 
@@ -30,21 +27,17 @@ const DetalhesCurso = ({ curso, setCurso, handleUpdateCurso, router }) => {
         if (!toast.current) return;
 
         try {
-            const payload = {
-                nome: curso.nome,
-                sigla: curso.sigla,
-                descricao: curso.descricao,
-                limite_orientacoes: parseInt(curso.limite_orientacoes, 10),
-                regra_sessao_publica: curso.regra_sessao_publica,
-                prazo_propostas_inicio: curso.prazo_propostas_inicio,
-                prazo_propostas_fim: curso.prazo_propostas_fim,
+            const updatedData = {
+                nome: formData.nome,
+                sigla: formData.sigla,
+                descricao: formData.descricao,
+                limite_orientacoes: formData.limite_orientacoes,
+                regra_sessao_publica: formData.regra_sessao_publica,
+                prazo_propostas_inicio: formData.prazo_propostas_inicio.split('T')[0], // Remove o timestamp
+            prazo_propostas_fim: formData.prazo_propostas_fim.split('T')[0], // Remove o timestamp
             };
 
-            // Chamar o serviço de atualização
-            await handleUpdateCurso(payload);
-
-            // Atualizar os campos após salvar
-            populateFields(payload);
+            const response = await AdminCursoService.updateCurso(curso.id, updatedData);
 
             toast.current.show({
                 severity: 'success',
@@ -52,6 +45,9 @@ const DetalhesCurso = ({ curso, setCurso, handleUpdateCurso, router }) => {
                 detail: 'Curso atualizado com sucesso!',
                 life: 3000,
             });
+
+            setFormData(response.curso);
+            setOriginalCurso(response.curso);
         } catch (error) {
             console.error('Erro ao salvar o curso:', error);
             toast.current.show({
@@ -63,12 +59,9 @@ const DetalhesCurso = ({ curso, setCurso, handleUpdateCurso, router }) => {
         }
     };
 
-    // Função para cancelar e restaurar os dados originais
+    // Função para cancelar as alterações
     const handleCancel = () => {
-        if (!toast.current) return;
-
-        populateFields(originalCurso);
-
+        setFormData(originalCurso);
         toast.current.show({
             severity: 'info',
             summary: 'Cancelado',
@@ -80,22 +73,34 @@ const DetalhesCurso = ({ curso, setCurso, handleUpdateCurso, router }) => {
     return (
         <div className="bg-white mb-5 p-4 shadow-md rounded-md border border-gray-200">
             <Toast ref={toast} />
-            <h2 className="text-2xl font-bold mb-4">{curso.nome}</h2>
+            <div className='flex gap-4 justify-between items-center mb-4'>
+                <div>
+                    <h2 className="text-2xl font-bold mb-4">{formData.nome} </h2>
+                </div>
+                <div>
+                    <Button
+                        label="Voltar para Cursos"
+                        icon="pi pi-arrow-left"
+                        className="p-button-secondary"
+                        onClick={() => router.push('/superadmin/cursos')}
+                    />
+                </div>
+            </div>
 
             <div className="flex gap-4 mb-4">
                 <div className="flex-1 max-w-[100px]">
                     <label className="block text-sm font-medium mb-2">Sigla</label>
                     <InputText
-                        value={curso?.sigla || ''}
-                        onChange={(e) => setCurso({ ...curso, sigla: e.target.value })}
+                        value={formData?.sigla || ''}
+                        onChange={(e) => setFormData({ ...formData, sigla: e.target.value })}
                         className="w-full"
                     />
                 </div>
                 <div className="flex-1">
                     <label className="block text-sm font-medium mb-2">Nome do Curso</label>
                     <InputText
-                        value={curso?.nome || ''}
-                        onChange={(e) => setCurso({ ...curso, nome: e.target.value })}
+                        value={formData?.nome || ''}
+                        onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                         className="w-full"
                     />
                 </div>
@@ -104,8 +109,8 @@ const DetalhesCurso = ({ curso, setCurso, handleUpdateCurso, router }) => {
             <div className="mb-4">
                 <label className="block text-sm font-medium mb-2">Descrição</label>
                 <InputText
-                    value={curso?.descricao || ''}
-                    onChange={(e) => setCurso({ ...curso, descricao: e.target.value })}
+                    value={formData?.descricao || ''}
+                    onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
                     className="w-full"
                 />
             </div>
@@ -115,21 +120,21 @@ const DetalhesCurso = ({ curso, setCurso, handleUpdateCurso, router }) => {
                     <label className="block text-sm font-medium mb-2">Limite de Orientações</label>
                     <InputText
                         type="number"
-                        value={curso?.limite_orientacoes || ''}
-                        onChange={(e) => setCurso({ ...curso, limite_orientacoes: e.target.value })}
+                        value={formData?.limite_orientacoes || ''}
+                        onChange={(e) => setFormData({ ...formData, limite_orientacoes: e.target.value })}
                         className="w-full"
                     />
                 </div>
                 <div className="flex-1">
                     <label className="block text-sm font-medium mb-2">Regra de Sessão Pública</label>
                     <Dropdown
-                        value={curso?.regra_sessao_publica || ''}
+                        value={formData?.regra_sessao_publica || ''}
                         options={[
                             { label: 'Desabilitar', value: 'Desabilitar' },
                             { label: 'Opcional', value: 'Opcional' },
                             { label: 'Obrigatório', value: 'Obrigatório' },
                         ]}
-                        onChange={(e) => setCurso({ ...curso, regra_sessao_publica: e.value })}
+                        onChange={(e) => setFormData({ ...formData, regra_sessao_publica: e.value })}
                         placeholder="Selecione uma regra"
                         className="w-full"
                     />
@@ -140,8 +145,8 @@ const DetalhesCurso = ({ curso, setCurso, handleUpdateCurso, router }) => {
                 <div className="flex-1">
                     <label className="block text-sm font-medium mb-2">Prazo de Propostas (Início)</label>
                     <Calendar
-                        value={parseISO(curso?.prazo_propostas_inicio || new Date().toISOString())}
-                        onChange={(e) => setCurso({ ...curso, prazo_propostas_inicio: e.value.toISOString() })}
+                        value={parseISO(formData?.prazo_propostas_inicio || new Date().toISOString())}
+                        onChange={(e) => setFormData({ ...formData, prazo_propostas_inicio: e.value.toISOString() })}
                         dateFormat="dd/mm/yy"
                         showButtonBar
                         locale="ptbr"
@@ -151,12 +156,31 @@ const DetalhesCurso = ({ curso, setCurso, handleUpdateCurso, router }) => {
                 <div className="flex-1">
                     <label className="block text-sm font-medium mb-2">Prazo de Propostas (Fim)</label>
                     <Calendar
-                        value={parseISO(curso?.prazo_propostas_fim || new Date().toISOString())}
-                        onChange={(e) => setCurso({ ...curso, prazo_propostas_fim: e.value.toISOString() })}
+                        value={parseISO(formData?.prazo_propostas_fim || new Date().toISOString())}
+                        onChange={(e) => setFormData({ ...formData, prazo_propostas_fim: e.value.toISOString() })}
                         dateFormat="dd/mm/yy"
                         showButtonBar
                         locale="ptbr"
                         className="w-full"
+                    />
+                </div>
+            </div>
+
+            <div className="flex gap-4 mb-4">
+                <div className="flex-1">
+                    <label className="block text-sm font-medium mb-2">Última Atualização</label>
+                    <InputText
+                        value={formData?.ultima_atualizacao ? format(parseISO(formData.ultima_atualizacao), 'dd/MM/yyyy - HH:mm') : ''}
+                        readOnly
+                        className="w-full bg-gray-100 cursor-not-allowed"
+                    />
+                </div>
+                <div className="flex-1">
+                    <label className="block text-sm font-medium mb-2">Data de Criação</label>
+                    <InputText
+                        value={formData?.data_criacao ? format(parseISO(formData.data_criacao), 'dd/MM/yyyy - HH:mm') : ''}
+                        readOnly
+                        className="w-full bg-gray-100 cursor-not-allowed"
                     />
                 </div>
             </div>

@@ -1,5 +1,3 @@
-
-
 import AuthService from "meutcc/services/AuthService";
 import { useRouter } from "next/router";
 import React from "react";
@@ -24,50 +22,27 @@ export const AuthProvider = ({ children, guards }) => {
 
     React.useEffect(() => {
         const fetchUsuario = async () => {
-            const accessToken = localStorage.getItem('superadminAccessToken') || localStorage.getItem('token');
-            const isSuperAdmin = localStorage.getItem('isSuperAdmin') === 'true'; 
-
-           // Exceção para rotas que começam com "/superadmin"
-            if (router.pathname.startsWith('/superadmin')) {
-            // Caso 1: Usuário está logado via Google, mas não como SuperAdmin
-                if (accessToken && !isSuperAdmin) {
-                    await AuthService.logout(); // Desloga o usuário Google
-                    localStorage.removeItem('superadminAccessToken');
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('isSuperAdmin');
-                    window.location.href = '/superadmin/login'; // Redireciona para o login de SuperAdmin
-                    return; // Impede a execução do restante da lógica
-                }
-
-                // Caso 2: Usuário não tem token de autenticação
-                if (!accessToken) {
-                    if (router.pathname !== '/superadmin/login') {
-                        window.location.href = '/superadmin/login'; // Redireciona para o login de SuperAdmin
-                    }
-                    return; // Impede a execução do restante da lógica
-                }
-
-                // Caso 3: Usuário já é SuperAdmin
-                if (isSuperAdmin && router.pathname === '/superadmin/login') {
-                    window.location.href = '/superadmin/dashboard'; // Redireciona para o dashboard de SuperAdmin
-                    return; // Impede a execução do restante da lógica
-                }
-            setLoading(false);
-            return;
-            }          
-
+            const accessToken = localStorage.getItem('token');
+    
             if (guards && guards.length > 0 && !accessToken) {
-                window.location.href = ('/auth');
+                if (router.pathname.startsWith('/superadmin/') && router.pathname !== '/superadmin/login') {
+                    window.location.href = '/superadmin/login';
+                } else{
+                    window.location.href = ('/auth');
+                }
             }
-
+            // Se não houver token, redireciona para o login
             if (!accessToken) {
                 setLoading(false);
                 return;
             }
 
+    
             try {
+                // Chama a API para obter detalhes do usuário
                 const data = await AuthService.detalhesUsuario();
 
+                //Redireciona para página de cadastro
                 if ('cadastroIncompleto' in data) {
                     setLoading(false);
                     if (router.pathname !== '/cadastro') {
@@ -75,29 +50,27 @@ export const AuthProvider = ({ children, guards }) => {
                     }
                     return;
                 }
-                setUser(data);
-
+    
+                setUser(data); // Define o estado do usuário com os dados retornados
+    
+                // Verifica se os guards permitem o acesso
                 if (guards && guards.length > 0 && !guards.includes(data.resourcetype)) {
                     window.location.href = '/acesso-proibido';
                     return;
                 }
-
             } catch (error) {
                 setUser(null);
                 localStorage.removeItem('token');
                 if (guards && guards.length > 0 && router.pathname !== '/auth') {
                     window.location.href = ('/auth');
                 }
-                console.error(error);
             }
-
+    
             setLoading(false);
-
-        }
-
+        };
+    
         fetchUsuario();
-
-    }, []);
+    }, [guards, router]);
 
     const value = {
         user,
@@ -107,7 +80,6 @@ export const AuthProvider = ({ children, guards }) => {
 }
 
 export const handleUserLogout = async () => {
-    localStorage.removeItem('superadminAccessToken');
     localStorage.removeItem('token');
     window.location.href = '/auth';
 }

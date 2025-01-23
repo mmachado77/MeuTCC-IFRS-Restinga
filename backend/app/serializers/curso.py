@@ -63,7 +63,7 @@ class ProfessorSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = ProfessorInterno
-        fields = ['nome', 'email']  # Retorna apenas nome e email
+        fields = ['id', 'nome', 'email', 'avatar']  # Retorna apenas nome e email
 
 class HistoricoCoordenadorSerializer(serializers.ModelSerializer):
     """
@@ -76,12 +76,20 @@ class HistoricoCoordenadorSerializer(serializers.ModelSerializer):
         model = HistoricoCoordenadorCurso
         fields = ['coordenador', 'data_alteracao']
 
+class CursoConcorrenciaSerializer(serializers.ModelSerializer):
+    """
+    Serializer para lidar apenas com os campos de concorrência.
+    """
+    class Meta:
+        model = Curso
+        fields = ['ultima_atualizacao', 'data_criacao']
+        read_only_fields = ['ultima_atualizacao', 'data_criacao']
 class CursoDetailSerializer(serializers.ModelSerializer):
     """
     Serializa todos os dados de um curso, incluindo coordenador, professores e histórico.
     """
     coordenador_atual = serializers.SerializerMethodField()
-    historico_coordenadores = HistoricoCoordenadorSerializer(many=True, source='historico_coordenadores.all')
+    historico_coordenadores = serializers.SerializerMethodField()
     professores = ProfessorSerializer(many=True)
 
     class Meta:
@@ -101,7 +109,34 @@ class CursoDetailSerializer(serializers.ModelSerializer):
 
         if coordenador and professor_coordenador:
             return {
+                "id": professor_coordenador.id,
                 "nome": professor_coordenador.nome,
-                "email": coordenador.email
+                "email": coordenador.email,
+                "avatar": professor_coordenador.avatar
             }
         return None
+    def get_historico_coordenadores(self, obj):
+        """
+        Chama o método da model Curso para obter o histórico ordenado.
+        """
+        return obj.get_historico_coordenadores()
+    
+class CursoEditSerializer(serializers.ModelSerializer):
+    """
+    Serializer para edição de cursos.
+    Inclui apenas os campos editáveis no formulário e os campos de concorrência.
+    """
+    concorrencia = CursoConcorrenciaSerializer(source='*', read_only=True)
+
+    class Meta:
+        model = Curso
+        fields = [
+            'nome',
+            'sigla',
+            'descricao',
+            'limite_orientacoes',
+            'regra_sessao_publica',
+            'prazo_propostas_inicio',
+            'prazo_propostas_fim',
+            'concorrencia',  # Inclui os campos de concorrência
+        ]

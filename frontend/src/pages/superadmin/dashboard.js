@@ -45,13 +45,6 @@ const DashboardSuperAdmin = () => {
                 </Card>
             </div>
 
-            {/* Botão Logout */}
-            <Button
-                label="Logout"
-                icon="pi pi-sign-out"
-                className="p-button-raised p-button-danger mt-6"
-                onClick={handleLogout}
-            />
         </div>
     );
 };

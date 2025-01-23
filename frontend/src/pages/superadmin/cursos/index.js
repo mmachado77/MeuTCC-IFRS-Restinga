@@ -5,8 +5,11 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { AdminCursoService } from '../../../services/CursoService';
+import { GUARDS } from 'meutcc/core/constants';
+import { useAuth } from 'meutcc/core/context/AuthContext';
 
 const CursosPage = () => {
+    const { user } = useAuth();
     const [cursos, setCursos] = useState([]);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
@@ -77,4 +80,6 @@ const CursosPage = () => {
     );
 };
 
+CursosPage.guards = [GUARDS.COORDENADOR, GUARDS.SUPERADMIN];
+CursosPage.title = 'Gerenciamento de Cursos';
 export default CursosPage;

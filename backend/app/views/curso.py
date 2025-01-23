@@ -3,8 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from app.models import Curso
-from app.permissions import IsSuperAdmin
-from app.serializers.curso import CursoDetailSerializer, CursoSerializer, CursoSimplificadoSerializer, CursoListSerializer
+from app.permissions import *
+from app.serializers.curso import *
 from .custom_api_view import CustomAPIView
 
 class CursosSimplificadosView(CustomAPIView):
@@ -75,12 +75,31 @@ class CursosView(CustomAPIView):
                 {'status': 'error', 'message': f'Erro ao listar cursos: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
+class CursoConcorrenciaView(APIView):
+    """
+    API para obter os campos de concorrência de um curso.
+    """
+    permission_classes = [IsSuperAdminOrCoordenador]
+
+    def get(self, request, pk):
+        try:
+            curso = Curso.objects.get(pk=pk)
+        except Curso.DoesNotExist:
+            return Response(
+                {"error": "Curso não encontrado."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = CursoConcorrenciaSerializer(curso)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 class CursoDetailView(APIView):
     """
     View para obter e editar todos os campos de um curso.
     Apenas acessível para SuperAdmins.
     """
-    permission_classes = [IsSuperAdmin]
+    permission_classes = [IsSuperAdminOrCoordenador]
 
     def get(self, request, pk):
         try:
@@ -98,7 +117,6 @@ class CursoDetailView(APIView):
 
     def put(self, request, pk):
         try:
-            # Obtém o curso pelo ID
             curso = Curso.objects.get(pk=pk)
         except Curso.DoesNotExist:
             return Response(
@@ -106,13 +124,90 @@ class CursoDetailView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # Atualiza os dados do curso com os dados fornecidos
-        serializer = CursoDetailSerializer(curso, data=request.data)
+        serializer = CursoEditSerializer(curso, data=request.data)
         if serializer.is_valid():
             serializer.save()
+
+            # Adiciona os campos de concorrência ao response
+            concorrencia_serializer = CursoConcorrenciaSerializer(curso)
+            response_data = serializer.data
+            response_data.update(concorrencia_serializer.data)
+
             return Response(
-                {"message": "Curso atualizado com sucesso!", "curso": serializer.data},
+                {"message": "Curso atualizado com sucesso!", "curso": response_data},
                 status=status.HTTP_200_OK
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class TrocaCoordenadorAPIView(APIView):
+    """
+    API para realizar a troca de coordenador de um curso.
+    """
+    permission_classes = [IsSuperAdminOrCoordenador]  # Apenas superadmin pode realizar a ação
+
+    def put(self, request, curso_id):
+        try:
+            # Obtendo o curso e o professor a partir dos IDs fornecidos
+            curso = Curso.objects.get(id=curso_id)
+            professor_id = request.data.get('professor_id')
+
+            if not professor_id:
+                return Response(
+                    {"error": "O ID do professor é obrigatório."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            novo_coordenador = ProfessorInterno.objects.get(id=professor_id)
+
+            # Criar novo registro no histórico de coordenadores
+            HistoricoCoordenadorCurso.objects.create(
+                curso=curso,
+                coordenador=novo_coordenador
+            )
+
+            return Response(
+                {
+                    "message": "Coordenador atualizado com sucesso.",
+                    "coordenador_atual": {
+                        "id": novo_coordenador.id,
+                        "nome": novo_coordenador.nome,
+                        "email": novo_coordenador.email,
+                        "avatar": novo_coordenador.avatar
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+
+        except Curso.DoesNotExist:
+            return Response(
+                {"error": "Curso não encontrado."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except ProfessorInterno.DoesNotExist:
+            return Response(
+                {"error": "Professor não encontrado."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+class HistoricoCoordenadorAPIView(APIView):
+    """
+    View para retornar o histórico de coordenadores de um curso.
+    """
+    permission_classes = [IsSuperAdminOrCoordenador] 
+    def get(self, request, curso_id):
+        try:
+            curso = Curso.objects.get(id=curso_id)
+            historico = curso.get_historico_coordenadores()
+
+            return Response(historico, status=status.HTTP_200_OK)
+        except Curso.DoesNotExist:
+            return Response(
+                {"error": "Curso não encontrado."},
+                status=status.HTTP_404_NOT_FOUND
+            )
