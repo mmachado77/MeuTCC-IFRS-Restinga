@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import PermissionDenied
 from app.models import Curso
 from app.permissions import *
 from app.serializers.curso import *
@@ -37,12 +38,33 @@ class CursosSimplificadosView(CustomAPIView):
 
 class CursoListView(APIView):
     """
-    View para listar todos os cursos disponíveis.
+    View para listar cursos disponíveis.
+    Retorna:
+    - Apenas o curso associado, se for Coordenador.
+    - Todos os cursos, se for SuperAdmin.
     """
-    permission_classes = [IsSuperAdmin]
+    permission_classes = [IsSuperAdminOrCoordenador]
 
     def get(self, request):
-        cursos = Curso.objects.all()
+        user = request.user
+
+        # Verifica se o usuário é um SuperAdmin
+        if SuperAdmin.objects.filter(user=user).exists():
+            cursos = Curso.objects.all()
+
+        # Verifica se o usuário é um Coordenador
+        elif Coordenador.objects.filter(user=user).exists():
+            try:
+                coordenador = Coordenador.objects.get(user=user)
+                cursos = Curso.objects.filter(id=coordenador.curso.id)  # Retorna apenas o curso do coordenador
+            except Coordenador.DoesNotExist:
+                raise PermissionDenied("Você não está associado a nenhum curso como coordenador.")
+
+        # Caso não seja SuperAdmin nem Coordenador
+        else:
+            raise PermissionDenied("Você não tem permissão para visualizar os cursos.")
+
+        # Serializa e retorna os cursos
         serializer = CursoListSerializer(cursos, many=True)
         return Response(serializer.data)
 
@@ -101,10 +123,10 @@ class CursoDetailView(APIView):
     """
     permission_classes = [IsSuperAdminOrCoordenador]
 
-    def get(self, request, pk):
+    def get(self, request, curso_id):
         try:
             # Obtém o curso pelo ID
-            curso = Curso.objects.get(pk=pk)
+            curso = Curso.objects.get(pk=curso_id)
         except Curso.DoesNotExist:
             return Response(
                 {"error": "Curso não encontrado."},
@@ -115,9 +137,9 @@ class CursoDetailView(APIView):
         serializer = CursoDetailSerializer(curso)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, pk):
+    def put(self, request, curso_id):
         try:
-            curso = Curso.objects.get(pk=pk)
+            curso = Curso.objects.get(pk=curso_id)
         except Curso.DoesNotExist:
             return Response(
                 {"error": "Curso não encontrado."},

@@ -19,24 +19,31 @@ from app.models import SuperAdmin, Coordenador
 
 class IsSuperAdminOrCoordenador(BasePermission):
     """
-    Permissão personalizada que verifica se o usuário é SuperAdmin ou Coordenador
-    (apenas uma das condições precisa ser satisfeita).
+    Permissão personalizada para SuperAdmin e Coordenador.
     """
 
     def has_permission(self, request, view):
-        # Verifica se o usuário está autenticado
-        if not request.user or not request.user.is_authenticated:
+        user = request.user
+
+        # Verifica se o usuário é um SuperAdmin
+        if SuperAdmin.objects.filter(user=user).exists():
+            return True
+
+        # Verifica se o usuário é um Coordenador
+        try:
+            coordenador = Coordenador.objects.get(user=user)
+
+            # Obtém o ID do curso da URL
+            curso_id = view.kwargs.get('curso_id')
+
+            # Caso o curso_id seja fornecido, verifica se corresponde ao curso do Coordenador
+            if curso_id:
+                return coordenador.curso.id == int(curso_id)
+
+            # Se não houver curso_id, permite o acesso (para listagem, etc.)
+            return True
+        except Coordenador.DoesNotExist:
             return False
 
-        # Verifica se é SuperAdmin
-        is_superadmin = SuperAdmin.objects.filter(user=request.user).exists()
-
-        # Verifica se é Coordenador e se está associado ao curso da URL
-        curso_id = view.kwargs.get('curso_id') or view.kwargs.get('pk')
-        is_coordenador = (
-            Coordenador.objects.filter(user=request.user, curso__id=curso_id).exists()
-            if curso_id else False
-        )
-
-        # Retorna True se uma das condições for verdadeira
-        return is_superadmin or is_coordenador
+        # Caso não seja SuperAdmin nem Coordenador, nega o acesso
+        return False

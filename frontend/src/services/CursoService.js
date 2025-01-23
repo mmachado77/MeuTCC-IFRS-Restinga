@@ -10,11 +10,11 @@ const AdminCursoService = {
     getCursos: () => {
         return apiClient.get('/superadmin/cursos/').then(response => response.data); // Endpoint para superadmin
     },
-    getCursoById: (id) => {
-        return apiClient.get(`/superadmin/cursos/${id}/`).then(response => response.data);
+    getCursoById: (cursoId) => {
+        return apiClient.get(`/superadmin/cursos/${cursoId}/`).then(response => response.data);
     },
-    updateCurso: (id, cursoData) => {
-        return apiClient.put(`/superadmin/cursos/${id}/`, cursoData).then(response => response.data);
+    updateCurso: (cursoId, cursoData) => {
+        return apiClient.put(`/superadmin/cursos/${cursoId}/`, cursoData).then(response => response.data);
     },
     trocarCoordenador: (cursoId, professorId) => {
         return apiClient.put(`/superadmin/cursos/${cursoId}/trocar-coordenador/`, { professor_id: professorId })

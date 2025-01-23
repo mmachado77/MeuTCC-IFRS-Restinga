@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Card } from 'primereact/card';
-import { Button } from 'primereact/button';
-import { ListBox } from 'primereact/listbox';
 import DetalhesCurso from '../components/detalhescurso';
+import ListaProfessores from '../components/listaprofessores';
 import CoordenadorAtual from '../components/coordenadoratual';
-import { AdminCursoService } from '../../../services/CursoService'; // Atualize o caminho conforme necessário
+import PermissaoNegada from '../components/permissaonegada';
+import { AdminCursoService } from '../../../services/CursoService';
+import { GUARDS } from 'meutcc/core/constants';
+import { useAuth } from 'meutcc/core/context/AuthContext';
 
 const CursoDetalhes = () => {
+    const { user } = useAuth();
     const router = useRouter();
     const { id } = router.query;
     const [curso, setCurso] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [hasPermission, setHasPermission] = useState(false);
 
     useEffect(() => {
         if (id) {
@@ -19,6 +23,14 @@ const CursoDetalhes = () => {
                 try {
                     const data = await AdminCursoService.getCursoById(id);
                     setCurso(data);
+
+                    // Verifica permissão com base no tipo de usuário
+                    if (
+                        user.resourcetype === 'SuperAdmin' ||
+                        (user.resourcetype === 'Coordenador' && user.curso === data.id)
+                    ) {
+                        setHasPermission(true);
+                    }
                 } catch (error) {
                     console.error('Erro ao buscar curso:', error);
                 } finally {
@@ -27,18 +39,20 @@ const CursoDetalhes = () => {
             };
             fetchCurso();
         }
-    }, [id]);
-
-    const handleAddProfessor = () => {
-        // Lógica para adicionar um novo professor
-    };
-
-    const handleRemoveProfessor = (professorId) => {
-        // Lógica para remover um professor específico
-    };
+    }, [id, user]);
 
     if (loading) {
         return <div>Carregando...</div>;
+    }
+
+    if (!hasPermission) {
+        return (
+            <div className="p-4 max-w-screen-lg mx-auto">
+                <Card className="text-gray-700 border border-gray-200 border-solid rounded-lg shadow-md shadow-gray-300">
+                    <PermissaoNegada />
+                </Card>
+            </div>
+        );
     }
 
     return (
@@ -46,35 +60,13 @@ const CursoDetalhes = () => {
             <Card className="text-gray-700 border border-gray-200 border-solid rounded-lg shadow-md shadow-gray-300">
                 <DetalhesCurso curso={curso} />
                 <CoordenadorAtual curso={curso} />
-                <div>
-                    <h2 className="text-lg font-bold mb-2">Professores</h2>
-                    <ListBox
-                        value={curso.professores}
-                        options={curso.professores}
-                        optionLabel="nome"
-                        itemTemplate={(professor) => (
-                            <div className="flex justify-between items-center">
-                                <span>
-                                    {professor.nome} - {professor.email}
-                                </span>
-                                <Button
-                                    icon="pi pi-trash"
-                                    className="p-button-rounded p-button-danger p-button-sm"
-                                    onClick={() => handleRemoveProfessor(professor.id)}
-                                />
-                            </div>
-                        )}
-                    />
-                    <Button
-                        label="Adicionar Professor"
-                        icon="pi pi-plus"
-                        className="p-button-success mt-4"
-                        onClick={handleAddProfessor}
-                    />
-                </div>
+                <ListaProfessores curso={curso} />
             </Card>
         </div>
     );
 };
+
+CursoDetalhes.guards = [GUARDS.COORDENADOR, GUARDS.SUPERADMIN];
+CursoDetalhes.title = "Editar Curso";
 
 export default CursoDetalhes;

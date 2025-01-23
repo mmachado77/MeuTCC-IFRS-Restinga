@@ -84,7 +84,7 @@ export const AppLayout = ({ children, guards }) => {
         ProfessorInterno: [],
         ProfessorExterno: [],
         SuperAdmin: [
-            { label: 'Dashboard', icon: 'pi pi-fw pi-home', url: '/superadmin/dashboard' },
+            { label: 'Dashboard', icon: 'pi pi-fw pi-cog', url: '/superadmin/dashboard' },
         ],
     };
     const items = typesMenu.Todos

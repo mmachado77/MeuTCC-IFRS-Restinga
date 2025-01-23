@@ -12,26 +12,6 @@ from rest_framework.authtoken.models import Token
 import logging
 logger = logging.getLogger(__name__)
 
-class SuperAdminDetailsView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        user = request.user
-        if hasattr(user, 'superadmin'):
-            return Response({
-                "id": user.id,
-                "email": user.email,
-                "resourcetype": "SuperAdmin",
-                "isSuperAdmin": hasattr(user, 'superadmin'),  # Retorna true/false
-            })
-        return Response({"error": "Usuário não autorizado."}, status=403)
-    
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from django.contrib.auth import authenticate
-from rest_framework.authtoken.models import Token
-
 class SuperAdminLoginView(APIView):
     """
     View para autenticação de SuperAdmins com Tokens.
