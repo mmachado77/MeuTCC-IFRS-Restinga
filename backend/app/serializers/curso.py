@@ -90,7 +90,7 @@ class CursoDetailSerializer(serializers.ModelSerializer):
     """
     coordenador_atual = serializers.SerializerMethodField()
     historico_coordenadores = serializers.SerializerMethodField()
-    professores = ProfessorSerializer(many=True)
+    professores = serializers.SerializerMethodField()  # Altere aqui para usar um método
 
     class Meta:
         model = Curso
@@ -107,19 +107,36 @@ class CursoDetailSerializer(serializers.ModelSerializer):
         # Obtém o email do coordenador relacionado ao curso
         coordenador = Coordenador.objects.filter(curso=obj).first()
 
-        if coordenador and professor_coordenador:
-            return {
-                "id": professor_coordenador.id,
-                "nome": professor_coordenador.nome,
-                "email": coordenador.email,
-                "avatar": professor_coordenador.avatar
-            }
+        if professor_coordenador:
+            if coordenador:
+                return {
+                    "id": professor_coordenador.id,
+                    "nome": professor_coordenador.nome,
+                    "email": coordenador.email,
+                    "avatar": professor_coordenador.avatar
+                }
+            else:
+                return {
+                    "id": professor_coordenador.id,
+                    "nome": professor_coordenador.nome,
+                    "email": "Nenhuma conta de Coordenador Associada",
+                    "avatar": professor_coordenador.avatar
+                }
         return None
+
     def get_historico_coordenadores(self, obj):
         """
         Chama o método da model Curso para obter o histórico ordenado.
         """
         return obj.get_historico_coordenadores()
+
+    def get_professores(self, obj):
+        """
+        Ordena e retorna os professores do curso.
+        """
+        professores = obj.professores.all().order_by("nome")  # Ordena por nome
+        return ProfessorSerializer(professores, many=True).data  # Serializa os professores
+
     
 class CursoEditSerializer(serializers.ModelSerializer):
     """

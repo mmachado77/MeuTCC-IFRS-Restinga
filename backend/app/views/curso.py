@@ -260,7 +260,7 @@ class AdicionarProfessorCursoView(APIView):
         curso.professores.add(professor)
         curso.save()
 
-        professores = ProfessorSerializer(curso.professores.all(), many=True)
+        professores = ProfessorSerializer(curso.professores.all().order_by("nome"), many=True)
 
         return Response(
             {
@@ -294,7 +294,7 @@ class RemoverProfessorCursoView(APIView):
         curso.professores.remove(professor)
         curso.save()
 
-        professores = ProfessorSerializer(curso.professores.all(), many=True)
+        professores = ProfessorSerializer(curso.professores.all().order_by("nome"), many=True)
 
         return Response(
             {

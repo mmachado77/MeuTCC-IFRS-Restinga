@@ -22,12 +22,13 @@ const ListaProfessores = ({ curso }) => {
     const [selectedProfessor, setSelectedProfessor] = useState(null);
     const [confirmDialog, setConfirmDialog] = useState(false);
     const [addDialog, setAddDialog] = useState(false);
+    const [professoresAtualizados, setProfessoresAtualizados] = useState(curso.professores);
     const toast = useRef(null);
 
     const carregarProfessoresDisponiveis = async () => {
         try {
             const todosProfessores = await ProfessorService.getProfessoresInternos();
-            const idsJaAssociados = curso.professores.map((prof) => prof.id);
+            const idsJaAssociados = professoresAtualizados.map((prof) => prof.id);
             setProfessoresDisponiveis(
                 todosProfessores.filter((professor) => !idsJaAssociados.includes(professor.id))
             );
@@ -53,13 +54,14 @@ const ListaProfessores = ({ curso }) => {
         }
 
         try {
-            await AdminCursoService.adicionarProfessor(curso.id, professorSelecionado.id);
+            const response = await AdminCursoService.adicionarProfessor(curso.id, professorSelecionado.id);
             toast.current.show({
                 severity: 'success',
                 summary: 'Sucesso',
                 detail: `Professor ${professorSelecionado.nome} adicionado com sucesso!`,
                 life: 3000,
             });
+            setProfessoresAtualizados(response.professores);
             setAddDialog(false);
         } catch (error) {
             toast.current.show({
@@ -73,13 +75,14 @@ const ListaProfessores = ({ curso }) => {
 
     const handleExcluir = async () => {
         try {
-            await AdminCursoService.removerProfessor(curso.id, selectedProfessor.id);
+            const response = await AdminCursoService.removerProfessor(curso.id, selectedProfessor.id);
             toast.current.show({
                 severity: 'success',
                 summary: 'Sucesso',
                 detail: `Professor ${selectedProfessor.nome} removido com sucesso!`,
                 life: 3000,
             });
+            setProfessoresAtualizados(response.professores);
             setConfirmDialog(false);
         } catch (error) {
             toast.current.show({
@@ -94,15 +97,15 @@ const ListaProfessores = ({ curso }) => {
     const renderHeader = () => (
         <div className="flex justify-between items-center">
             <div>
-            <Button cl
-                label="Adicionar Professor"
-                icon="pi pi-plus"
-                severity='success'
-                onClick={() => {
-                    setAddDialog(true);
-                    carregarProfessoresDisponiveis();
-                }}
-            />
+                <Button
+                    label="Adicionar Professor"
+                    icon="pi pi-plus"
+                    severity='success'
+                    onClick={() => {
+                        setAddDialog(true);
+                        carregarProfessoresDisponiveis();
+                    }}
+                />
             </div>
             <div className="p-inputgroup max-w-40%" id='buscaCurso'>
                 <span className="p-inputgroup-addon">
@@ -152,8 +155,10 @@ const ListaProfessores = ({ curso }) => {
     return (
         <div>
             <Toast ref={toast} />
+
             <DataTable
-                value={curso.professores}
+                value={professoresAtualizados || []}
+                stripedRows
                 paginator
                 rows={5}
                 rowsPerPageOptions={[5, 10, 20]}
@@ -162,18 +167,19 @@ const ListaProfessores = ({ curso }) => {
                 filters={filters}
                 responsiveLayout="scroll"
                 filterDisplay="menu"
+                emptyMessage="Nenhum Professor Associado ao Curso"
             >
                 <Column header="Avatar" body={avatarTemplate} style={{ width: '100px' }} />
-                <Column field="nome" header="Nome" filter filterPlaceholder="Buscar por nome" />
-                <Column field="email" header="Email" filter filterPlaceholder="Buscar por email" />
+                <Column field="nome" sortable header="Nome" />
+                <Column field="email" header="Email" />
                 <Column header="Ações" body={actionsTemplate} style={{ width: '200px' }} />
             </DataTable>
 
-            {/* Dialog para exclusão */}
             <Dialog
+                className='text-center'
                 visible={confirmDialog}
                 onHide={() => setConfirmDialog(false)}
-                header="Confirmação"
+                header="Atenção"
                 footer={
                     <div>
                         <Button
@@ -191,13 +197,14 @@ const ListaProfessores = ({ curso }) => {
                     </div>
                 }
             >
-                <p>
-                    Deseja desassociar o professor <strong>{selectedProfessor?.nome}</strong> do
-                    curso <strong>{curso.nome}</strong>?
+                <p className='text-xl'>
+                    Deseja desassociar o professor <strong>{selectedProfessor?.nome}</strong> 
+                </p>
+                <p className='text-xl'>
+                    do curso <strong>{curso.nome}</strong>?
                 </p>
             </Dialog>
 
-            {/* Dialog para adicionar */}
             <Dialog
                 visible={addDialog}
                 onHide={() => setAddDialog(false)}
@@ -219,14 +226,17 @@ const ListaProfessores = ({ curso }) => {
                     </div>
                 }
             >
-                <Dropdown
-                    value={professorSelecionado}
-                    options={professoresDisponiveis}
-                    onChange={(e) => setProfessorSelecionado(e.value)}
-                    optionLabel="nome"
-                    placeholder="Selecione um professor"
-                    className="w-full"
-                />
+                
+                    <Dropdown
+                        value={professorSelecionado}
+                        options={professoresDisponiveis}
+                        emptyMessage="Nenhum Disponível para Associar ao Curso"
+                        onChange={(e) => setProfessorSelecionado(e.value)}
+                        optionLabel="nome"
+                        placeholder="Selecione um professor"
+                        className="w-full"
+                    />
+
             </Dialog>
         </div>
     );
