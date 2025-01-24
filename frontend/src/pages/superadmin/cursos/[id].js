@@ -60,7 +60,10 @@ const CursoDetalhes = () => {
             <Card className="text-gray-700 border border-gray-200 border-solid rounded-lg shadow-md shadow-gray-300">
                 <DetalhesCurso curso={curso} />
                 <CoordenadorAtual curso={curso} />
+                <Card title={`Professores de ${curso.nome}`}>
                 <ListaProfessores curso={curso} />
+                </Card>
+                
             </Card>
         </div>
     );

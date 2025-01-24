@@ -7,6 +7,7 @@ from app.models import Curso
 from app.permissions import *
 from app.serializers.curso import *
 from .custom_api_view import CustomAPIView
+from django.shortcuts import get_object_or_404
 
 class CursosSimplificadosView(CustomAPIView):
     """
@@ -233,3 +234,72 @@ class HistoricoCoordenadorAPIView(APIView):
                 {"error": "Curso não encontrado."},
                 status=status.HTTP_404_NOT_FOUND
             )
+        
+from app.serializers.curso import ProfessorSerializer
+
+class AdicionarProfessorCursoView(APIView):
+    """
+    View para adicionar um professor a um curso.
+
+    Método POST:
+    - Requer o ID do curso na URL (curso_id).
+    - Requer o ID do professor no corpo da requisição (professor_id).
+    - Adiciona o professor especificado ao curso informado.
+    - Retorna uma mensagem de sucesso, a lista atualizada de professores ou um erro caso o professor já esteja associado ao curso.
+    """
+    permission_classes = [IsSuperAdminOrCoordenador]
+
+    def post(self, request, curso_id):
+        curso = get_object_or_404(Curso, id=curso_id)
+        professor_id = request.data.get("professor_id")
+
+        if not professor_id:
+            return Response({"erro": "O campo 'professor_id' é obrigatório."}, status=status.HTTP_400_BAD_REQUEST)
+
+        professor = get_object_or_404(ProfessorInterno, id=professor_id)
+        curso.professores.add(professor)
+        curso.save()
+
+        professores = ProfessorSerializer(curso.professores.all(), many=True)
+
+        return Response(
+            {
+                "mensagem": f"Professor {professor.nome} adicionado ao curso {curso.nome} com sucesso.",
+                "professores": professores.data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class RemoverProfessorCursoView(APIView):
+    """
+    View para remover um professor de um curso.
+
+    Método DELETE:
+    - Requer o ID do curso na URL (curso_id).
+    - Requer o ID do professor no corpo da requisição (professor_id).
+    - Remove o professor especificado do curso informado.
+    - Retorna uma mensagem de sucesso, a lista atualizada de professores ou um erro caso o professor não esteja associado ao curso.
+    """
+    permission_classes = [IsSuperAdminOrCoordenador]
+
+    def delete(self, request, curso_id):
+        curso = get_object_or_404(Curso, id=curso_id)
+        professor_id = request.data.get("professor_id")
+
+        if not professor_id:
+            return Response({"erro": "O campo 'professor_id' é obrigatório."}, status=status.HTTP_400_BAD_REQUEST)
+
+        professor = get_object_or_404(ProfessorInterno, id=professor_id)
+        curso.professores.remove(professor)
+        curso.save()
+
+        professores = ProfessorSerializer(curso.professores.all(), many=True)
+
+        return Response(
+            {
+                "mensagem": f"Professor {professor.nome} removido do curso {curso.nome} com sucesso.",
+                "professores": professores.data,
+            },
+            status=status.HTTP_200_OK,
+        )

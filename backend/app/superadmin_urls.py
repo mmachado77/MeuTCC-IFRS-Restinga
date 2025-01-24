@@ -8,4 +8,6 @@ urlpatterns = [
     path('cursos/<int:curso_id>/', CursoDetailView.as_view(), name='curso-detail'),
     path('cursos/<int:curso_id>/trocar-coordenador/', TrocaCoordenadorAPIView.as_view(), name='trocar-coordenador'),
     path('cursos/<int:curso_id>/historico-coordenadores/', HistoricoCoordenadorAPIView.as_view(), name='trocar-coordenador'),
+    path('cursos/<int:curso_id>/adicionar-professor/', AdicionarProfessorCursoView.as_view(), name='adicionar-professor-curso'),
+    path('cursos/<int:curso_id>/remover-professor/', RemoverProfessorCursoView.as_view(), name='remover-professor-curso'),
 ]

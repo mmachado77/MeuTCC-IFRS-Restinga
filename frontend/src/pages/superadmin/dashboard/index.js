@@ -11,13 +11,13 @@ const DashboardSuperAdmin = () => {
     const { user } = useAuth(); // Obtém o usuário autenticado
 
     return (
-        <div className="flex flex-col items-center justify-center bg-gray-100 px-4">
+        <div className="flex flex-col items-center justify-center bg-gray-100 pt-4 pb-12">
             <h1 className="text-4xl font-bold mb-8 text-gray-800">Dashboard</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
                 {/* Card Gerenciar Cursos */}
                 <Card
                     title="Gerenciar Cursos"
-                    subTitle="Adicione, edite ou remova cursos"
+                    subTitle="Gerencia as configurações, coordenador e professores de um curso."
                     className="hover:shadow-lg transition-shadow"
                 >
                     <Button
@@ -28,11 +28,11 @@ const DashboardSuperAdmin = () => {
                     />
                 </Card>
 
-                {/* Card Gerenciar Coordenadores (visível apenas para SuperAdmin) */}
+                {/* Card Gerenciar Coordenadores */}
                 {user?.resourcetype === 'SuperAdmin' && (
                     <Card
                         title="Gerenciar Coordenadores"
-                        subTitle="Gerencie os coordenadores por curso"
+                        subTitle="Associe contas de coordenador a um curso já cadastrado no sistema."
                         className="hover:shadow-lg transition-shadow"
                     >
                         <Button
@@ -43,8 +43,39 @@ const DashboardSuperAdmin = () => {
                         />
                     </Card>
                 )}
-            </div>
 
+                {/* Card Adicionar Curso */}
+                {user?.resourcetype === 'SuperAdmin' && (
+                    <Card
+                        title="Adicionar Curso"
+                        subTitle="Adicione um novo curso ao sistema."
+                        className="hover:shadow-lg transition-shadow"
+                    >
+                        <Button
+                            label="Acessar"
+                            icon="pi pi-plus"
+                            className="p-button-outlined p-button-success"
+                            onClick={() => router.push('/superadmin/cursos/adicionar')}
+                        />
+                    </Card>
+                )}
+
+                {/* Card Remover Curso */}
+                {user?.resourcetype === 'SuperAdmin' && (
+                    <Card
+                        title="Remover Curso"
+                        subTitle="Remova cursos existentes do sistema."
+                        className="hover:shadow-lg transition-shadow"
+                    >
+                        <Button
+                            label="Acessar"
+                            icon="pi pi-trash"
+                            className="p-button-outlined p-button-danger"
+                            onClick={() => router.push('/superadmin/cursos/remover')}
+                        />
+                    </Card>
+                )}
+            </div>
         </div>
     );
 };

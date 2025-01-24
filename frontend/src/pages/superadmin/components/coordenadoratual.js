@@ -141,7 +141,7 @@ const CoordenadorAtual = ({ curso }) => {
                         <Button
                             className='w-full'
                             label="Ver Histórico"
-                            severity="warning"
+                            severity="secondary"
                             icon="pi pi-history"
                             outlined
                             onClick={() => setVisible(true)}
@@ -149,7 +149,7 @@ const CoordenadorAtual = ({ curso }) => {
                         <Button
                             label="Alterar Coordenador"
                             icon="pi pi-user-edit"
-                            severity="warning"
+                            severity="secondary"
                             onClick={() => setDialogVisible(true)}
                         />
                     </div>

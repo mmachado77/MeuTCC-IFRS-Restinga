@@ -12,7 +12,7 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { useRouter } from "next/router";
-import SuperAdminService from "../../services/SuperAdminService";
+import SuperAdminService from "../../../services/SuperAdminService";
 
 const SuperAdminLogin = () => {
     const [email, setEmail] = useState("");

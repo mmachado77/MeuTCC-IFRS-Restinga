@@ -16,6 +16,7 @@ class Curso(models.Model):
         data_criacao (DateTimeField): Data de criação do registro.
         limite_orientacoes (IntegerField): Limite de orientações por professor.
         regra_sessao_publica (CharField): Regras para sessões públicas.
+        visible (BooleanField): Se o curso está ativo ou não.
         prazo_propostas_inicio (DateField): Data de início do prazo para envio de propostas.
         prazo_propostas_fim (DateField): Data de fim do prazo para envio de propostas.
         professores (ManyToManyField): Professores associados ao curso.
@@ -54,6 +55,7 @@ class Curso(models.Model):
         default=RegraSessaoPublicaEnum.OPCIONAL.value,
         verbose_name="Regra para sessões públicas"
     )
+    visible = models.BooleanField(verbose_name="Visibilidade do Curso", default=True)
     prazo_propostas_inicio = models.DateField(
         verbose_name="Início do prazo para envio de propostas"
     )

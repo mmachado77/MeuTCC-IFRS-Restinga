@@ -23,6 +23,24 @@ const AdminCursoService = {
     getHistoricoCoordenadores: (cursoId) => {
         return apiClient.get(`/superadmin/cursos/${cursoId}/historico-coordenadores/`)
             .then(response => response.data);
+    },
+    adicionarProfessor: (cursoId, professorId) => {
+        return apiClient.post(`/superadmin/cursos/${cursoId}/adicionar-professor/`, { professor_id: professorId })
+            .then(response => response.data)
+            .catch(error => {
+                console.error('Erro ao adicionar professor:', error);
+                throw error;
+            });
+    },
+    removerProfessor: (cursoId, professorId) => {
+        return apiClient.delete(`/superadmin/cursos/${cursoId}/remover-professor/`, {
+            data: { professor_id: professorId }
+        })
+            .then(response => response.data)
+            .catch(error => {
+                console.error('Erro ao remover professor:', error);
+                throw error;
+            });
     }
     
 };
