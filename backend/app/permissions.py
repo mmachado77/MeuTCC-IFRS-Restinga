@@ -14,9 +14,6 @@ class IsSuperAdmin(BasePermission):
         # Verifica se o usuário está relacionado a um SuperAdmin
         return SuperAdmin.objects.filter(user=request.user).exists()
 
-from rest_framework.permissions import BasePermission
-from app.models import SuperAdmin, Coordenador
-
 class IsSuperAdminOrCoordenador(BasePermission):
     """
     Permissão personalizada para SuperAdmin e Coordenador.

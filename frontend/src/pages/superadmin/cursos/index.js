@@ -4,6 +4,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
+import { Card } from 'primereact/card';
 import { AdminCursoService } from '../../../services/CursoService';
 import { GUARDS } from 'meutcc/core/constants';
 import { useAuth } from 'meutcc/core/context/AuthContext';
@@ -29,12 +30,10 @@ const CursosPage = () => {
         fetchCursos();
     }, []);
 
-    // Função chamada ao clicar no botão "Editar"
     const handleEdit = (rowData) => {
         router.push(`/superadmin/cursos/${rowData.id}`);
     };
 
-    // Renderiza o botão "Editar" na quarta coluna
     const actionTemplate = (rowData) => {
         return (
             <Button
@@ -53,29 +52,38 @@ const CursosPage = () => {
             : <span className="text-gray-500">Sem coordenador</span>;
     };
 
+    const header = (
+        <div className="flex justify-between items-center px-6 pt-6">
+            <div>
+            <h1 className="text-2xl font-bold">Gerenciamento de Cursos</h1>
+            </div>
+            <Button
+                label="Voltar ao Dashboard"
+                icon="pi pi-arrow-left"
+                className="p-button-secondary"
+                onClick={() => router.push('dashboard')}
+            />
+        </div>
+    );
+
     return (
         <div className="p-4 max-w-screen-lg mx-auto">
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold">Gerenciamento de Cursos</h1>
-                <Button
-                    label="Voltar ao Dashboard"
-                    icon="pi pi-arrow-left"
-                    className="p-button-secondary"
-                    onClick={() => router.push('dashboard')}
-                />
-            </div>
-            {loading ? (
-                <div className="flex justify-center items-center h-64">
-                    <ProgressSpinner />
-                </div>
-            ) : (
-                <DataTable value={cursos} responsiveLayout="scroll" paginator rows={10}>
-                    <Column field="sigla" header="Sigla" sortable></Column>
-                    <Column field="nome" header="Nome" sortable></Column>
-                    <Column body={coordenadorTemplate} header="Coordenador Atual"></Column>
-                    <Column body={actionTemplate} header="Editar"></Column>
-                </DataTable>
-            )}
+            <Card header={header}>
+                {loading ? (
+                    <div className="flex justify-center items-center h-64">
+                        <ProgressSpinner />
+                    </div>
+                ) : (
+                    <div className='mx-auto'>
+                    <DataTable value={cursos} responsiveLayout="scroll" paginator rows={10}>
+                        <Column field="sigla" header="Sigla" sortable></Column>
+                        <Column field="nome" header="Nome" sortable></Column>
+                        <Column body={coordenadorTemplate} header="Coordenador Atual"></Column>
+                        <Column body={actionTemplate} header="Editar"></Column>
+                    </DataTable>
+                    </div>
+                )}
+            </Card>
         </div>
     );
 };

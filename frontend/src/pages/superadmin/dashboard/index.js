@@ -48,7 +48,7 @@ const DashboardSuperAdmin = () => {
                 {user?.resourcetype === 'SuperAdmin' && (
                     <Card
                         title="Adicionar Curso"
-                        subTitle="Adicione um novo curso ao sistema."
+                        subTitle="Adicione um novo curso ao sistema de Gerenciamento de TCCs."
                         className="hover:shadow-lg transition-shadow"
                     >
                         <Button
@@ -63,15 +63,15 @@ const DashboardSuperAdmin = () => {
                 {/* Card Remover Curso */}
                 {user?.resourcetype === 'SuperAdmin' && (
                     <Card
-                        title="Remover Curso"
-                        subTitle="Remova cursos existentes do sistema."
+                        title="Visibilidade de Curso"
+                        subTitle="Altere a visibilidade dos cursos do existentes do sistema."
                         className="hover:shadow-lg transition-shadow"
                     >
                         <Button
                             label="Acessar"
-                            icon="pi pi-trash"
+                            icon="pi pi-eye-slash"
                             className="p-button-outlined p-button-danger"
-                            onClick={() => router.push('/superadmin/cursos/remover')}
+                            onClick={() => router.push('/superadmin/cursos/visibilidade')}
                         />
                     </Card>
                 )}

@@ -157,3 +157,10 @@ class CursoEditSerializer(serializers.ModelSerializer):
             'prazo_propostas_fim',
             'concorrencia',  # Inclui os campos de concorrência
         ]
+
+
+class CoordenadorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Coordenador
+        fields = ['id', 'nome', 'email', 'curso', 'avatar']
+

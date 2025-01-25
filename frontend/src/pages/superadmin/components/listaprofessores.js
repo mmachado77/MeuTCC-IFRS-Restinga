@@ -208,7 +208,8 @@ const ListaProfessores = ({ curso }) => {
             <Dialog
                 visible={addDialog}
                 onHide={() => setAddDialog(false)}
-                header={`Adicionar Professor ao curso ${curso.nome}`}
+                header="Adicionar Professor"
+                filter
                 footer={
                     <div>
                         <Button
@@ -226,7 +227,14 @@ const ListaProfessores = ({ curso }) => {
                     </div>
                 }
             >
-                
+                <div className='text-center'>
+                    <p className='text-xl'>
+                    Escolha um professor para adicionar ao curso
+                    </p>
+                    <p className='text-xl'>
+                    <strong>{curso.nome}</strong>
+                    </p>
+                    </div>
                     <Dropdown
                         value={professorSelecionado}
                         options={professoresDisponiveis}
