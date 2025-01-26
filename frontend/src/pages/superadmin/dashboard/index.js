@@ -60,21 +60,19 @@ const DashboardSuperAdmin = () => {
                     </Card>
                 )}
 
-                {/* Card Remover Curso */}
-                {user?.resourcetype === 'SuperAdmin' && (
-                    <Card
-                        title="Visibilidade de Curso"
-                        subTitle="Altere a visibilidade dos cursos do existentes do sistema."
-                        className="hover:shadow-lg transition-shadow"
-                    >
-                        <Button
-                            label="Acessar"
-                            icon="pi pi-eye-slash"
-                            className="p-button-outlined p-button-danger"
-                            onClick={() => router.push('/superadmin/cursos/visibilidade')}
-                        />
-                    </Card>
-                )}
+                {/* Card Visibilidade de Curso */}
+                <Card
+                    title="Visibilidade de Curso"
+                    subTitle="Altere a visibilidade dos cursos do existentes do sistema."
+                    className="hover:shadow-lg transition-shadow"
+                >
+                    <Button
+                        label="Acessar"
+                        icon="pi pi-eye-slash"
+                        className="p-button-outlined p-button-danger"
+                        onClick={() => router.push('/superadmin/cursos/visibilidade')}
+                    />
+                </Card>
             </div>
         </div>
     );

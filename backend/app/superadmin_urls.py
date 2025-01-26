@@ -11,7 +11,8 @@ urlpatterns = [
     path('cursos/<int:curso_id>/historico-coordenadores/', HistoricoCoordenadorAPIView.as_view(), name='trocar-coordenador'),
     path('cursos/<int:curso_id>/adicionar-professor/', AdicionarProfessorCursoView.as_view(), name='adicionar-professor-curso'),
     path('cursos/<int:curso_id>/remover-professor/', RemoverProfessorCursoView.as_view(), name='remover-professor-curso'),
+    path('cursos/<int:curso_id>/atualizar-visibilidade/', UpdateCursoVisibilityView.as_view(), name='atualizar-visibilidade'),
     path('coordenadores/listar/', ListarCoordenadoresView.as_view(), name='listar-coordenadores'),
     path('coordenadores/<int:coordenador_id>/adicionar-curso/', AdicionarCursoCoordenadorView.as_view(), name='adicionar-curso-coordenador'),
-    path('coordenadores/<int:coordenador_id>/limpar-curso/', LimparCursoCoordenadorView.as_view(), name='limpar-curso-coordenador')
+    path('coordenadores/<int:coordenador_id>/limpar-curso/', LimparCursoCoordenadorView.as_view(), name='limpar-curso-coordenador'),
 ]

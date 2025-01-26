@@ -49,7 +49,7 @@ class CursoListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Curso
-        fields = ['id', 'sigla', 'nome', 'coordenador_atual']
+        fields = ['id', 'sigla', 'nome', 'coordenador_atual', 'visible']
 
     def get_coordenador_atual(self, obj):
         coordenador = obj.get_coordenador_atual()

@@ -41,6 +41,14 @@ const AdminCursoService = {
                 console.error('Erro ao remover professor:', error);
                 throw error;
             });
+    },
+    atualizarVisibilidade: (cursoId, visible) => {
+        return apiClient.post(`/superadmin/cursos/${cursoId}/atualizar-visibilidade/`, { visible })
+            .then(response => response.data)
+            .catch(error => {
+                console.error('Erro ao atualizar visibilidade do curso:', error);
+                throw error;
+            });
     }
     
 };

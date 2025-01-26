@@ -8,7 +8,6 @@ import { Dialog } from 'primereact/dialog';
 import { Card } from 'primereact/card';
 import { Dropdown } from 'primereact/dropdown';
 import { useRouter } from 'next/router';
-
 import coordenadorService from '../../../services/CoordenadorService';
 import { AdminCursoService } from '../../../services/CursoService';
 import { GUARDS } from 'meutcc/core/constants';

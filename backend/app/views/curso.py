@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
-from app.models import Curso
+from app.models import Curso, SuperAdmin
 from app.permissions import *
 from app.serializers.curso import *
 from .custom_api_view import CustomAPIView
@@ -33,7 +33,7 @@ class CursosSimplificadosView(CustomAPIView):
     """
     def get(self, request):
         # Ordena os cursos alfabeticamente pelo nome
-        cursos = Curso.objects.all().order_by('nome')
+        cursos = Curso.objects.all().filter(visible=True).order_by('sigla')
         serializer = CursoSimplificadoSerializer(cursos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -51,7 +51,7 @@ class CursoListView(APIView):
 
         # Verifica se o usuário é um SuperAdmin
         if SuperAdmin.objects.filter(user=user).exists():
-            cursos = Curso.objects.all()
+            cursos = Curso.objects.all().order_by('-visible', 'sigla')
 
         # Verifica se o usuário é um Coordenador
         elif Coordenador.objects.filter(user=user).exists():
@@ -303,3 +303,47 @@ class RemoverProfessorCursoView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+class UpdateCursoVisibilityView(APIView):
+    """
+    View para atualizar o atributo 'visible' de um curso.
+
+    Permissões:
+        - Super Admins podem alterar qualquer curso.
+        - Coordenadores podem alterar apenas cursos associados a eles.
+    """
+    permission_classes = [IsSuperAdminOrCoordenador]
+
+    def post(self, request, curso_id):
+        try:
+            # Obtém o usuário logado
+            user = request.user
+            superadmin = SuperAdmin.objects.filter(user=user).exists()
+
+            # Verifica se o curso existe
+            curso = get_object_or_404(Curso, id=curso_id)
+
+            # Se o usuário for Coordenador, verifica a associação ao curso
+            if not superadmin:
+                coordenador = Coordenador.objects.filter(user=user).first()
+                if not coordenador or coordenador.curso.id != curso.id:
+                    return Response({"detail": "Permissão negada."}, status=status.HTTP_403_FORBIDDEN)
+
+            # Obtém o valor de 'visible' do corpo da requisição
+            visible = request.data['visible']
+            if visible is None or not isinstance(visible, bool):
+                return Response({"detail": "O campo 'visible' deve ser um booleano."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Atualiza o atributo 'visible'
+            curso.visible = visible
+            curso.save()
+
+            # Retorna o curso atualizado
+            serializer = CursoListSerializer(curso)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Curso.DoesNotExist:
+            return Response({"detail": "Curso não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

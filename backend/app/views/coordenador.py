@@ -76,7 +76,7 @@ class LimparCursoCoordenadorView(APIView):
     Retorno:
         - Mensagem de sucesso ou erro junto com a lista atualizada de coordenadores.
     """
-    permission_classes = [permissions.IsAuthenticated, IsSuperAdmin]
+    permission_classes = [IsSuperAdmin]
 
     def post(self, request, coordenador_id):
         try:
