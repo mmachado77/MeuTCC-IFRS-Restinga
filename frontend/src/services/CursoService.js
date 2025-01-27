@@ -49,8 +49,15 @@ const AdminCursoService = {
                 console.error('Erro ao atualizar visibilidade do curso:', error);
                 throw error;
             });
-    }
-    
+    },
+    criarCurso: (novoCurso) => {
+        return apiClient.post('/superadmin/cursos/criar/', novoCurso)
+            .then(response => response.data)
+            .catch(error => {
+                console.error('Erro ao criar curso:', error);
+                throw error;
+            });
+    }    
 };
 
 export { AdminCursoService };

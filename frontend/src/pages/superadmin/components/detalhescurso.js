@@ -7,6 +7,7 @@ import { Button } from 'primereact/button';
 import { parseISO, format } from 'date-fns';
 import { useRouter } from 'next/router';
 import {AdminCursoService} from '../../../services/CursoService';
+import { InputTextarea } from 'primereact/inputtextarea';
 
 const DetalhesCurso = ({ curso }) => {
     const router = useRouter();
@@ -108,7 +109,7 @@ const DetalhesCurso = ({ curso }) => {
 
             <div className="mb-4">
                 <label className="block text-sm font-medium mb-2">Descrição</label>
-                <InputText
+                <InputTextarea
                     value={formData?.descricao || ''}
                     onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
                     className="w-full"

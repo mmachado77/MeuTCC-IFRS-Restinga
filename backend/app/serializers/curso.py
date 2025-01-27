@@ -158,6 +158,11 @@ class CursoEditSerializer(serializers.ModelSerializer):
             'concorrencia',  # Inclui os campos de concorrência
         ]
 
+class CursoCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Curso
+        fields = ['nome', 'sigla', 'descricao', 'limite_orientacoes', 
+                  'regra_sessao_publica', 'prazo_propostas_inicio', 'prazo_propostas_fim']
 
 class CoordenadorSerializer(serializers.ModelSerializer):
     class Meta:

@@ -347,3 +347,82 @@ class UpdateCursoVisibilityView(APIView):
 
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class CriarCursoView(APIView):
+    """
+    View para criar novos cursos no sistema.
+
+    Métodos HTTP permitidos:
+        - POST: Criação de um novo curso.
+
+    Permissões:
+        - Apenas SuperAdmins podem acessar esta view.
+
+    Requisição:
+        - Body:
+            {
+                "nome": "Tecnologia em Análise e Desenvolvimento de Sistemas",
+                "sigla": "ADS",
+                "descricao": "Descrição do curso",
+                "limite_orientacoes": 3,
+                "regra_sessao_publica": "Obrigatório",
+                "prazo_propostas_inicio": "2025-01-23",
+                "prazo_propostas_fim": "2025-01-23"
+            }
+
+    Respostas:
+        - 201 Created:
+            {
+                "message": "Curso criado com sucesso!",
+                "curso": {
+                    "nome": "Tecnologia em Análise e Desenvolvimento de Sistemas",
+                    "sigla": "ADS",
+                    "descricao": "Descrição do curso",
+                    "limite_orientacoes": 3,
+                    "regra_sessao_publica": "Obrigatório",
+                    "prazo_propostas_inicio": "2025-01-23",
+                    "prazo_propostas_fim": "2025-01-23"
+                }
+            }
+        - 400 Bad Request:
+            {
+                "nome": ["Este campo é obrigatório."]
+            }
+        - 403 Forbidden:
+            {
+                "detail": "Você não tem permissão para realizar esta ação."
+            }
+    """
+
+    permission_classes = [IsSuperAdmin]
+
+    def post(self, request):
+        """
+        Cria um novo curso com os dados fornecidos na requisição.
+
+        Requisição:
+            Body:
+                - nome (string): Nome completo do curso.
+                - sigla (string): Sigla do curso (máx. 3 caracteres).
+                - descricao (string, opcional): Breve descrição do curso.
+                - limite_orientacoes (integer): Limite de orientações por professor.
+                - regra_sessao_publica (string): Regras para sessões públicas.
+                - prazo_propostas_inicio (date): Data de início do prazo para envio de propostas.
+                - prazo_propostas_fim (date): Data de fim do prazo para envio de propostas.
+
+        Respostas:
+            - 201 Created: Retorna os dados do curso criado.
+            - 400 Bad Request: Retorna erros de validação.
+            - 403 Forbidden: Retorna erro de permissão, caso o usuário não seja SuperAdmin.
+        """
+        serializer = CursoCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            curso = serializer.save()
+            return Response(
+                {
+                    "message": "Curso criado com sucesso!",
+                    "curso": serializer.data
+                },
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
