@@ -90,6 +90,7 @@ const GerenciarVisibilidadeCursos = () => {
       await AdminCursoService.atualizarVisibilidade(curso.id, curso.visible);
 
       toast.current?.show({
+        position: 'top-center',
         severity: 'success',
         summary: 'Sucesso',
         detail: `Visibilidade do curso ${curso.sigla} atualizada.`,

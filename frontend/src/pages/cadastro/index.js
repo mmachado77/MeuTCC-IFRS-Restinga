@@ -19,6 +19,7 @@ const CadastroPage = () => {
         identidade: null,
         diploma: null,
         isProfessor: false,
+        isCoordenador: false, // Adicionando nova propriedade
         IsInterno: false,
         avatar: '',
         curso: null
@@ -49,7 +50,7 @@ const CadastroPage = () => {
     };
 
     const submitCadastro = async () => {
-        console.log('Dados enviados:', userData);
+        //console.log('Dados enviados:', userData);
         await UsuarioService.criarUsuario(userData);
     };
 
@@ -63,7 +64,19 @@ const CadastroPage = () => {
     return (
         <div>
             {activeIndex === 0 && <DadosPessoaisStep userData={userData} setUserData={setUserData} nome={userData.nome} email={userData.email} activeIndex={activeIndex} setActiveIndex={setActiveIndex} nextStep={nextStep} />}
-            {activeIndex === 1 && <TipoCadastroStep onTipoCadastroChange={(tipo) => setUserData({ ...userData, isProfessor: tipo })} setActiveIndex={setActiveIndex} activeIndex={activeIndex} />}
+            {activeIndex === 1 && (
+                <TipoCadastroStep 
+                onTipoCadastroChange={(novoTipoCadastro) => {
+                    setUserData({ 
+                      ...userData, 
+                      ...novoTipoCadastro,
+                    });
+                  }}
+                    setActiveIndex={setActiveIndex} 
+                    activeIndex={activeIndex} 
+                />
+            )}
+
             {activeIndex === 2 && <DetalhesAdicionaisStep IsInterno={userData.IsInterno} userData={userData} setUserData={setUserData} grausAcademicos={[
                 { label: 'Técnico', value: 'TECNICO' },
                 { label: 'Graduação', value: 'GRADUACAO' },
