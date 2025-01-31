@@ -18,7 +18,6 @@ from .nota import *
 from .coordenador import *
 from .tccStatus import *
 from .tema import *
-from .semestreCoordenador import *
 from .mensagem import *
 from .credenciais import *
 from .superadmin import SuperAdmin, SuperAdminManager
