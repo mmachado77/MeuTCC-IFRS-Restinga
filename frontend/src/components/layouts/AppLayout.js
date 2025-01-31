@@ -60,7 +60,6 @@ export const AppLayout = ({ children, guards }) => {
                     { label: 'Validar Sessões', icon: 'pi pi-fw pi-calendar', url: '/sessoes-futuras' },
                 ]
             },
-            { label: 'Semestres', icon: 'pi pi-fw pi-calendar', url: '/painel-configuracoes' },
             { label: 'Lista de Usuários', icon:'pi pi-fw pi-users', url: '/lista-usuarios'},
             {
                 label: 'Sugestões de Tema', icon: 'pi pi-fw pi-list', url: '',
@@ -68,7 +67,8 @@ export const AppLayout = ({ children, guards }) => {
                     { label: 'Listar Sugestões', icon: 'pi pi-fw pi-list', url: '/sugestoes-temas-tcc' },
                     { label: 'Minhas Sugestões', icon: 'pi pi-fw pi-plus', url: '/minhas-sugestoes' },
                 ]
-            }
+            },
+            { label: 'Dashboard', icon: 'pi pi-fw pi-cog', url: '/superadmin/dashboard' }
         ],
         Professor: [
             { label: 'Propostas Pendentes', icon: 'pi pi-fw pi-thumbs-up', url: '/proposta-pendente' },
@@ -83,8 +83,23 @@ export const AppLayout = ({ children, guards }) => {
         ],
         ProfessorInterno: [],
         ProfessorExterno: [],
+        SuperAdmin: [
+            { label: 'Dashboard', icon: 'pi pi-fw pi-cog', url: '/superadmin/dashboard' },
+        ],
     };
-    const items = typesMenu.Todos.concat(['ProfessorInterno', 'ProfessorExterno'].includes(user?.resourcetype) ? typesMenu.Professor : []).concat(typesMenu[user?.resourcetype] || []).map((item) => ({ ...item, template: menuItemTemplate }));
+    const items = typesMenu.Todos
+    .filter((item) => 
+        user?.resourcetype === 'SuperAdmin' 
+            ? item.label !== 'Inicio' && item.label !== 'Meus TCCs' // Remove "Inicio" e "Meus TCCs" apenas para SuperAdmin
+            : true
+    )
+    .concat(
+        ['ProfessorInterno', 'ProfessorExterno'].includes(user?.resourcetype)
+            ? typesMenu.Professor
+            : []
+    )
+    .concat(typesMenu[user?.resourcetype] || [])
+    .map((item) => ({ ...item, template: menuItemTemplate }));
 
     const isUserAuth = !!user || false;
 
