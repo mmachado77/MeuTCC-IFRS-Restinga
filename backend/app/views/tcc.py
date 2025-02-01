@@ -4,8 +4,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from django.db.models import Max, F, Q
 from app.enums import StatusTccEnum, UsuarioTipoEnum
-from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre, Professor, Coordenador, Sessao, Banca, Tema
-from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer, TemaSerializer, TccEditSerializer, TccPublicSerializer, DetalhesTccPublicSerializer
+from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre, Professor, Coordenador, Sessao, Banca, Tema, Curso
+from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer, TemaSerializer, TccEditSerializer, TccPublicSerializer, DetalhesTccPublicSerializer, TCCPendentesSerializer
 from app.services.proposta import PropostaService
 from app.services.tcc import TccService
 from app.services.notificacoes import notificacaoService
@@ -35,7 +35,8 @@ class ListarTccPendente(CustomAPIView):
         tccs = None
         if usuario.tipo == UsuarioTipoEnum.COORDENADOR: 
             tccs = Tcc.objects.all().annotate(max_id=Max('tccstatus__id')).filter(
-                tccstatus__id=F('max_id'), 
+                tccstatus__id=F('max_id'),
+                curso = usuario.curso,
                 semestre=semestreAtual, 
                 tccstatus__status=StatusTccEnum.PROPOSTA_ANALISE_COORDENADOR)
         elif usuario.isProfessor():
@@ -46,7 +47,7 @@ class ListarTccPendente(CustomAPIView):
                 tccstatus__status=StatusTccEnum.PROPOSTA_ANALISE_PROFESSOR
             )
 
-        serializer = TccSerializer(tccs, many=True)
+        serializer = TCCPendentesSerializer(tccs, many=True)
         return Response(serializer.data)
     
 class TCCs(CustomAPIView):
@@ -175,7 +176,13 @@ class CriarTCCView(CustomAPIView):
         # Validar "afirmo que conversei com o orientador e coorientador sobre o tema do TCC."
         try:
             usuario = Estudante.objects.get(user=request.user)
-            serializer = TccCreateSerializer(data=request.data)
+            curso = usuario.curso  # Obtém o curso do estudante autenticado
+            
+            # Criar um dicionário mutável para adicionar o curso ao payload
+            dados_tcc = request.data.copy()
+            dados_tcc['curso'] = curso.id  # Adiciona o ID do curso ao payload
+            
+            serializer = TccCreateSerializer(data=dados_tcc)
 
             if not serializer.is_valid():
                 print (serializer.errors)

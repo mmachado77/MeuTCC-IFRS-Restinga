@@ -12,6 +12,10 @@ class SemestreSerializer(serializers.ModelSerializer):
     Métodos:
         ultimoCoordenador(obj): Retorna o nome do último coordenador do semestre.
     """
+    class Meta:
+        model = Semestre
+        fields = ['periodo', 'dataAberturaSemestre', 'dataFechamentoSemestre']
+
     
 class CriarSemestreSerializer(serializers.ModelSerializer):
     """

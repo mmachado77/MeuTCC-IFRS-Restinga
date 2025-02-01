@@ -5,8 +5,7 @@ import React from 'react';
 import { Dropdown } from 'primereact/dropdown';
 import { Checkbox } from 'primereact/checkbox';
 import TccService from 'meutcc/services/TccService';
-import ProfessorService from 'meutcc/services/ProfessorService';
-import SemestreService from 'meutcc/services/SemestreService';
+import SubmeterServices from './services/SubmeterServices';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 import { GUARDS } from 'meutcc/core/constants';
@@ -56,7 +55,7 @@ const SubmeterPropostaPage = () => {
 
             setLoading(true);
             try {
-                const data = await ProfessorService.getProfessores();
+                const data = await SubmeterServices.getProfessoresByCurso();
                 const professores = data.map((professor) => ({ name: professor.nome, value: professor.id }));
     
                 setOrientadores(professores);
@@ -72,7 +71,7 @@ const SubmeterPropostaPage = () => {
 
         const verificarPrazoEnvioProposta = async () => {
             try{
-                const data = await SemestreService.getPrazoEnvioProposta();
+                const data = await SubmeterServices.getPrazoEnvioProposta();
                 const hoje = new Date();
                 const dataAbertura = new Date(data.dataAberturaPrazoPropostas);
                 const dataFechamento = new Date(data.dataFechamentoPrazoPropostas);
@@ -154,10 +153,10 @@ const SubmeterPropostaPage = () => {
 
         const response = await TccService.submeterProposta(jsonData);
 
-        if (response) {
+        if (response && response.status === 201) {
             toast.success('Proposta submetida com sucesso');
         } else {
-            toast.error('Erro ao submeter proposta');
+            toast.error('Erro ao submeter proposta:', response);
         }
 
         setLoading(false);

@@ -54,6 +54,44 @@ class TccSerializer(serializers.ModelSerializer):
         model = Tcc
         fields = '__all__'
 
+class TCCPendentesSerializer(serializers.ModelSerializer):
+    """
+    Serializer para o modelo Tcc.
+
+    Atributos:
+        autor (EstudanteNomeSerializer): Serializer aninhado para o autor do TCC.
+        orientador (ProfessorNomeSerializer): Serializer aninhado para o orientador do TCC.
+        coorientador (ProfessorNomeSerializer): Serializer aninhado para o coorientador do TCC.
+        semestre (SemestreSerializer): Serializer aninhado para o semestre do TCC.
+        documentoTCC (FileDetailSerializer): Serializer aninhado para o documento do TCC.
+        autorizacaoPublicacao (FileDetailSerializer): Serializer aninhado para a autorização de publicação do TCC.
+        status (SerializerMethodField): Campo que utiliza um método para serializar os status do TCC.
+        sessoes (SerializerMethodField): Campo que utiliza um método para serializar as sessões do TCC.
+
+    Métodos:
+        get_status(obj): Retorna os dados serializados dos status associados ao TCC.
+        get_sessoes(obj): Retorna os dados serializados das sessões associadas ao TCC.
+    """
+    autor = EstudanteNomeSerializer()
+    orientador = ProfessorNomeSerializer()
+    coorientador = ProfessorNomeSerializer()
+    semestre = SemestreSerializer()
+    status = serializers.SerializerMethodField(method_name='get_status')
+
+    def get_status(self, obj):
+        """
+        Retorna os dados serializados dos status associados ao TCC.
+
+        Args:
+            obj (Tcc): A instância do modelo Tcc.
+        """
+        status_objects = TccStatus.objects.filter(tcc=obj)
+        return TccStatusSerializer(status_objects, many=True).data
+    class Meta:
+        model = Tcc
+        fields = ['id', 'tema,', 'resumo','autor', 'orientador', 'coorientador', 'status','semestre','dataSubmissaoProposta']
+
+
 class TccPublicSerializer(serializers.ModelSerializer):
     """
     Serializer público para o modelo Tcc.
@@ -179,7 +217,7 @@ class TccCreateSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Tcc
-        fields = "tema", "resumo", "orientador", "coorientador"
+        fields = "tema", "resumo", "orientador", "coorientador", "curso"
 
 class TccEditSerializer(serializers.ModelSerializer):
     """

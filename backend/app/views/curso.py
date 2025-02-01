@@ -3,7 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
-from app.models import Curso, SuperAdmin
+from app.models import Curso, SuperAdmin, Estudante
+from app.enums import *
 from app.permissions import *
 from app.serializers.curso import *
 from .custom_api_view import CustomAPIView
@@ -426,3 +427,55 @@ class CriarCursoView(APIView):
                 status=status.HTTP_201_CREATED
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+##Views Públicas Para o resto do sistema
+
+class ProfessoresCursoView(APIView):
+    """
+    Retorna os professores associados ao curso do estudante autenticado.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        usuario = Estudante.objects.get(user=request.user)
+        curso = usuario.curso
+        professores = curso.professores.all()
+        serializer = ProfessorSerializer(professores, many=True)
+        return Response(serializer.data)
+
+
+class PrazoEnvioPropostaCursoView(APIView):
+    """
+    Retorna os prazos de envio de propostas dos cursos associados ao usuário autenticado.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        usuario = Usuario.objects.get(user=request.user)
+
+        if usuario.tipo in [UsuarioTipoEnum.COORDENADOR, UsuarioTipoEnum.ESTUDANTE]:
+            curso = usuario.curso  # Obtém o curso único do usuário
+            return Response({
+                "curso": curso.nome,
+                "sigla": curso.sigla,
+                "dataAberturaPrazoPropostas": curso.prazo_propostas_inicio,
+                "dataFechamentoPrazoPropostas": curso.prazo_propostas_fim
+            })
+
+        elif usuario.tipo == UsuarioTipoEnum.PROFESSOR_INTERNO:
+            cursos = Curso.objects.filter(professores=usuario)  # Filtra cursos em que o professor está associado
+            cursos_prazos = [
+                {
+                    "curso": curso.nome,
+                    "sigla": curso.sigla,
+                    "dataAberturaPrazoPropostas": curso.prazo_propostas_inicio,
+                    "dataFechamentoPrazoPropostas": curso.prazo_propostas_fim
+                }
+                for curso in cursos
+            ]
+            return Response({"cursos": cursos_prazos})
+
+        elif usuario.tipo == UsuarioTipoEnum.PROFESSOR_EXTERNO:
+            return Response({"message": "Acesso permitido, mas sem cursos associados."})
+
+        return Response({"error": "Tipo de usuário não reconhecido."}, status=400)

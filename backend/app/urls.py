@@ -67,5 +67,7 @@ urlpatterns = [
     path('atualizar-tema/<int:pk>/', views.AtualizarTemaView.as_view(), name='atualizar-tema'),
     path('excluir-tema/<int:pk>/', views.ExcluirTemaView.as_view(), name='excluir-tema'),
     path('search', SearchView.as_view(), name='search'),
+    path('curso/professores/', ProfessoresCursoView.as_view(), name='curso-professores'),
+    path('curso/prazo-envio-proposta/', PrazoEnvioPropostaCursoView.as_view(), name='curso-prazo-envio-proposta'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
