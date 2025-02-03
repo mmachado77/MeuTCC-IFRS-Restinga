@@ -8,6 +8,10 @@ async function getSessoesPendentesOrientador() {
     return apiClient.get('/app/sessoes-futuras-orientador').then((response) => response.data);
 }
 
+async function getSessoesPendentesCoordenador() {
+    return apiClient.get('/app/sessoes-futuras-coordenador').then((response) => response.data);
+}
+
 async function putEditarSessao(data) {
     return apiClient.put('/app/editar-sessao', data).then((response) => response.data);
 }
@@ -32,6 +36,7 @@ async function avaliarPrevia(sessaoId, data) {
 export default {
     getSessoesPendentes,
     getSessoesPendentesOrientador,
+    getSessoesPendentesCoordenador,
     putEditarSessao,
     putEditarSessaoOrientador,
     postNovaSessao,

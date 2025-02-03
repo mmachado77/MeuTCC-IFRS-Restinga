@@ -2,9 +2,12 @@ from django.urls import path
 from app.views.superadmin import *
 from app.views.curso import *
 from app.views.coordenador import *
+from app.views.listar_usuarios import *
+
 
 urlpatterns = [
     path('login/', SuperAdminLoginView.as_view(), name='login'),
+    path('listar-usuarios', ListarUsuariosSuperAdmin.as_view(), name='listar-usuarios'),
     path('cursos/', CursoListView.as_view(), name='curso-list'),
     path('cursos/criar/', CriarCursoView.as_view(), name='criar_curso'),
     path('cursos/<int:curso_id>/', CursoDetailView.as_view(), name='curso-detail'),

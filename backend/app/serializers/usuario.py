@@ -3,6 +3,14 @@ from app.models import Usuario, Estudante, Professor, ProfessorInterno, Professo
 from rest_polymorphic.serializers import PolymorphicSerializer
 from app.enums import AreaInteresseEnum
 from django.core.exceptions import ValidationError
+from app.serializers.usuario_lista import (
+    UsuarioListaSerializer,
+    EstudanteListaSerializer,
+    ProfessorListaSerializer,
+    ProfessorInternoListaSerializer,
+    ProfessorExternoListaSerializer,
+    CoordenadorListaSerializer
+)
 
 class StatusCadastroSerializer(serializers.ModelSerializer):
     """
@@ -174,7 +182,7 @@ class CoordenadorSerializer(UsuarioSerializer):
         model = Coordenador
         fields = '__all__'
 
-class UsuarioPolymorphicSerializer(PolymorphicSerializer):
+class DetalhesUsuarioPolymorphicSerializer(PolymorphicSerializer):
     """
     Serializer polimórfico para os modelos de usuário.
 
@@ -190,6 +198,18 @@ class UsuarioPolymorphicSerializer(PolymorphicSerializer):
         Coordenador: CoordenadorSerializer,
     }
 
+class UsuarioPolymorphicSerializer(PolymorphicSerializer):
+    """
+    Serializer polimórfico para listagem de usuários com dados reduzidos.
+    """
+    model_serializer_mapping = {
+        Usuario: UsuarioListaSerializer,
+        Estudante: EstudanteListaSerializer,
+        Professor: ProfessorListaSerializer,
+        ProfessorInterno: ProfessorInternoListaSerializer,
+        ProfessorExterno: ProfessorExternoListaSerializer,
+        Coordenador: CoordenadorListaSerializer,
+    }
 
 def validate_cpf(value):
     """

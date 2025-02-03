@@ -21,6 +21,7 @@ urlpatterns = [
     path('semestre/<int:semestreid>', SemestreView.as_view(), name='semestre'),
     path('criar-semestre', CriarSemestreView.as_view(), name='criar-semestre'),
     path('sessoes-futuras', SessoesFuturasView.as_view(), name='sessoes-futuras'),
+    path('sessoes-futuras-coordenador', SessoesFuturasCoordenadorView.as_view(), name='sessoes-futuras-coordenador'),
     path('sessoes-futuras-orientador', SessoesFuturasOrientadorView.as_view(), name='sessoes-futuras-orientador'),
     path('editar-sessao', SessaoEditView.as_view(), name='editar-sessao'),
     path('editar-sessao-orientador', SessaoEditOrientadorView.as_view(), name='editar-sessao-orientador'),

@@ -36,8 +36,7 @@ export default function ListaUsuarios() {
 
     const fetchUsuarios = async () => {
         try {
-            const response = await UsuarioService.listarUsuarios();
-            console.log('Usuários recebidos:', response.data);
+            const response = await UsuarioService.listarUsuariosSuperAdmin();
             setUsuarios(response.data);
             setFilteredUsuarios(response.data);
             handleApiResponse(response);
@@ -101,7 +100,7 @@ export default function ListaUsuarios() {
     };
 
     const header = (
-        <div className="table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="table-header p-4" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
                 <SelectButton value={statusFilter} onChange={(e) => setStatusFilter(e.value)} options={statusOptions} />
             </div>

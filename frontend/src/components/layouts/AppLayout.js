@@ -60,7 +60,6 @@ export const AppLayout = ({ children, guards }) => {
                     { label: 'Validar Sessões', icon: 'pi pi-fw pi-calendar', url: '/sessoes-futuras' },
                 ]
             },
-            { label: 'Lista de Usuários', icon:'pi pi-fw pi-users', url: '/lista-usuarios'},
             {
                 label: 'Sugestões de Tema', icon: 'pi pi-fw pi-list', url: '',
                 items: [

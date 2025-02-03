@@ -1,6 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.exceptions import NotFound, PermissionDenied
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from django.db.models import Max, F, Q
 from app.enums import StatusTccEnum, UsuarioTipoEnum
@@ -52,28 +54,58 @@ class ListarTccPendente(CustomAPIView):
     
 class TCCs(CustomAPIView):
     """
-    API para listar todos os TCCs.
+    API para listar os TCCs de um curso.
+
+    Esta API retorna todos os TCCs pertencentes ao curso do coordenador autenticado.
+
+    Permissões:
+        - Apenas usuários autenticados que sejam coordenadores de curso podem acessar.
 
     Métodos:
-        get(request): Retorna todos os TCCs.
+        - GET: Retorna todos os TCCs do curso do coordenador autenticado.
+
+    Respostas:
+        - 200 OK: Lista de TCCs do curso.
+        - 403 Forbidden: Usuário não tem permissão para acessar os TCCs.
+        - 404 Not Found: Coordenador ou curso não encontrados.
     """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         """
-        Retorna todos os TCCs.
+        Retorna todos os TCCs do curso do coordenador autenticado.
 
         Args:
             request (Request): A requisição HTTP.
 
         Retorna:
-            Response: Resposta HTTP com todos os TCCs ou mensagem de erro.
+            Response: Lista de TCCs do curso ou erro apropriado.
         """
-     
-        tccs = Tcc.objects.all()
-        serializer = TccSerializer(tccs, many=True)
+        try:
+            # Obtém o coordenador autenticado
+            coordCurso = get_object_or_404(Coordenador, user=request.user)
+            
+            # Obtém o curso do coordenador
+            curso = get_object_or_404(Curso, pk=coordCurso.curso.id)
+
+            # Filtra os TCCs do curso
+            tccs = Tcc.objects.filter(curso=curso)
+
+            # Serializa os dados
+            serializer = TCCPendentesSerializer(tccs, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except PermissionDenied:
+            return Response(
+                {"detail": "Você não tem permissão para acessar esta lista de TCCs."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        except Exception as e:
+            return Response(
+                {"detail": "Erro ao buscar os TCCs.", "erro": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
         
-        return Response(serializer.data)
     
 class TCCsByAluno(CustomAPIView):
     """
@@ -97,7 +129,7 @@ class TCCsByAluno(CustomAPIView):
         usuario = Usuario.objects.get(user=request.user)
         tccs = Tcc.objects.filter(autor = usuario)
         
-        serializer = TccSerializer(tccs, many=True)
+        serializer = TCCPendentesSerializer(tccs, many=True)
         return Response(serializer.data)
     
 
@@ -124,7 +156,7 @@ class TCCsByOrientador(CustomAPIView):
         
         tccs = Tcc.objects.filter(Q(orientador=usuario) | Q(coorientador=usuario))
         
-        serializer = TccSerializer(tccs, many=True)
+        serializer = TCCPendentesSerializer(tccs, many=True)
         return Response(serializer.data)
     
 class PossuiProposta(CustomAPIView):

@@ -88,6 +88,21 @@ const DashboardSuperAdmin = () => {
                         />
                     </Card>
                 )}
+                {/* Card Lista de Usuários */}
+                {user?.resourcetype === 'SuperAdmin' && (
+                    <Card
+                        title="Lista de Usuários"
+                        subTitle="Consulte todos os usuários cadastrados no sistemas."
+                        className="hover:shadow-lg transition-shadow"
+                    >
+                        <Button
+                            label="Acessar"
+                            icon="pi pi-users"
+                            className="p-button-outlined p-button-info"
+                            onClick={() => router.push('/superadmin/lista-usuarios')}
+                        />
+                    </Card>
+                )}
             </div>
         </div>
     );
