@@ -126,7 +126,6 @@ class Curso(models.Model):
             None: Caso o curso não tenha um template associado.
         """
         return getattr(self, 'template_avaliacao', None)
-    
 
 
     class Meta:

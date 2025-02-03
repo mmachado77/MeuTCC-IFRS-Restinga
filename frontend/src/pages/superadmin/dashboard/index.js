@@ -14,6 +14,23 @@ const DashboardSuperAdmin = () => {
         <div className="flex flex-col items-center justify-center bg-gray-100 pt-4 pb-12">
             <h1 className="text-4xl font-bold mb-8 text-gray-800">Dashboard</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
+                
+                {/* Card Adicionar Curso */}
+                {user?.resourcetype === 'SuperAdmin' && (
+                    <Card
+                        title="Adicionar Curso"
+                        subTitle="Adicione um novo curso ao sistema de Gerenciamento de TCCs."
+                        className="hover:shadow-lg transition-shadow"
+                    >
+                        <Button
+                            label="Acessar"
+                            icon="pi pi-plus"
+                            className="p-button-outlined p-button-info"
+                            onClick={() => router.push('/superadmin/cursos/adicionar')}
+                        />
+                    </Card>
+                )}
+
                 {/* Card Gerenciar Cursos */}
                 <Card
                     title="Gerenciar Cursos"
@@ -28,6 +45,19 @@ const DashboardSuperAdmin = () => {
                     />
                 </Card>
 
+                {/* Card Visibilidade de Curso */}
+                <Card
+                    title="Visibilidade de Curso"
+                    subTitle="Altere a visibilidade dos cursos do existentes do sistema."
+                    className="hover:shadow-lg transition-shadow"
+                >
+                    <Button
+                        label="Acessar"
+                        icon="pi pi-eye-slash"
+                        className="p-button-outlined p-button-info"
+                        onClick={() => router.push('/superadmin/cursos/visibilidade')}
+                    />
+                </Card>
                 {/* Card Gerenciar Coordenadores */}
                 {user?.resourcetype === 'SuperAdmin' && (
                     <Card
@@ -38,41 +68,26 @@ const DashboardSuperAdmin = () => {
                         <Button
                             label="Acessar"
                             icon="pi pi-arrow-right"
-                            className="p-button-outlined p-button-warning"
+                            className="p-button-outlined p-button-info"
                             onClick={() => router.push('/superadmin/coordenadores')}
                         />
                     </Card>
                 )}
-
-                {/* Card Adicionar Curso */}
+                {/* Card Gerenciar Semestres */}
                 {user?.resourcetype === 'SuperAdmin' && (
                     <Card
-                        title="Adicionar Curso"
-                        subTitle="Adicione um novo curso ao sistema de Gerenciamento de TCCs."
+                        title="Gerenciar Semestres"
+                        subTitle="Configure os Semestres do sistema de acordo com o Calendário Acadêmico."
                         className="hover:shadow-lg transition-shadow"
                     >
                         <Button
                             label="Acessar"
-                            icon="pi pi-plus"
-                            className="p-button-outlined p-button-success"
-                            onClick={() => router.push('/superadmin/cursos/adicionar')}
+                            icon="pi pi-calendar"
+                            className="p-button-outlined p-button-info"
+                            onClick={() => router.push('/superadmin/semestres')}
                         />
                     </Card>
                 )}
-
-                {/* Card Visibilidade de Curso */}
-                <Card
-                    title="Visibilidade de Curso"
-                    subTitle="Altere a visibilidade dos cursos do existentes do sistema."
-                    className="hover:shadow-lg transition-shadow"
-                >
-                    <Button
-                        label="Acessar"
-                        icon="pi pi-eye-slash"
-                        className="p-button-outlined p-button-danger"
-                        onClick={() => router.push('/superadmin/cursos/visibilidade')}
-                    />
-                </Card>
             </div>
         </div>
     );

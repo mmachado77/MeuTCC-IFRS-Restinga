@@ -123,6 +123,7 @@ class CriarSemestreView(CustomAPIView):
                 return Response({'status': 'error', 'message': 'As datas do semestre estão sobrepostas com semestres existentes.'}, status=status.HTTP_400_BAD_REQUEST)
 
             else:
+                serializer_semestre.save()
                 return Response(serializer_semestre.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer_semestre.errors, status=status.HTTP_400_BAD_REQUEST)

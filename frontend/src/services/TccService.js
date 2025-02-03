@@ -1,8 +1,18 @@
 import { apiClient } from "meutcc/libs/api";
 
 async function submeterProposta(data) {
-    return apiClient.post('/app/criar-tcc', data).then((response) => response.data);
-}
+    try {
+      const response = await apiClient.post('/app/criar-tcc', data);
+      // Retorne um objeto contendo status e dados
+      return { 
+        status: response.status,
+        data: response.data
+      };
+    } catch (error) {
+      // Você pode dar throw para tratar o erro no local que chamar
+      throw error; 
+    }
+  }
 
 async function getTccsByAluno() {
     return apiClient.get('/app/tccs-by-aluno').then((response) => response.data);

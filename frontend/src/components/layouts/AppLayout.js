@@ -112,7 +112,7 @@ export const AppLayout = ({ children, guards }) => {
             console.error('Erro ao carregar notificações:', error);
         }
     };
-
+/*
     const fetchConfigs = async () => {
         try {
             const data = await ConfiguracoesService.getCoordenador();
@@ -121,12 +121,12 @@ export const AppLayout = ({ children, guards }) => {
             console.error('Erro ao buscar as configurações', error);
         }
     };
-
+*/
     React.useEffect(() => {
         if (isUserAuth) {
         loadNotifications();
         }
-        fetchConfigs();
+        //fetchConfigs();
     }, [])
 
 
@@ -175,7 +175,7 @@ export const AppLayout = ({ children, guards }) => {
                         </p>
                         <p>Rua Alberto Hoffmann, 285 | Bairro Restinga | CEP: 91791-508 | Porto Alegre/RS</p>
                         <p>
-                            Coordenador: {coordenadorNome} - <a href="mailto:ads@restinga.ifrs.edu.br" className="anchor-link">ads@restinga.ifrs.edu.br</a>
+                        Telefone: (51) 3247-8400
                         </p>
                     </div>
                 </div>

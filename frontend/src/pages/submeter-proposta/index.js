@@ -151,17 +151,23 @@ const SubmeterPropostaPage = () => {
             return;
         }
 
-        const response = await TccService.submeterProposta(jsonData);
+        try {
+            const { status, data } = await TccService.submeterProposta(jsonData);
 
-        if (response && response.status === 201) {
-            toast.success('Proposta submetida com sucesso');
-        } else {
-            toast.error('Erro ao submeter proposta:', response);
-        }
+            if (status === 201) {
+                toast.success('Proposta submetida com sucesso');
+                setLoading(false);
+                router.push('/meus-tccs');
+            } else {
+                toast.error('Erro ao submeter proposta:', data);
+            }
+        } catch (error) {
+            // Se cair aqui, normalmente significa que deu falha de rede ou erro 4xx/5xx
+            // que o axios lançou como exceção
+            toast.error('Erro ao submeter proposta: ', error.response?.data);
+          }
 
-        setLoading(false);
-        router.push('/meus-tccs');
-
+            setLoading(false);
     }
 
     const handleTemCoorientadorChange = (e) => {

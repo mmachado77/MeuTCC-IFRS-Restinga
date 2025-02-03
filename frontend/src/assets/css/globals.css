@@ -23,6 +23,10 @@ body {
   transition: background-color 0.2s ease-in-out; /* Transição suave */
 }
 
+.p-datatable-header{
+  padding: 0;
+}
+
 /* Mantém o texto visível ao passar o mouse */
 .p-datatable .p-highlight:hover {
   background-color: #c7c7c7 !important; /* Escurece ainda mais ao passar o mouse */

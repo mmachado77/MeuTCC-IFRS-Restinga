@@ -89,7 +89,7 @@ class TCCPendentesSerializer(serializers.ModelSerializer):
         return TccStatusSerializer(status_objects, many=True).data
     class Meta:
         model = Tcc
-        fields = ['id', 'tema,', 'resumo','autor', 'orientador', 'coorientador', 'status','semestre','dataSubmissaoProposta']
+        fields = ['id', 'tema', 'resumo','autor', 'orientador', 'coorientador', 'status','semestre','dataSubmissaoProposta']
 
 
 class TccPublicSerializer(serializers.ModelSerializer):
