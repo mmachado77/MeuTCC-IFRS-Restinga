@@ -9,15 +9,18 @@ async function getProfessoresInternos() {
 }
 
 async function getProfessoresPendentes() {
-    return apiClient.get('/app/professores-pendentes').then((response) => response.data);
+    return apiClient.get('/app/professores-pendentes/')
+        .then((response) => response.data);
 }
 
-async function aprovarProfessor(idProfessor) {
-    return apiClient.put(`/app/aprovar-professor/${idProfessor}`).then((response) => response.data);
+async function aprovarProfessor(professorId) {
+    return apiClient.put(`/app/aprovar-professor/${professorId}/`)
+        .then((response) => response.data);
 }
 
-async function recusarProfessor(idProfessor, data) {
-    return apiClient.put(`/app/recusar-professor/${idProfessor}`, data).then((response) => response.data);
+async function recusarProfessor(professorId, justificativa) {
+    return apiClient.put(`/app/recusar-professor/${professorId}/`, { justificativa })
+        .then((response) => response.data);
 }
 
 export default {

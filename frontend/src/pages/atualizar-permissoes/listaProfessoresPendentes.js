@@ -39,46 +39,56 @@ export default function ListaProfessores() {
     const fetchProfessors = async () => {
         try {
             const professoresPendentes = await ProfessorService.getProfessoresPendentes();
-
             setProfessors(professoresPendentes);
         } catch (error) {
             handleApiResponse(error.response);
             console.error('Erro ao obter professores pendentes:', error);
-            // Exiba uma mensagem de erro se necessário
         }
-    }
-
-    const atualizaProfessoresPosAvaliacao = async () => {
-        fetchProfessors()
-        hideDialog()
-    }
-
-    const aprovarProfessor = async () => {
-        const data = await toast.promise(ProfessorService.aprovarProfessor(professor.id), {
-            loading: 'Aprovando professor...',
-            success: 'Professor aprovado com sucesso!',
-            error: 'Erro ao aprovar professor.',
-        });
-        atualizaProfessoresPosAvaliacao()
     };
-
-
+    
+    const atualizaProfessoresPosAvaliacao = async () => {
+        fetchProfessors();
+        hideDialog();
+    };
+    
+    const aprovarProfessor = async () => {
+        try {
+            await toast.promise(
+                ProfessorService.aprovarProfessor(professor.id),
+                {
+                    loading: 'Aprovando professor...',
+                    success: 'Professor aprovado com sucesso!',
+                    error: 'Erro ao aprovar professor.',
+                }
+            );
+            atualizaProfessoresPosAvaliacao();
+        } catch (error) {
+            console.error('Erro ao aprovar professor:', error);
+        }
+    };
+    
     useEffect(() => {
         fetchProfessors();
-    }, []); // Adicionando [] como dependência para garantir que o useEffect seja executado apenas uma vez
-
+    }, []); // Executado apenas uma vez ao montar o componente.
+    
     const hideDialog = () => {
         setProfessorDialog(false);
     };
-
+    
     const detalhesProfessor = (professor) => {
         setProfessor({ ...professor });
         setProfessorDialog(true);
     };
-
+    
     const actionBodyTemplate = (rowData) => {
         return (
-            <Button label="Analisar" icon='pi pi-search-plus' severity="success" outlined onClick={() => detalhesProfessor(rowData)} />
+            <Button 
+                label="Analisar" 
+                icon="pi pi-search-plus" 
+                severity="success" 
+                outlined 
+                onClick={() => detalhesProfessor(rowData)} 
+            />
         );
     };
 

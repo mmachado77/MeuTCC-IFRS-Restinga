@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
-from .professorInterno import ProfessorInterno
+from .professor import Professor
 from app.enums import RegraSessaoPublicaEnum
 
 
@@ -64,7 +64,7 @@ class Curso(models.Model):
     )
 
     professores = models.ManyToManyField(
-        ProfessorInterno,
+        Professor,
         related_name="cursos",
         verbose_name="Professores associados ao curso",
     )
