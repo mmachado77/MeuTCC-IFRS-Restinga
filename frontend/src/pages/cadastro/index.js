@@ -30,15 +30,17 @@ const CadastroPage = () => {
         if (token) {
             const decodedData = JSON.parse(atob(token));
             const { name, email, picture } = decodedData;
+            const isInterno = email.endsWith('@restinga.ifrs.edu.br') || email.endsWith('@aluno.restinga.ifrs.edu.br');
+    
             setUserData({
                 ...userData,
                 nome: name,
                 email: email,
-                IsInterno: email.endsWith('@restinga.ifrs.edu.br') || email.endsWith('@aluno.restinga.ifrs.edu.br'),
+                IsInterno: isInterno,
+                isProfessor: !isInterno, // Se não for interno, então é professor
                 avatar: picture
             });
         }
-
     }, []);
 
     const nextStep = () => {

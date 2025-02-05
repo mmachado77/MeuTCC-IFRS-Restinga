@@ -10,6 +10,17 @@ const SubmeterServices = {
         }
     },
 
+    async getProfessoresInternosByCurso() {
+        try {
+            const response = await apiClient.get('app/curso/professores-internos/');
+            return response.data;
+        } catch (error) {
+            console.error("Erro ao buscar professores do curso", error);
+            throw error;
+        }
+    },
+    
+
     async getPrazoEnvioProposta() {
         try {
             const response = await apiClient.get('app/curso/prazo-envio-proposta/');

@@ -25,6 +25,11 @@ class UsuarioService:
         # 2) Lógica para Professor Externo
         if (serializer.validated_data['isProfessor']
             and not self.IsInterno(usuario.email)):
+            curso_id = serializer.validated_data.get('curso')
+            curso = None
+            if curso_id:
+                # Se você precisa instanciar o objeto:
+                curso = Curso.objects.get(pk=curso_id)
             status = StatusCadastro.objects.create(aprovacao=False)
             return ProfessorExterno.objects.create(
                 nome=serializer.validated_data['nome'],
@@ -37,6 +42,7 @@ class UsuarioService:
                 identidade=serializer.validated_data.get('identidade'),
                 diploma=serializer.validated_data.get('diploma'),
                 status=status,
+                curso=curso,
                 user=usuario
             )
 

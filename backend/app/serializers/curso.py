@@ -134,7 +134,7 @@ class CursoDetailSerializer(serializers.ModelSerializer):
         """
         Ordena e retorna os professores do curso.
         """
-        professores = obj.professores.all().order_by("nome")  # Ordena por nome
+        professores = obj.professores.filter(status__aprovacao=True).order_by("nome")  # Ordena por nome
         return ProfessorSerializer(professores, many=True).data  # Serializa os professores
 
     

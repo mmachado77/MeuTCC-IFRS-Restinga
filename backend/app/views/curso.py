@@ -432,15 +432,57 @@ class CriarCursoView(APIView):
 
 class ProfessoresCursoView(APIView):
     """
-    Retorna os professores associados ao curso do estudante autenticado.
+    Retorna os professores associados ao curso do estudante autenticado, apenas aqueles aprovados.
     """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        usuario = Estudante.objects.get(user=request.user)
+        usuario = None
+
+        # Primeiro tenta encontrar o estudante
+        try:
+            usuario = Estudante.objects.get(user=request.user)
+        except Estudante.DoesNotExist:
+            pass
+
+        # Se não encontrou estudante, tenta encontrar o coordenador
+        if not usuario:
+            try:
+                usuario = Coordenador.objects.get(user=request.user)
+            except Coordenador.DoesNotExist:
+                return Response({"detail": "Usuário não encontrado como Estudante ou Coordenador."}, status=404)
         curso = usuario.curso
-        professores = curso.professores.all()
+        professores = curso.professores.filter(status__aprovacao=True)  # Apenas aprovados
         serializer = ProfessorSerializer(professores, many=True)
+        return Response(serializer.data)
+    
+class ProfessoresInternosCursoView(APIView):
+    """
+    Retorna apenas os professores internos associados ao curso do estudante ou coordenador autenticado, 
+    apenas aqueles aprovados.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        usuario = None
+
+        # Primeiro tenta encontrar o estudante
+        try:
+            usuario = Estudante.objects.get(user=request.user)
+        except Estudante.DoesNotExist:
+            pass
+
+        # Se não encontrou estudante, tenta encontrar o coordenador
+        if not usuario:
+            try:
+                usuario = Coordenador.objects.get(user=request.user)
+            except Coordenador.DoesNotExist:
+                return Response({"detail": "Usuário não encontrado como Estudante ou Coordenador."}, status=404)
+
+        # Obtém o curso associado ao usuário encontrado
+        curso = usuario.curso
+        professores_internos = ProfessorInterno.objects.filter(cursos=curso, status__aprovacao=True)  # Apenas aprovados
+        serializer = ProfessorSerializer(professores_internos, many=True)
         return Response(serializer.data)
 
 

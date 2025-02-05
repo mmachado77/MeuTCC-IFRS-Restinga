@@ -104,71 +104,117 @@ export default function ListaProfessores() {
                 </DataTable>
             </div>
 
-            <Dialog visible={professorDialog} style={{ width: '32rem' }} header="Detalhes do Cadastro" modal className="p-fluid" onHide={hideDialog}>
+            <Dialog
+                visible={professorDialog}
+                style={{ width: '32rem' }}
+                header="Detalhes do Cadastro"
+                modal
+                className="p-fluid"
+                onHide={hideDialog}
+                >
                 <div style={{ marginBottom: '1rem' }}>
                     <label htmlFor="nome" className="font-bold">Nome: </label>
                     <span>{professor.nome}</span>
                 </div>
+
                 <div style={{ marginBottom: '1rem' }}>
                     <label htmlFor="cpf" className="font-bold">CPF: </label>
                     <span>{professor.cpf}</span>
                 </div>
+
                 <div style={{ marginBottom: '1rem' }}>
                     <label htmlFor="email" className="font-bold">Email: </label>
                     <span>{professor.email}</span>
                 </div>
+
                 <div style={{ marginBottom: '1rem' }}>
                     <label htmlFor="dataCadastro" className="font-bold">Data de Cadastro: </label>
-                    <span>{professor.dataCadastro && format(professor.dataCadastro, 'dd/MM/yyyy')}</span>
+                    <span>
+                    {professor.dataCadastro && format(new Date(professor.dataCadastro), 'dd/MM/yyyy')}
+                    </span>
                 </div>
+
                 <div style={{ marginBottom: '1rem' }}>
-                    <label htmlFor="area" className="font-bold">Área: </label>
-                    <span>{professor.area}</span>
+                    <label htmlFor="area_atuacao" className="font-bold">Área de Atuação: </label>
+                    <span>{professor.area_atuacao}</span>
                 </div>
+
                 <div style={{ marginBottom: '1rem' }}>
-                    <label htmlFor="grauAcademico" className="font-bold">Grau Acadêmico: </label>
-                    <span>{professor.grau_academico}</span>
+                    <label htmlFor="titulo" className="font-bold">Título Acadêmico: </label>
+                    <span>{professor.titulo}</span>
                 </div>
-                {professor.resourcetype === 'ProfessorInterno' && (
-                    <div style={{ marginBottom: '1rem' }}>
-                        <label htmlFor="matricula" className="font-bold">Matrícula: </label>
-                        <span>{professor.matricula}</span>
-                    </div>
-                )}
-                {professor.resourcetype === 'ProfessorExterno' && (
+
+                {/* Se for Professor Externo, exibe campos de identidade e diploma */}
+                {professor.tipo === 'Professor Externo' ? (
                     <>
-                        <div style={{ marginBottom: '1rem' }}>
-                            <label htmlFor="identidade" className="font-bold">Identidade: </label>
-                            {professor.identidade ? (
-                                <a href={`${baseURL}${professor.identidade}`} target="_blank" rel="noopener noreferrer">{professor.identidade.split('/').pop()}</a>
-                            ) : (
-                                <span>Não disponível</span>
-                            )}
-                        </div>
-                        <div style={{ marginBottom: '1rem' }}>
-                            <label htmlFor="diploma" className="font-bold">Diploma: </label>
-                            {professor.diploma ? (
-                                <a href={`${baseURL}${professor.diploma}`} target="_blank" rel="noopener noreferrer">{professor.diploma.split('/').pop()}</a>
-                            ) : (
-                                <span>Não disponível</span>
-                            )}
-                        </div>
-                    </>
-                )}
-                <div className='pt-4 border-0 border-t border-gray-200 border-dashed'>
-                    <div className={'flex justify-around ' + (exibeFormulario ? 'hidden' : '')}>
-                        <div>
-                            <Button label="Aprovar" severity="success" icon='pi pi-thumbs-up-fill' iconPos='right' onClick={aprovarProfessor} />
-                        </div>
-                        <div>
-                            <Button label="Recusar" severity="danger" icon='pi pi-thumbs-down-fill' iconPos='right' onClick={() => setExibeFormulario(!exibeFormulario)} />
-                        </div>
+                    <div style={{ marginBottom: '1rem' }}>
+                        <label htmlFor="identidade" className="font-bold">Identidade: </label>
+                        {professor.identidade ? (
+                        <a
+                            href={`${baseURL}${professor.identidade}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {professor.identidade.split('/').pop()}
+                        </a>
+                        ) : (
+                        <span>Não disponível</span>
+                        )}
                     </div>
-                    <div className={(!exibeFormulario ? 'hidden' : '')} >
-                        <FormularioJustificativa onSetVisibility={setExibeFormulario} onPosAvaliacao={atualizaProfessoresPosAvaliacao} professor={professor} />
+                    <div style={{ marginBottom: '1rem' }}>
+                        <label htmlFor="diploma" className="font-bold">Diploma: </label>
+                        {professor.diploma ? (
+                        <a
+                            href={`${baseURL}${professor.diploma}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {professor.diploma.split('/').pop()}
+                        </a>
+                        ) : (
+                        <span>Não disponível</span>
+                        )}
+                    </div>
+                    </>
+                ) : (
+                    /* Se for Professor Interno, exibe a matrícula (caso exista) */
+                    <div style={{ marginBottom: '1rem' }}>
+                    <label htmlFor="matricula" className="font-bold">Matrícula: </label>
+                    <span>{professor.matricula || 'Não disponível'}</span>
+                    </div>
+                )}
+
+                <div className="pt-4 border-0 border-t border-gray-200 border-dashed">
+                    <div className={'flex justify-around ' + (exibeFormulario ? 'hidden' : '')}>
+                    <div>
+                        <Button
+                        label="Aprovar"
+                        severity="success"
+                        icon="pi pi-thumbs-up-fill"
+                        iconPos="right"
+                        onClick={aprovarProfessor}
+                        />
+                    </div>
+                    <div>
+                        <Button
+                        label="Recusar"
+                        severity="danger"
+                        icon="pi pi-thumbs-down-fill"
+                        iconPos="right"
+                        onClick={() => setExibeFormulario(!exibeFormulario)}
+                        />
+                    </div>
+                    </div>
+                    <div className={!exibeFormulario ? 'hidden' : ''}>
+                    <FormularioJustificativa
+                        onSetVisibility={setExibeFormulario}
+                        onPosAvaliacao={atualizaProfessoresPosAvaliacao}
+                        professor={professor}
+                    />
                     </div>
                 </div>
-            </Dialog>
+                </Dialog>
+
         </div>
     );
 }

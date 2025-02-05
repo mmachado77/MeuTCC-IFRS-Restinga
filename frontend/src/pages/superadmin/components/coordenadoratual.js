@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
@@ -13,6 +13,8 @@ const CoordenadorAtual = ({ curso }) => {
     const [dialogVisible, setDialogVisible] = useState(false);
     const [selectedProfessor, setSelectedProfessor] = useState(null);
     const [loading, setLoading] = useState(false);
+    // Estado para armazenar os professores aptos
+    const [professoresAptos, setProfessoresAptos] = useState([]);
 
     const toast = useRef(null); // Referência para o Toast
 
@@ -30,7 +32,7 @@ const CoordenadorAtual = ({ curso }) => {
             });
         }
     };
-    
+
     const handleSalvar = async () => {
         if (!selectedProfessor) {
             toast.current.show({
@@ -41,25 +43,25 @@ const CoordenadorAtual = ({ curso }) => {
             });
             return;
         }
-    
+
         setLoading(true);
-    
+
         try {
             const response = await AdminCursoService.trocarCoordenador(curso.id, selectedProfessor.id);
-    
+
             // Atualiza os dados do card com o novo coordenador
             curso.coordenador_atual = response.coordenador_atual;
-    
+
             // Atualiza a timeline
             await fetchHistorico();
-    
+
             toast.current.show({
                 severity: 'success',
                 summary: 'Sucesso',
                 detail: 'Coordenador atualizado com sucesso.',
                 life: 3000,
             });
-    
+
             setDialogVisible(false);
         } catch (error) {
             console.error('Erro ao trocar coordenador:', error);
@@ -73,8 +75,6 @@ const CoordenadorAtual = ({ curso }) => {
             setLoading(false);
         }
     };
-    
-    
 
     const professorOptionTemplate = (option) => {
         return (
@@ -109,6 +109,25 @@ const CoordenadorAtual = ({ curso }) => {
         return <span>Selecione um professor</span>;
     };
 
+    // Novo fetch para carregar os professores aptos para coordenador quando o dialog for aberto
+    useEffect(() => {
+        if (dialogVisible) {
+            AdminCursoService.getProfessoresAptosParaCoordenador()
+                .then((data) => {
+                    setProfessoresAptos(data);
+                })
+                .catch((error) => {
+                    console.error('Erro ao buscar professores aptos:', error);
+                    toast.current.show({
+                        severity: 'error',
+                        summary: 'Erro',
+                        detail: 'Erro ao buscar professores aptos para coordenador.',
+                        life: 3000,
+                    });
+                });
+        }
+    }, [dialogVisible]);
+
     return (
         <>
             <Toast ref={toast} /> {/* Componente Toast */}
@@ -139,7 +158,7 @@ const CoordenadorAtual = ({ curso }) => {
                     {/* Botões */}
                     <div className="flex flex-col items-end gap-2">
                         <Button
-                            className='w-full'
+                            className="w-full"
                             label="Ver Histórico"
                             severity="secondary"
                             icon="pi pi-history"
@@ -186,14 +205,14 @@ const CoordenadorAtual = ({ curso }) => {
                             <Button
                                 label="Cancelar"
                                 icon="pi pi-times"
-                                severity='danger'
+                                severity="danger"
                                 outlined
                                 onClick={() => setDialogVisible(false)}
                             />
                             <Button
                                 label="Salvar"
                                 icon="pi pi-check"
-                                severity='success'
+                                severity="success"
                                 onClick={handleSalvar}
                                 loading={loading}
                             />
@@ -202,7 +221,8 @@ const CoordenadorAtual = ({ curso }) => {
                 >
                     <Dropdown
                         value={selectedProfessor}
-                        options={curso.professores}
+                        // Utilizando os professores aptos para coordenador
+                        options={professoresAptos}
                         onChange={(e) => setSelectedProfessor(e.value)}
                         optionLabel="nome"
                         valueTemplate={selectedProfessorTemplate}

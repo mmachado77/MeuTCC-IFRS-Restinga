@@ -23,10 +23,30 @@ async function recusarProfessor(professorId, justificativa) {
         .then((response) => response.data);
 }
 
+// Professores Internos Pendentes
+async function getProfessoresInternosPendentes() {
+    return apiClient.get('/superadmin/professores-internos-pendentes/')
+        .then((response) => response.data);
+}
+
+async function aprovarProfessorInterno(professorId) {
+    return apiClient.put(`/superadmin/professores-internos/${professorId}/aprovar/`)
+        .then((response) => response.data);
+}
+
+async function recusarProfessorInterno(professorId, justificativa) {
+    return apiClient.put(`/superadmin/professores-internos/${professorId}/recusar/`, { justificativa })
+        .then((response) => response.data);
+}
+
+
 export default {
     getProfessores,
     getProfessoresInternos,
     getProfessoresPendentes,
     aprovarProfessor,
     recusarProfessor,
+    getProfessoresInternosPendentes,
+    aprovarProfessorInterno,
+    recusarProfessorInterno
 }

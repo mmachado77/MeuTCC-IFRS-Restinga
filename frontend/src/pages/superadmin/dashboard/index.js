@@ -277,7 +277,7 @@ const Dashboard = () => {
               label="Acessar"
               icon="pi pi-arrow-right"
               className="p-button-outlined p-button-info"
-              onClick={() => router.push('/coordenador/cursos')}
+              onClick={() => router.push('/superadmin/cursos')}
             />
           </Card>
 
@@ -291,7 +291,7 @@ const Dashboard = () => {
               label="Acessar"
               icon="pi pi-eye-slash"
               className="p-button-outlined p-button-info"
-              onClick={() => router.push('/coordenador/cursos/visibilidade')}
+              onClick={() => router.push('/superadmin/cursos/visibilidade')}
             />
           </Card>
         </div>

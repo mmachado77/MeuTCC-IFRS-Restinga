@@ -117,6 +117,16 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
                 });
                 error = true;
             }
+
+            if (!IsInterno && !userData.curso) {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'Erro',
+                    detail: 'Curso deve ser informado para usuários externos.',
+                    life: 3000
+                });
+                error = true;
+            }
             
             if (!IsInterno && !userData.area_atuacao) {
                 toast.current.show({
@@ -256,6 +266,15 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
                         <FileUpload name="identidade" mode="basic" auto={false} accept="application/pdf,image/png,image/jpeg" maxFileSize={5000000} label="Upload Identidade" chooseLabel="Selecionar Identificação" onSelect={(e) => onFileSelect(e, setIdentidade)} className="w-full p-button-sm p-button-outlined" style={{ marginBottom: '10px', marginTop: '5px', border: '1px solid #ccc', padding: '10px', borderRadius: '10px', justifyContent: 'space-between' }} />
                         <label htmlFor='diploma' className='font-bold text-gray-700'> Diploma: </label>
                         <FileUpload name="diploma" mode="basic" auto={false} accept="application/pdf,image/png,image/jpeg" maxFileSize={5000000} label="Upload Diploma" chooseLabel="Selecionar Diploma" onSelect={(e) => onFileSelect(e, setDiploma)} className="w-full p-button-sm p-button-outlined" style={{ marginBottom: '10px', marginTop: '5px', border: '1px solid #ccc', padding: '10px', borderRadius: '10px', justifyContent: 'space-between' }} />
+                        <Dropdown
+                            className="w-full mb-2"
+                            value={userData.curso} // Valor atual selecionado
+                            options={cursos} // Lista de cursos
+                            onChange={(e) => onFieldChange(e, 'curso')} // Atualiza o estado de userData
+                            placeholder="Selecione o curso"
+                            filter // Adiciona a funcionalidade de filtro
+                            showClear // Adiciona a opção para limpar a seleção
+                        />
                         <Button className='w-full mb-2' label="Concluir Cadastro" onClick={validateAndSubmit} />
                     </>
                 )}
@@ -274,7 +293,7 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
                         <Button className='w-full mb-2' label="Concluir Cadastro" onClick={validateAndSubmit} />
                     </>
                 )}
-                {userData.isProfessor === true &&(
+                {userData.isProfessor === true && userData.IsInterno &&(
                     <>
                         <InputText className='w-full mb-2' value={userData.matricula} placeholder="Matrícula" onChange={(e) => onFieldChange(e, 'matricula')} />
                         <Dropdown className='w-full mb-2' value={userData.titulo} options={grausAcademicos} onChange={(e) => onFieldChange(e, 'titulo')} placeholder="Selecione o seu título acadêmico" />

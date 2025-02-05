@@ -25,7 +25,7 @@ urlpatterns = [
     path('coordenadores/<int:coordenador_id>/limpar-curso/', LimparCursoCoordenadorView.as_view(), name='limpar-curso-coordenador'),
 
     # Professores Internos (SuperAdmin)
-    path('professores-internos/', ListaProfessoresInternosView.as_view(), name='listar-professores-internos'),
+    path('professores-internos-pendentes/', ListaProfessoresInternosView.as_view(), name='listar-professores-internos'),
     path('professores-internos/<int:pk>/aprovar/', AprovarProfessorInternoView.as_view(), name='aprovar-professor-interno'),
     path('professores-internos/<int:pk>/recusar/', RecusarProfessorInternoView.as_view(), name='recusar-professor-interno'),
 ]

@@ -24,6 +24,15 @@ const AdminCursoService = {
         return apiClient.get(`/superadmin/cursos/${cursoId}/historico-coordenadores/`)
             .then(response => response.data);
     },
+    async getProfessoresAptosParaCoordenador() {
+        try {
+            const response = await apiClient.get('app/curso/professores-internos/');
+            return response.data;
+        } catch (error) {
+            console.error("Erro ao buscar professores do curso", error);
+            throw error;
+        }
+    },
     adicionarProfessor: (cursoId, professorId) => {
         return apiClient.post(`/superadmin/cursos/${cursoId}/adicionar-professor/`, { professor_id: professorId })
             .then(response => response.data)
