@@ -521,3 +521,32 @@ class PrazoEnvioPropostaCursoView(APIView):
             return Response({"message": "Acesso permitido, mas sem cursos associados."})
 
         return Response({"error": "Tipo de usuário não reconhecido."}, status=400)
+    
+class CursosUsuarioView(CustomAPIView):
+    """
+    API para listar os cursos do usuário autenticado.
+
+    - Se for professor, retorna todos os cursos em que atua.
+    - Se for coordenador, retorna apenas o curso que coordena.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Obtém o usuário customizado a partir do usuário autenticado
+        usuario = Usuario.objects.get(user=request.user)
+        cursos = Curso.objects.none()  # Inicializa como vazio
+
+        if usuario.tipo == UsuarioTipoEnum.PROFESSOR_INTERNO:
+            # Utilize o request.user (instância do modelo User) para buscar o professor interno
+            professor = ProfessorInterno.objects.get(user=request.user)
+            cursos = professor.cursos.all()
+
+        elif usuario.tipo == UsuarioTipoEnum.COORDENADOR:
+            # Utilize o request.user para buscar o coordenador
+            coordenador = Coordenador.objects.get(user=request.user)
+            # Como serializer espera uma lista, use filter() em vez de get()
+            cursos = Curso.objects.filter(id=coordenador.curso.id)
+
+        serializer = CursoSimplificadoSerializer(cursos, many=True)
+        return Response(serializer.data)
+

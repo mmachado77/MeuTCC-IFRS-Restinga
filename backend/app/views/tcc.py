@@ -441,28 +441,61 @@ class TCCsPublicadosView(CustomAPIView):
             )
 
 
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from app.models.tema import Tema
+from app.models.usuario import Usuario
+from app.models.professorInterno import ProfessorInterno
+from app.models.estudante import Estudante
+from app.models.coordenador import Coordenador
+from app.enums.usuario_tipo_enum import UsuarioTipoEnum
+from app.serializers.tema import TemaSerializer
+from app.views.custom_api_view import CustomAPIView
+
 class TemasSugeridosView(CustomAPIView):
     """
-    API para listar todos os temas sugeridos.
+    API para listar os temas sugeridos filtrados pelo curso do usuário.
 
     Métodos:
-        get(request): Retorna todos os temas sugeridos.
+        get(request): Retorna os temas sugeridos filtrados conforme o tipo de usuário.
     """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         """
-        Retorna todos os temas sugeridos.
+        Retorna os temas sugeridos conforme o curso do usuário.
 
         Args:
             request (Request): A requisição HTTP.
 
         Retorna:
-            Response: Resposta HTTP com todos os temas sugeridos ou mensagem de erro.
+            Response: Resposta HTTP com os temas sugeridos filtrados.
         """
-        temas = Tema.objects.all()
+        # Recupera a instância do usuário customizado a partir do usuário autenticado.
+        usuario = Usuario.objects.get(user=request.user)
+        temas = Tema.objects.none()  # Inicializa sem temas
+
+        if usuario.tipo == UsuarioTipoEnum.ESTUDANTE:
+            # Se for estudante, pega os temas do curso do estudante.
+            estudante = Estudante.objects.filter(user=request.user).first()
+            if estudante:
+                temas = Tema.objects.filter(curso=estudante.curso)
+
+        elif usuario.tipo == UsuarioTipoEnum.COORDENADOR:
+            # Se for coordenador, pega os temas do curso que coordena.
+            coordenador = Coordenador.objects.filter(user=request.user).first()
+            if coordenador:
+                temas = Tema.objects.filter(curso=coordenador.curso)
+
+        elif usuario.tipo == UsuarioTipoEnum.PROFESSOR_INTERNO:
+            # Se for professor, pega os temas de todos os cursos em que ele atua.
+            professor = ProfessorInterno.objects.filter(user=request.user).first()
+            if professor:
+                temas = Tema.objects.filter(curso__in=professor.cursos.all())
+
         serializer = TemaSerializer(temas, many=True)
         return Response(serializer.data)
+
 
 class MeusTemasSugeridosView(CustomAPIView):
     """
@@ -483,10 +516,12 @@ class MeusTemasSugeridosView(CustomAPIView):
         Retorna:
             Response: Resposta HTTP com todos os temas sugeridos pelo professor ou mensagem de erro.
         """
+        # Recupera o usuário customizado a partir do request.
         professor = Usuario.objects.get(user=request.user)
-        temas = Tema.objects.filter(professor = professor)
+        temas = Tema.objects.filter(professor=professor)
         serializer = TemaSerializer(temas, many=True)
         return Response(serializer.data)
+
     
 class CriarTemaView(CustomAPIView):
     """
@@ -511,7 +546,28 @@ class CriarTemaView(CustomAPIView):
         if isinstance(perfil, Coordenador) or isinstance(perfil, Professor):
             usuario_id = request.user.id
         else:
-            return Response({'status': 'error', "message": "Usuário não autorizado para criar um tema."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'status': 'error', "message": "Usuário não autorizado para criar um tema."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Copia os dados enviados na requisição
+        dados = request.data.copy()
+
+        # Se o campo 'curso' for um objeto (dict) com os dados do curso, extrai o seu id.
+        if 'curso' in dados and isinstance(dados['curso'], dict):
+            curso_obj = dados.get('curso')
+            dados['curso'] = curso_obj.get('id')
+
+        # Preenche o campo professor com o usuário autenticado (assumindo que request.user seja uma instância de Usuario)
+        dados['professor'] = usuario_id
+
+        serializer = TemaSerializer(data=dados, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class AtualizarTemaView(CustomAPIView):
     """

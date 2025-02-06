@@ -10,6 +10,9 @@ const AdminCursoService = {
     getCursos: () => {
         return apiClient.get('/superadmin/cursos/').then(response => response.data); // Endpoint para superadmin
     },
+    getCursosByUsuario: () => {
+        return apiClient.get('app/meus-cursos/').then(response => response.data); 
+    },
     getCursoById: (cursoId) => {
         return apiClient.get(`/superadmin/cursos/${cursoId}/`).then(response => response.data);
     },
