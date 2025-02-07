@@ -34,6 +34,10 @@ async function getListarTccsPendente() {
     return apiClient.get('/app/listar-tccs-pendente').then((response) => response.data);
 }
 
+async function getOrientacoesSimultaneas() {
+    return apiClient.get('/app/orientacoes-simultaneas').then((response) => response.data);
+}
+
 async function responderProposta(tccId, data) {
     return apiClient.post(`/app/responder-proposta/${tccId}`, data).then((response) => response.data);
 }
@@ -108,6 +112,7 @@ export default {
     getDetalhesTCC,
     responderProposta,
     getListarTccsPendente,
+    getOrientacoesSimultaneas,
     getPossuiTcc,
     getTccsByAluno,
     getTccsByOrientador,

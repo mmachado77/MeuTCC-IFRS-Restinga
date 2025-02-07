@@ -3,10 +3,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
-from app.models import Curso, SuperAdmin, Estudante
+from app.models import *
 from app.enums import *
 from app.permissions import *
 from app.serializers.curso import *
+from app.serializers.tcc import *
+from app.serializers.usuario import *
 from .custom_api_view import CustomAPIView
 from django.shortcuts import get_object_or_404
 
@@ -550,3 +552,45 @@ class CursosUsuarioView(CustomAPIView):
         serializer = CursoSimplificadoSerializer(cursos, many=True)
         return Response(serializer.data)
 
+class ProfessorOrientacoesView(CustomAPIView):
+    """
+    API para listar os cursos e limites de orientação do professor autenticado,
+    além de verificar se possui TCCs ativos.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        usuario = request.user
+        
+        try:
+            professor = ProfessorInterno.objects.get(user=usuario)
+        except ProfessorInterno.DoesNotExist:
+            return Response({'error': 'Usuário não é um professor interno'}, status=404)
+        
+        professor_data = ProfessorNomeSerializer(professor).data
+        cursos = CursoLimiteOrientacoesSerializer(professor.cursos.all(), many=True).data
+        
+        # Identificar TCCs ativos do professor
+        tccs_ativos = []
+        tccs_orientados = Tcc.objects.filter(orientador=professor)
+        
+        for tcc in tccs_orientados:
+            ultimo_status = TccStatus.objects.filter(tcc=tcc).order_by('-dataStatus').first()
+            if ultimo_status and ultimo_status.status not in [
+                StatusTccEnum.PROPOSTA_ANALISE_PROFESSOR,
+                StatusTccEnum.PROPOSTA_RECUSADA_PROFESSOR,
+                StatusTccEnum.PROPOSTA_RECUSADA_COORDENADOR,
+                StatusTccEnum.REPROVADO_PREVIA,
+                StatusTccEnum.REPROVADO_FINAL,
+                StatusTccEnum.APROVADO
+            ]:
+                tccs_ativos.append(tcc)
+        
+        tccs_ativos_serialized = TccPublicSerializer(tccs_ativos, many=True).data
+        professor_data["qtdOrientacoesAtivas"] = len(tccs_ativos)
+        
+        return Response({
+            'professor': professor_data,
+            'cursos': cursos,
+            'tccs_ativos': tccs_ativos_serialized
+        })

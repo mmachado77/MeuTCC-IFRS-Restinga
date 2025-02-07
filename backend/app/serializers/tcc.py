@@ -2,6 +2,7 @@ from rest_framework import serializers
 from ..models import Tcc,TccStatus, SessaoPrevia, SessaoFinal, Sessao, Tema, Usuario
 from app.enums import StatusTccEnum, UsuarioTipoEnum
 from ..serializers import UsuarioPolymorphicSerializer, TccStatusSerializer, SessaoPolymorphicSerializer, FileDetailSerializer, EstudanteNomeSerializer, ProfessorNomeSerializer, SemestreSerializer
+from ..serializers.curso import CursoLimiteOrientacoesSerializer
 
 class TccSerializer(serializers.ModelSerializer):
     """
@@ -55,41 +56,57 @@ class TccSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class TCCPendentesSerializer(serializers.ModelSerializer):
-    """
-    Serializer para o modelo Tcc.
-
-    Atributos:
-        autor (EstudanteNomeSerializer): Serializer aninhado para o autor do TCC.
-        orientador (ProfessorNomeSerializer): Serializer aninhado para o orientador do TCC.
-        coorientador (ProfessorNomeSerializer): Serializer aninhado para o coorientador do TCC.
-        semestre (SemestreSerializer): Serializer aninhado para o semestre do TCC.
-        documentoTCC (FileDetailSerializer): Serializer aninhado para o documento do TCC.
-        autorizacaoPublicacao (FileDetailSerializer): Serializer aninhado para a autorização de publicação do TCC.
-        status (SerializerMethodField): Campo que utiliza um método para serializar os status do TCC.
-        sessoes (SerializerMethodField): Campo que utiliza um método para serializar as sessões do TCC.
-
-    Métodos:
-        get_status(obj): Retorna os dados serializados dos status associados ao TCC.
-        get_sessoes(obj): Retorna os dados serializados das sessões associadas ao TCC.
-    """
     autor = EstudanteNomeSerializer()
     orientador = ProfessorNomeSerializer()
     coorientador = ProfessorNomeSerializer()
+    curso = CursoLimiteOrientacoesSerializer()
     semestre = SemestreSerializer()
     status = serializers.SerializerMethodField(method_name='get_status')
+    
+    # NOVOS CAMPOS
+    orientacoesDoOrientador = serializers.SerializerMethodField()
+    limiteDoCurso = serializers.SerializerMethodField()
 
     def get_status(self, obj):
-        """
-        Retorna os dados serializados dos status associados ao TCC.
-
-        Args:
-            obj (Tcc): A instância do modelo Tcc.
-        """
         status_objects = TccStatus.objects.filter(tcc=obj)
         return TccStatusSerializer(status_objects, many=True).data
+
+    def get_limiteDoCurso(self, obj):
+        # Retorna o limite de orientações definido no curso deste TCC
+        return obj.curso.limite_orientacoes
+
+    def get_orientacoesDoOrientador(self, obj):
+        """
+        Conta quantos TCCs ativos o professor (orientador) possui para o curso deste TCC.
+        A lógica para 'ativo' segue a verificação do último status:
+          Se o último status não for um dos status que indicam que o TCC não está em acompanhamento,
+          contamos o TCC como ativo.
+        """
+        excluded_statuses = [
+            StatusTccEnum.PROPOSTA_ANALISE_COORDENADOR,
+            StatusTccEnum.PROPOSTA_RECUSADA_PROFESSOR,
+            StatusTccEnum.PROPOSTA_RECUSADA_COORDENADOR,
+            StatusTccEnum.REPROVADO_PREVIA,
+            StatusTccEnum.REPROVADO_FINAL,
+            StatusTccEnum.APROVADO
+        ]
+        active_count = 0
+        # Filtra os TCCs do mesmo curso em que o professor é o orientador
+        tccs = Tcc.objects.filter(orientador=obj.orientador)
+        for tcc in tccs:
+            last_status = TccStatus.objects.filter(tcc=tcc).order_by('-dataStatus').first()
+            if last_status and last_status.status not in excluded_statuses:
+                active_count += 1
+        return active_count
+
     class Meta:
         model = Tcc
-        fields = ['id', 'tema', 'resumo','autor', 'orientador', 'coorientador', 'status','semestre','dataSubmissaoProposta']
+        fields = [
+            'id', 'tema', 'curso', 'resumo', 'autor',
+            'orientador', 'coorientador', 'status', 'semestre',
+            'dataSubmissaoProposta', 
+            'orientacoesDoOrientador', 'limiteDoCurso'
+        ]
 
 
 class TccPublicSerializer(serializers.ModelSerializer):

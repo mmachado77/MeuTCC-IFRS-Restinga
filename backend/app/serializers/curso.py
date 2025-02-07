@@ -12,6 +12,14 @@ class CursoSimplificadoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Curso
         fields = ['id', 'sigla', 'nome']
+
+class CursoLimiteOrientacoesSerializer(serializers.ModelSerializer):
+    """
+    Serializer para retornar apenas id, sigla e nome do curso.
+    """
+    class Meta:
+        model = Curso
+        fields = ['id', 'sigla', 'nome', 'limite_orientacoes']
         
 class CursoSerializer(serializers.ModelSerializer):
     """
