@@ -40,15 +40,14 @@ const CardTccDetalhes = () => {
         <span className="text-2xl font-bold text-gray-700">
           {tema || 'Título do TCC'}
         </span>
-          
       </div>
       {/* Linha pontilhada */}
-      <hr className="border-dotted border-gray-300 w-full mb-4" />
+      <hr className="border-dashed border-gray-300 w-full mb-4" />
 
     <div className='text-gray-600 px-6'>
      {/* Itens de detalhes */}
-     <div className='flex justify-between'>
-      <span className="text-lg font-semibold text-gray-600 ">
+     <div className='flex justify-between mb-4'>
+      <span className="text-xl font-semibold text-gray-600 ">
         Detalhes:
       </span>
       <StatusTag
@@ -79,7 +78,7 @@ const CardTccDetalhes = () => {
       )}
     </span>
 
-    <span className="flex justify-between mb-2 block">
+    <span className="flex justify-between mb-6 block">
       <span>
         <span className="font-bold">Semestre: </span>
         {periodoSemestre || 'Não definido'}
@@ -91,11 +90,11 @@ const CardTccDetalhes = () => {
     </span>
 
     {/* Subtítulo Resumo */}
-    <span className="text-lg font-semibold text-gray-600 mt-6 mb-2 block">
+    <span className="font-semibold text-gray-600 mb-2 block text-justify">
       Resumo:
     </span>
 
-    <span className="text-gray-700 leading-relaxed block">
+    <span className="text-gray-700 leading-relaxed">
       {resumo || 'Nenhum resumo fornecido.'}
     </span>
     </div>

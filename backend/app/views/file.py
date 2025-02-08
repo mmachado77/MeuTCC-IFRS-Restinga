@@ -321,7 +321,12 @@ class DownloadDocumentoTCCView(CustomAPIView):
         try:
             tcc = Tcc.objects.get(id=tccId)
             if tcc.documentoTCC:
-                content, file_name = self.googleDriveService.download_file(tcc.documentoTCC)
+                # Extrai o ID do documento a partir do JSON armazenado
+                document_info = json.loads(tcc.documentoTCC)
+                file_id = document_info.get("id")
+                if not file_id:
+                    raise Exception("ID do documento não encontrado")
+                content, file_name = self.googleDriveService.download_file(file_id)
                 response = FileResponse(content, as_attachment=True)
                 response['Content-Disposition'] = f'attachment; filename="{file_name}"'
                 return response
@@ -330,7 +335,6 @@ class DownloadDocumentoTCCView(CustomAPIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
 class DownloadDocumentoSessaoView(CustomAPIView):
     """
     API para download de documentos de sessões.

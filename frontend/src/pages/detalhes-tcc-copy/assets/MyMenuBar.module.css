@@ -1,0 +1,44 @@
+/* Fundo branco para todo o Menubar */
+.myMenubar {
+  background-color: #ffffff;
+  border: none;
+}
+
+/* Distribuição dos itens: flex na lista interna */
+.myMenubar :global(.p-menubar-root-list) {
+  display: flex;
+  justify-content: space-between;
+  padding: 0;
+  margin: 0;
+}
+
+/* Cada item ocupa igualmente o espaço e fica centralizado */
+.myMenubar :global(.p-menubar-root-list > .p-menuitem) {
+  flex: 1;
+  text-align: start;
+}
+
+/* Itens: fonte pequena, em negrito e cor gray-700 */
+.myMenubar :global(.p-menuitem-link) {
+  font-size: 1rem;
+  color: #4a5568;
+}
+
+/* Quando o item está ativo (focado):
+   Seleciona o link interno do <li> que possua a classe p-focus ou data-p-focused="true" */
+.myMenubar :global(.p-menubar-root-list > .p-menuitem.p-focus > .p-menuitem-content .p-menuitem-link),
+.myMenubar :global(.p-menubar-root-list > .p-menuitem[data-p-focused="true"] > .p-menuitem-content .p-menuitem-link) {
+  background: rgb(14,165,233);
+  background: linear-gradient(0deg, rgba(14,165,233,1) 0%, rgba(14,165,233,0.6867121848739496) 64%);
+  border-radius: 6px;
+  font-weight: bold;
+  color: #ffffff !important;
+}
+
+/* Garantir que os ícones e textos internos também fiquem brancos */
+.myMenubar :global(.p-menubar-root-list > .p-menuitem.p-focus > .p-menuitem-content .p-menuitem-link .p-menuitem-icon),
+.myMenubar :global(.p-menubar-root-list > .p-menuitem.p-focus > .p-menuitem-content .p-menuitem-link .p-menuitem-text),
+.myMenubar :global(.p-menubar-root-list > .p-menuitem[data-p-focused="true"] > .p-menuitem-content .p-menuitem-link .p-menuitem-icon),
+.myMenubar :global(.p-menubar-root-list > .p-menuitem[data-p-focused="true"] > .p-menuitem-content .p-menuitem-link .p-menuitem-text) {
+  color: #ffffff !important;
+}

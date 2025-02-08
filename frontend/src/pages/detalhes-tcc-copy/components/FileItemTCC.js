@@ -2,20 +2,22 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import TccService from '../../../services/TccService';
+import { Menubar } from 'primereact/menubar';
+import styles from '../assets/MyMenuBar.module.css'; // arquivo de estilos customizados
 
-const FileItemTCC = ({ file, tccId, prazoEntrega, user, updateTccDetails }) => {
+const FileItemTCC = ({ file, tccId, prazoEntrega, user, updateTccDetails, isEditable }) => {
   const toast = useRef(null);
   const fileInputRef = useRef(null);
   const [inputId, setInputId] = useState('');
-  
+  const [activeTab, setActiveTab] = useState('TCC');
   const [uploadLoading, setUploadLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [downloadLoading, setDownloadLoading] = useState(false);
 
-  // Se o nome tiver mais de 10 caracteres, exibe os 10 primeiros + "..."
+  // Se o nome tiver mais de 15 caracteres, exibe os 15 primeiros + "..."
   const truncateFileName = (name) => {
     if (!name) return '';
-    return name.length > 10 ? name.substring(0, 10) + '...' : name;
+    return name.length > 15 ? name.substring(0, 15) + '...pdf' : name;
   };
 
   // Formata a data de modificação para "dd/mm/aa, às hh:mm"
@@ -105,6 +107,9 @@ const FileItemTCC = ({ file, tccId, prazoEntrega, user, updateTccDetails }) => {
     setDownloadLoading(true);
     try {
       const blob = await TccService.downloadDocumentoTCC(tccId);
+      if (!blob) {
+        throw new Error("Nenhum arquivo retornado para download.");
+      }
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       const fileName = (file && typeof file === 'object' && file.name) ? file.name : 'documento.pdf';
@@ -124,6 +129,7 @@ const FileItemTCC = ({ file, tccId, prazoEntrega, user, updateTccDetails }) => {
       setDownloadLoading(false);
     }
   };
+  
 
   useEffect(() => {
     if (tccId) {
@@ -133,52 +139,238 @@ const FileItemTCC = ({ file, tccId, prazoEntrega, user, updateTccDetails }) => {
 
   // Renderiza os detalhes do arquivo com o ícone acima dos textos e com texto reduzido
   const renderFileDetails = () => {
-    const textStyle = { fontSize: '0.75rem' };
     if (file) {
       if (typeof file === 'object') {
         return (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', ...textStyle }}>
-            <i className="pi pi-file-pdf" style={{ fontSize: '5rem' }}></i>
-            <div style={{ marginTop: '4px', textAlign: 'start' }}>
-              <div><strong>Nome:</strong> {truncateFileName(file.name)}</div>
-              <div><strong>Tamanho:</strong> {formatFileSize(file.size)}</div>
-              <div><strong>Modificado:</strong> {file.dataModificacao ? formatDate(file.dataModificacao) : '---'}</div>
-            </div>
+          <div>
+          {renderFile()}
           </div>
         );
       }
-      if (typeof file === 'string' && file.trim() !== '') {
-        return (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', ...textStyle }}>
-            <i className="pi pi-file-pdf" style={{ fontSize: '1.5rem' }}></i>
-            <div style={{ marginTop: '4px', textAlign: 'center' }}>
-              <div><strong>Nome:</strong> Documento enviado</div>
-            </div>
-          </div>
+    } else{
+      return(
+        <div>
+        {renderNoFile()}
+        </div>
         );
-      }
     }
-    return <span style={textStyle}>Nenhum documento anexado</span>;
+    
   };
 
-  // Estilo reduzido para os botões
-  const buttonStyle = { fontSize: '0.75rem', padding: '0.25rem 0.5rem' };
+  const renderBotoes = () => {
+      if(file){ //Tem arquivo
+        if(isEditable){ //Tem Grants para editar
+          return(
+            <div className='flex justify-between gap-2'>
+              <div className='w-3/5'>
+              <Button 
+              icon="pi pi-download"
+              label='Baixar'
+              outlined 
+              severity="info" 
+              aria-label="Baixar"
+              onClick={handleFileDownload}
+              loading={downloadLoading}
+              className='w-full'
+            />
+            </div>
+              <div className='w-2/5'>
+              <Button 
+                  icon="pi pi-trash" 
+                  label='Excluir'
+                  severity="danger" 
+                  aria-label="Excluir"
+                  onClick={handleFileDelete}
+                  loading={deleteLoading}
+                  className='w-full'
+                />
+              </div>
+            </div>
+          )
+        } else{
+          return(
+            <div className='flex justify-between'>
+              <Button 
+              icon="pi pi-download"
+              label='Baixar'
+              outlined 
+              severity="info" 
+              aria-label="Baixar"
+              onClick={handleFileDownload}
+              loading={downloadLoading}
+              className='w-full'
+            />
+            </div>
+          )
+        }
+      } else if(isEditable){
+        return(
+          <>
+            <input 
+              type="file" 
+              accept="application/pdf" 
+              style={{ display: 'none' }}
+              onChange={handleFileChange} 
+              id={inputId} 
+              ref={fileInputRef} 
+            />
+            <div className='flex justify-between'>
+            <Button 
+              icon="pi pi-upload" 
+              label='Adicionar' 
+              outlined
+              severity="success" 
+              aria-label="Anexar"
+              onClick={() => document.getElementById(inputId).click()}
+              loading={uploadLoading}
+              className='w-full'
+            />
+            </div>
+          </>
+        )
+      } else{
+        return
+      }
+  };
+  const renderFile = () => {
+    return (
+      <div>
+        <div className="w-[330px] py-6 flex items-center justify-between">
+          <div className="flex flex-row items-center">
+            {/* Container do ícone (ocupa 2/5 da largura) */}
+            <div
+              className="relative group w-2/5 h-[150px] cursor-pointer aspect-square rounded-xl bg-cyan-50 border border-dashed border-[#0ea5e9] transition-colors duration-300 hover:bg-[#0ea5e9]"
+              onClick={downloadLoading ? undefined : handleFileDownload}
+            >
+              {!downloadLoading && (
+                <>
+                  {/* Ícone de PDF (visível por padrão) */}
+                  <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300 group-hover:opacity-0">
+                    <i className="pi pi-file-pdf text-7xl text-[#0ea5e9]"></i>
+                  </div>
+                  {/* Ícone de Download (aparece no hover) */}
+                  <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+                    <i className="pi pi-download text-7xl text-white"></i>
+                  </div>
+                </>
+              )}
+              {downloadLoading && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <i className="pi pi-spin pi-spinner text-4xl" style={{ color: "#0284c7" }}></i>
+                </div>
+              )}
+            </div>
+            {/* Container das informações do arquivo (ocupa os 3/5 restantes) */}
+            <div className="ml-4 w-3/5 h-[150px] flex flex-col justify-between py-1">
+              <div>
+                <strong>Arquivo:</strong>
+                <span className="block">{truncateFileName(file.name)}</span>
+              </div>
+              <div>
+                <strong>Tamanho:</strong>
+                <span className="block">{formatFileSize(file.size)}</span>
+              </div>
+              <div>
+                <strong>Modificado:</strong>{" "}
+                <span className="block">{file.dataModificacao ? formatDate(file.dataModificacao) : "---"}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  const renderNoFile = () => {
+    return(
+      <>
+      <input 
+        type="file" 
+        accept="application/pdf" 
+        style={{ display: 'none' }}
+        onChange={handleFileChange} 
+        id={inputId} 
+        ref={fileInputRef} 
+      />
+      <div className="w-[330px] py-6 flex justify-center items-center">
+        <div className="flex flex-col items-center">
+          <div
+            className={`relative w-[150px] h-[150px] rounded-full bg-gray-100 ${
+              isEditable ? "group cursor-pointer hover:bg-green-300 transition-colors duration-300" : ""
+            }`}
+            onClick={isEditable && !uploadLoading ? () => document.getElementById(inputId).click() : undefined}
+          >
+            {/* Ícone padrão (Excel) */}
+            <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300 group-hover:opacity-0">
+              <i className="pi pi-file-excel text-7xl text-gray-400"></i>
+            </div>
+            {/* Ícone exibido somente no hover (Upload) */}
+            {isEditable && (
+              <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+                <i className="pi pi-upload text-7xl text-white"></i>
+              </div>
+            )}
+            {/* Spinner de loading, se estiver carregando */}
+            {uploadLoading && (
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-green-300">
+                <i className="pi pi-spin pi-spinner text-7xl text-white"></i>
+              </div>
+            )}
+          </div>
+          <span className="mt-4 text-base text-gray-600">Nenhum documento Adicionado.</span>
+        </div>
+      </div>
+    </>
+  );
+  }
+  const renderDocumentoTCC = () => {
+    return(
+      <div>
+        <div className='px-6'>{renderFileDetails()}</div>
+        <hr className="border-dashed border-gray-300 w-full mb-4" />
+        <div className='px-6'>{renderBotoes()}</div>
+      </div>
+    )
+  }
+
+  const renderDocumentoAutorizacao = () => {
+    return(
+      <div>
+        <h1>Este é um placeholder da autorização</h1>
+      </div>
+    )
+  }
+
+
+    const items = [
+      {
+        label: 'Documento do TCC',
+        icon: 'pi pi-book',
+        className: activeTab === 'TCC' ? styles.activeItem : '',
+        command: () => setActiveTab('TCC')
+      },
+      {
+        label: 'Autorização de Publicação',
+        icon: 'pi pi-check',
+        className: activeTab === 'Autorizacao' ? styles.activeItem : '',
+        command: () => setActiveTab('Autorizacao')
+      }
+    ];
+  
+
 
   return (
-    <div style={{
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      borderRadius: '10px',
-      border: '1px solid #ccc',
-      padding: '10px',
-      boxSizing: 'border-box'
-    }}>
-      <div style={{ flex: 1 }}>
-        {renderFileDetails()}
+    <div className="border border-solid border-gray-300 rounded-md bg-white pb-6">
+      <div className='px-6 flex flex-col'>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', flexWrap: 'wrap', marginTop: '10px' }}>
+      {/* Menubar com largura total e classe para customização */}
+      <Menubar model={items} style={{ width: '100%' }} className={styles.myMenubar} />
+      
+      {/* Conteúdo renderizado abaixo do menu */}
+      <div>
+        {activeTab === 'TCC' && renderDocumentoTCC()}
+        {activeTab === 'Autorizacao' && renderDocumentoAutorizacao()}
+      </div>
+      {/* <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', flexWrap: 'wrap', marginTop: '10px' }}>
         {file && (typeof file === 'string' && file.trim() !== '' || (typeof file === 'object' && (file.name || file.dataModificacao))) ? (
           <>
             <Button 
@@ -188,7 +380,7 @@ const FileItemTCC = ({ file, tccId, prazoEntrega, user, updateTccDetails }) => {
               aria-label="Baixar"
               onClick={handleFileDownload}
               loading={downloadLoading}
-              style={buttonStyle}
+              classname='w-full'
             />
             {!prazoExpirado ? (
               <Button 
@@ -198,7 +390,7 @@ const FileItemTCC = ({ file, tccId, prazoEntrega, user, updateTccDetails }) => {
                 aria-label="Excluir"
                 onClick={handleFileDelete}
                 loading={deleteLoading}
-                style={buttonStyle}
+                classname='w-full'
               />
             ) : (
               <Button 
@@ -207,7 +399,7 @@ const FileItemTCC = ({ file, tccId, prazoEntrega, user, updateTccDetails }) => {
                 severity="secondary" 
                 aria-label="Anexar"
                 onClick={erroPrazoExpirado}
-                style={buttonStyle}
+                classname='w-full'
               />
             )}
           </>
@@ -230,7 +422,7 @@ const FileItemTCC = ({ file, tccId, prazoEntrega, user, updateTccDetails }) => {
                   aria-label="Anexar"
                   onClick={() => document.getElementById(inputId).click()}
                   loading={uploadLoading}
-                  style={buttonStyle}
+                  classname='w-full'
                 />
               </>
             )}
@@ -241,12 +433,12 @@ const FileItemTCC = ({ file, tccId, prazoEntrega, user, updateTccDetails }) => {
                 severity="secondary" 
                 aria-label="Anexar"
                 onClick={erroPrazoExpirado}
-                style={buttonStyle}
+                classname='w-full'
               />
             )}
           </>
         )}
-      </div>
+      </div> */}
       <Toast ref={toast} />
     </div>
   );
