@@ -9,7 +9,7 @@ import DropdownProfessores from '../../../components/ui/DropdownProfessores';
 import TccService from '../services/TccService';
 import toast from 'react-hot-toast';
 
-const EditarForm = ({ buttonLabel = "Editar TCC", buttonClassName = "p-button-rounded p-button-success", isCoordenador }) => {
+const EditarForm = ({ buttonLabel = "Editar TCC", buttonClassName = "p-button-rounded p-button-success ", isCoordenador }) => {
     const { tccData, fetchTccDetails, updateTccDetails } = useTccContext();
     const [isDialogVisible, setIsDialogVisible] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -116,7 +116,7 @@ const EditarForm = ({ buttonLabel = "Editar TCC", buttonClassName = "p-button-ro
         <div>
             <Button
                 label={buttonLabel}
-                icon="pi pi-pencil"
+                icon="pi pi-calendar"
                 className={buttonClassName}
                 onClick={() => setIsDialogVisible(true)}
             />

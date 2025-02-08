@@ -41,6 +41,7 @@ const StatusTag = () => {
     return (
         <div>
             <Tag
+                className='text-sm text-center font-semibold'
                 value={currentStatus}
                 style={{ backgroundColor: statusColor, color: '#FFFFFF', cursor: 'pointer' }}
                 onClick={handleShowTimeline}

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from ..models import Tcc,TccStatus, SessaoPrevia, SessaoFinal, Sessao, Tema, Usuario
 from app.enums import StatusTccEnum, UsuarioTipoEnum
 from ..serializers import UsuarioPolymorphicSerializer, TccStatusSerializer, SessaoPolymorphicSerializer, FileDetailSerializer, EstudanteNomeSerializer, ProfessorNomeSerializer, SemestreSerializer
-from ..serializers.curso import CursoLimiteOrientacoesSerializer
+from ..serializers.curso import CursoLimiteOrientacoesSerializer, CursoSerializer
 
 class TccSerializer(serializers.ModelSerializer):
     """
@@ -27,7 +27,8 @@ class TccSerializer(serializers.ModelSerializer):
     coorientador = UsuarioPolymorphicSerializer()
     semestre = SemestreSerializer()
     documentoTCC = FileDetailSerializer()
-    autorizacaoPublicacao = FileDetailSerializer()
+    curso = CursoSerializer()
+    autorizacaoPublicacao = ''
     status = serializers.SerializerMethodField(method_name='get_status')
     sessoes = serializers.SerializerMethodField(method_name='get_sessoes')
 

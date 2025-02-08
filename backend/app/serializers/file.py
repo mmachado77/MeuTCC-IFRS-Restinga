@@ -1,61 +1,48 @@
 from rest_framework import serializers
+import json
 
 class FileDetailSerializer(serializers.Serializer):
     """
     Serializer para detalhes de arquivos.
 
     Atributos:
-        url (SerializerMethodField): Campo que utiliza um método para obter a URL do arquivo.
-        name (SerializerMethodField): Campo que utiliza um método para obter o nome do arquivo.
-        size (SerializerMethodField): Campo que utiliza um método para obter o tamanho do arquivo.
-
+        dataModificacao (SerializerMethodField): Obtém a data de modificação do arquivo, definida no momento do upload.
+        name (SerializerMethodField): Obtém o nome do arquivo.
+        size (SerializerMethodField): Obtém o tamanho do arquivo.
+    
     Métodos:
-        get_url(obj): Retorna a URL do arquivo, se disponível.
-        get_name(obj): Retorna o nome do arquivo, se disponível.
-        get_size(obj): Retorna o tamanho do arquivo, se disponível.
+        get_dataModificacao(obj): Retorna a data de modificação do arquivo, extraída do JSON armazenado.
+        get_name(obj): Retorna o nome do arquivo, extraído do JSON armazenado ou do atributo 'name' caso obj não seja uma string.
+        get_size(obj): Retorna o tamanho do arquivo, extraído do JSON armazenado ou do atributo 'size' caso obj não seja uma string.
     """
-    url = serializers.SerializerMethodField()
+    dataModificacao = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
     size = serializers.SerializerMethodField()
 
-    def get_url(self, obj):
-        """
-        Retorna a URL do arquivo, se disponível.
-
-        Args:
-            obj: O objeto do arquivo.
-
-        Retorna:
-            str: A URL do arquivo, ou None se não disponível.
-        """
-        if obj and hasattr(obj, 'url'):
-            return obj.url
+    def get_dataModificacao(self, obj):
+        if isinstance(obj, str):
+            try:
+                parsed = json.loads(obj)
+                return parsed.get("dataModificacao", None)
+            except Exception:
+                return None
+        # Se não for string (por exemplo, FieldFile), não há data de modificação armazenada
         return None
 
     def get_name(self, obj):
-        """
-        Retorna o nome do arquivo, se disponível.
-
-        Args:
-            obj: O objeto do arquivo.
-
-        Retorna:
-            str: O nome do arquivo, ou None se não disponível.
-        """
-        if obj and hasattr(obj, 'name'):
-            return obj.name.split("/")[-1]
-        return None
+        if isinstance(obj, str):
+            try:
+                parsed = json.loads(obj)
+                return parsed.get("name", None)
+            except Exception:
+                return None
+        return getattr(obj, "name", None)
 
     def get_size(self, obj):
-        """
-        Retorna o tamanho do arquivo, se disponível.
-
-        Args:
-            obj: O objeto do arquivo.
-
-        Retorna:
-            int: O tamanho do arquivo, ou None se não disponível.
-        """
-        if obj and hasattr(obj, 'size'):
-            return obj.size
-        return None
+        if isinstance(obj, str):
+            try:
+                parsed = json.loads(obj)
+                return parsed.get("size", None)
+            except Exception:
+                return None
+        return getattr(obj, "size", None)

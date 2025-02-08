@@ -8,35 +8,36 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from app.services.avaliacao import AvaliacaoService
 from app.models import Tcc, Sessao, SessaoFinal, Avaliacao
 from django.http import FileResponse
+import datetime
 from meutcc.services import GoogleDriveService
 from meutcc import settings
 from app.models import Credenciais
 from google.oauth2.credentials import Credentials
 
 class UploadDocumentoTCCView(CustomAPIView):
-    """
-    API para upload de documentos do TCC.
-
-    Métodos:
-        post(request, tccId): Realiza o upload de um documento do TCC.
-    """
     parser_classes = [MultiPartParser, FormParser]
     googleDriveService = GoogleDriveService()
 
     def post(self, request, tccId):
-        """
-        Realiza o upload de um documento do TCC.
-
-        Args:
-            request (Request): A requisição HTTP contendo o arquivo para upload.
-            tccId (int): ID do TCC.
-
-        Retorna:
-            Response: Resposta HTTP com o link do documento no Google Drive ou mensagem de erro.
-        """
         try:
             tcc = Tcc.objects.get(id=tccId)
-            tcc.documentoTCC = self.googleDriveService.upload_file(request.FILES['file'])
+            # Realiza o upload para o Google Drive e obtém o file id
+            file_id = self.googleDriveService.upload_file(request.FILES['file'])
+            if file_id is None:
+                return Response({"error": "Falha no upload para o Google Drive"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Extrai os metadados do arquivo recebido
+            file_name = request.FILES['file'].name
+            file_size = request.FILES['file'].size
+            
+            # Armazena os metadados como JSON no campo do TCC
+            file_metadata = {
+                "id": file_id,
+                "name": file_name,
+                "size": file_size,
+                "dataModificacao": datetime.datetime.now().isoformat()
+            }
+            tcc.documentoTCC = json.dumps(file_metadata)
             tcc.save()
             return Response({'status': 'success', 'message': 'Upload realizado com sucesso!'}, status=status.HTTP_200_OK)
         except Tcc.DoesNotExist:
