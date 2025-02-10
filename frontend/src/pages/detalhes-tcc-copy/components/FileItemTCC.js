@@ -129,7 +129,7 @@ const FileItemTCC = ({ file, tccId, prazoEntrega, user, updateTccDetails, isEdit
       setDownloadLoading(false);
     }
   };
-  
+
 
   useEffect(() => {
     if (tccId) {
@@ -143,187 +143,189 @@ const FileItemTCC = ({ file, tccId, prazoEntrega, user, updateTccDetails, isEdit
       if (typeof file === 'object') {
         return (
           <div>
-          {renderFile()}
+            {renderFile()}
           </div>
         );
       }
-    } else{
-      return(
+    } else {
+      return (
         <div>
-        {renderNoFile()}
+          {renderNoFile()}
         </div>
-        );
+      );
     }
-    
+
   };
 
   const renderBotoes = () => {
-      if(file){ //Tem arquivo
-        if(isEditable){ //Tem Grants para editar
-          return(
-            <div className='flex justify-between gap-2'>
-              <div className='w-3/5'>
-              <Button 
+    if (file) { //Tem arquivo
+      if (isEditable) { //Tem Grants para editar
+        return (
+          <div className='flex justify-between gap-2'>
+            <div className='w-4/6'>
+              <Button
+                icon="pi pi-download"
+                label='Baixar'
+                severity='success'
+                aria-label="Baixar"
+                onClick={handleFileDownload}
+                loading={downloadLoading}
+                className='w-full'
+              />
+            </div>
+            <div className='w-2/5'>
+              <Button
+                icon="pi pi-trash"
+                label='Excluir'
+                severity="danger"
+                aria-label="Excluir"
+                onClick={handleFileDelete}
+                loading={deleteLoading}
+                className='w-full'
+              />
+            </div>
+          </div>
+        )
+      } else {
+        return (
+          <div className='flex justify-between'>
+            <Button
               icon="pi pi-download"
               label='Baixar'
-              outlined 
-              severity="info" 
+              severity="success"
               aria-label="Baixar"
               onClick={handleFileDownload}
               loading={downloadLoading}
               className='w-full'
             />
-            </div>
-              <div className='w-2/5'>
-              <Button 
-                  icon="pi pi-trash" 
-                  label='Excluir'
-                  severity="danger" 
-                  aria-label="Excluir"
-                  onClick={handleFileDelete}
-                  loading={deleteLoading}
-                  className='w-full'
-                />
-              </div>
-            </div>
-          )
-        } else{
-          return(
-            <div className='flex justify-between'>
-              <Button 
-              icon="pi pi-download"
-              label='Baixar'
-              outlined 
-              severity="info" 
-              aria-label="Baixar"
-              onClick={handleFileDownload}
-              loading={downloadLoading}
-              className='w-full'
-            />
-            </div>
-          )
-        }
-      } else if(isEditable){
-        return(
-          <>
-            <input 
-              type="file" 
-              accept="application/pdf" 
-              style={{ display: 'none' }}
-              onChange={handleFileChange} 
-              id={inputId} 
-              ref={fileInputRef} 
-            />
-            <div className='flex justify-between'>
-            <Button 
-              icon="pi pi-upload" 
-              label='Adicionar' 
-              outlined
-              severity="success" 
+          </div>
+        )
+      }
+    } else if (isEditable) {
+      return (
+        <>
+          <input
+            type="file"
+            accept="application/pdf"
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+            id={inputId}
+            ref={fileInputRef}
+          />
+          <div className='flex justify-between'>
+            <Button
+              icon="pi pi-upload"
+              label='Enviar Arquivo'
+              severity="success"
               aria-label="Anexar"
               onClick={() => document.getElementById(inputId).click()}
               loading={uploadLoading}
               className='w-full'
             />
-            </div>
-          </>
-        )
-      } else{
-        return
-      }
+          </div>
+        </>
+      )
+    } else {
+      return
+    }
   };
   const renderFile = () => {
     return (
       <div>
-        <div className="w-[330px] py-6 flex items-center justify-between">
-          <div className="flex flex-row items-center">
-            {/* Container do ícone (ocupa 2/5 da largura) */}
-            <div
-              className="relative group w-2/5 h-[150px] cursor-pointer aspect-square rounded-xl bg-cyan-50 border border-dashed border-[#0ea5e9] transition-colors duration-300 hover:bg-[#0ea5e9]"
-              onClick={downloadLoading ? undefined : handleFileDownload}
-            >
-              {!downloadLoading && (
-                <>
-                  {/* Ícone de PDF (visível por padrão) */}
-                  <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300 group-hover:opacity-0">
-                    <i className="pi pi-file-pdf text-7xl text-[#0ea5e9]"></i>
-                  </div>
-                  {/* Ícone de Download (aparece no hover) */}
-                  <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
-                    <i className="pi pi-download text-7xl text-white"></i>
-                  </div>
-                </>
-              )}
-              {downloadLoading && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <i className="pi pi-spin pi-spinner text-4xl" style={{ color: "#0284c7" }}></i>
+        <div className="py-6 flex items-center justify-between">
+          <div className="w-full">
+            <div className='p-1 border border-dashed border-[#22c55e] flex justify-between rounded-xl'>
+              {/* Container do ícone (w-2/5 da largura) */}
+              <div className='w-2/5 flex justify-end items-center'>
+                <div
+                  className="group relative cursor-pointer flex justify-center flex-wrap aspect-square w-[80%] h-[80%] bg-gray-50 shadow-md rounded-md transition-colors duration-150 hover:bg-botao-gradient"
+                  onClick={downloadLoading ? undefined : handleFileDownload}
+                >
+                  {!downloadLoading && (
+                    <>
+                      {/* Ícone de PDF (visível por padrão) */}
+                      <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300 group-hover:opacity-0">
+                        <i className="pi pi-file-pdf text-7xl text-[#22c55e]"></i>
+                      </div>
+                      {/* Ícone de Download (aparece no hover) */}
+                      <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+                        <i className="pi pi-download text-6xl text-white"></i>
+                      </div>
+                    </>
+                  )}
+                  {downloadLoading && (
+                    <div className="inset-0 flex items-center justify-center">
+                      <i className="pi pi-spin pi-spinner text-4xl" style={{ color: "#22c55e" }}></i>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+
+              {/* Container das informações do arquivo (ocupa os 3/5 restantes) */}
+              <div className="ml-4 py-3 w-3/5 h-[150px] text-gray-600 flex flex-col justify-between py-1">
+                <div>
+                  <strong>Arquivo:</strong>
+                  <span className="block">{truncateFileName(file.name)}</span>
+                </div>
+                <div>
+                  <strong>Tamanho:</strong>
+                  <span className="block">{formatFileSize(file.size)}</span>
+                </div>
+                <div>
+                  <strong>Modificado:</strong>{" "}
+                  <span className="block">{file.dataModificacao ? formatDate(file.dataModificacao) : "---"}</span>
+                </div>
+              </div>
             </div>
-            {/* Container das informações do arquivo (ocupa os 3/5 restantes) */}
-            <div className="ml-4 w-3/5 h-[150px] flex flex-col justify-between py-1">
-              <div>
-                <strong>Arquivo:</strong>
-                <span className="block">{truncateFileName(file.name)}</span>
-              </div>
-              <div>
-                <strong>Tamanho:</strong>
-                <span className="block">{formatFileSize(file.size)}</span>
-              </div>
-              <div>
-                <strong>Modificado:</strong>{" "}
-                <span className="block">{file.dataModificacao ? formatDate(file.dataModificacao) : "---"}</span>
-              </div>
-            </div>
+
           </div>
         </div>
       </div>
     );
   };
   const renderNoFile = () => {
-    return(
+    return (
       <>
-      <input 
-        type="file" 
-        accept="application/pdf" 
-        style={{ display: 'none' }}
-        onChange={handleFileChange} 
-        id={inputId} 
-        ref={fileInputRef} 
-      />
-      <div className="w-[330px] py-6 flex justify-center items-center">
-        <div className="flex flex-col items-center">
-          <div
-            className={`relative w-[150px] h-[150px] rounded-full bg-gray-100 ${
-              isEditable ? "group cursor-pointer hover:bg-green-300 transition-colors duration-300" : ""
-            }`}
-            onClick={isEditable && !uploadLoading ? () => document.getElementById(inputId).click() : undefined}
-          >
-            {/* Ícone padrão (Excel) */}
-            <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300 group-hover:opacity-0">
-              <i className="pi pi-file-excel text-7xl text-gray-400"></i>
+        <input
+          type="file"
+          accept="application/pdf"
+          style={{ display: 'none' }}
+          onChange={handleFileChange}
+          id={inputId}
+          ref={fileInputRef}
+        />
+        <div className="w-[330px] py-6 flex justify-center items-center">
+          <div className="flex flex-col items-center">
+            <div
+              className={`relative w-[150px] h-[150px] rounded-full bg-gray-100 ${isEditable ? "group cursor-pointer hover: transition-colors duration-150 hover:bg-botao-gradient" : ""
+                }`}
+              onClick={isEditable && !uploadLoading ? () => document.getElementById(inputId).click() : undefined}
+            >
+              {/* Ícone padrão (Excel) */}
+              <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300 group-hover:opacity-0">
+                <i className="pi pi-file-excel text-7xl text-gray-400"></i>
+              </div>
+              {/* Ícone exibido somente no hover (Upload) */}
+              {isEditable && (
+                <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+                  <i className="pi pi-upload text-7xl text-white"></i>
+                </div>
+              )}
+              {/* Spinner de loading, se estiver carregando */}
+              {uploadLoading && (
+                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-green-300">
+                  <i className="pi pi-spin pi-spinner text-7xl text-white"></i>
+                </div>
+              )}
             </div>
-            {/* Ícone exibido somente no hover (Upload) */}
-            {isEditable && (
-              <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
-                <i className="pi pi-upload text-7xl text-white"></i>
-              </div>
-            )}
-            {/* Spinner de loading, se estiver carregando */}
-            {uploadLoading && (
-              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-green-300">
-                <i className="pi pi-spin pi-spinner text-7xl text-white"></i>
-              </div>
-            )}
+            <span className="mt-4 text-base text-gray-600">Nenhum documento Adicionado.</span>
           </div>
-          <span className="mt-4 text-base text-gray-600">Nenhum documento Adicionado.</span>
         </div>
-      </div>
-    </>
-  );
+      </>
+    );
   }
   const renderDocumentoTCC = () => {
-    return(
+    return (
       <div>
         <div className='px-6'>{renderFileDetails()}</div>
         <hr className="border-dashed border-gray-300 w-full mb-4" />
@@ -333,7 +335,7 @@ const FileItemTCC = ({ file, tccId, prazoEntrega, user, updateTccDetails, isEdit
   }
 
   const renderDocumentoAutorizacao = () => {
-    return(
+    return (
       <div>
         <h1>Este é um placeholder da autorização</h1>
       </div>
@@ -341,104 +343,29 @@ const FileItemTCC = ({ file, tccId, prazoEntrega, user, updateTccDetails, isEdit
   }
 
 
-    const items = [
-      {
-        label: 'Documento do TCC',
-        icon: 'pi pi-book',
-        className: activeTab === 'TCC' ? styles.activeItem : '',
-        command: () => setActiveTab('TCC')
-      },
-      {
-        label: 'Autorização de Publicação',
-        icon: 'pi pi-check',
-        className: activeTab === 'Autorizacao' ? styles.activeItem : '',
-        command: () => setActiveTab('Autorizacao')
-      }
-    ];
-  
+  const items = [
+    {
+      label: 'Documento do TCC',
+      icon: 'pi pi-book',
+      className: activeTab === 'TCC' ? styles.activeItem : '',
+      command: () => setActiveTab('TCC')
+    },
+    {
+      label: 'Autorização de Publicação',
+      icon: 'pi pi-check',
+      className: activeTab === 'Autorizacao' ? styles.activeItem : '',
+      command: () => setActiveTab('Autorizacao')
+    }
+  ];
+
 
 
   return (
     <div className="border border-solid border-gray-300 rounded-md bg-white pb-6">
-      <div className='px-6 flex flex-col'>
-      </div>
-      {/* Menubar com largura total e classe para customização */}
-      <Menubar model={items} style={{ width: '100%' }} className={styles.myMenubar} />
-      
       {/* Conteúdo renderizado abaixo do menu */}
       <div>
-        {activeTab === 'TCC' && renderDocumentoTCC()}
-        {activeTab === 'Autorizacao' && renderDocumentoAutorizacao()}
+        {renderDocumentoTCC()}
       </div>
-      {/* <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', flexWrap: 'wrap', marginTop: '10px' }}>
-        {file && (typeof file === 'string' && file.trim() !== '' || (typeof file === 'object' && (file.name || file.dataModificacao))) ? (
-          <>
-            <Button 
-              icon="pi pi-download" 
-              rounded 
-              severity="success" 
-              aria-label="Baixar"
-              onClick={handleFileDownload}
-              loading={downloadLoading}
-              classname='w-full'
-            />
-            {!prazoExpirado ? (
-              <Button 
-                icon="pi pi-trash" 
-                rounded 
-                severity="danger" 
-                aria-label="Excluir"
-                onClick={handleFileDelete}
-                loading={deleteLoading}
-                classname='w-full'
-              />
-            ) : (
-              <Button 
-                icon="pi pi-upload" 
-                rounded 
-                severity="secondary" 
-                aria-label="Anexar"
-                onClick={erroPrazoExpirado}
-                classname='w-full'
-              />
-            )}
-          </>
-        ) : (
-          <>
-            {!prazoExpirado && (
-              <>
-                <input 
-                  type="file" 
-                  accept="application/pdf" 
-                  style={{ display: 'none' }}
-                  onChange={handleFileChange} 
-                  id={inputId} 
-                  ref={fileInputRef} 
-                />
-                <Button 
-                  icon="pi pi-upload" 
-                  rounded 
-                  severity="success" 
-                  aria-label="Anexar"
-                  onClick={() => document.getElementById(inputId).click()}
-                  loading={uploadLoading}
-                  classname='w-full'
-                />
-              </>
-            )}
-            {prazoExpirado && (
-              <Button 
-                icon="pi pi-upload" 
-                rounded 
-                severity="secondary" 
-                aria-label="Anexar"
-                onClick={erroPrazoExpirado}
-                classname='w-full'
-              />
-            )}
-          </>
-        )}
-      </div> */}
       <Toast ref={toast} />
     </div>
   );

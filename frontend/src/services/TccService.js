@@ -82,6 +82,11 @@ async function getTccsPublicados() {
     return apiClient.get('/app/tccs-publicados').then((response) => response.data);
 }
 
+async function getProximosPassos(tccid) {
+    return apiClient.get('/app/proximos-passos', tccid).then((response) => response.data);
+}
+
+
 async function getTccsByUsuario() {
     return apiClient.get('/app/user-tccs').then((response) => response.data);
 }
@@ -127,6 +132,7 @@ export default {
     downloadDocumentoSessao,
     getTccsPublicados,
     getSugestoes,
+    getProximosPassos,
     getMinhasSugestoes,
     createTema,
     updateTema,

@@ -19,14 +19,12 @@ const CardEdit = () => {
   const isCoordenador = user?.tipo === 'Coordenador';
 
   return (
-    <div className="border border-solid border-gray-300 rounded-md bg-white p-6">
       <div className=''>
         <EditarForm
             buttonLabel="Editar TCC"
             isCoordenador={isCoordenador}
         />
       </div>  
-    </div>
   );
 };
 

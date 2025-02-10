@@ -1,11 +1,9 @@
 import React from 'react';
-import { useRouter } from 'next/router';
 import { useTccContext } from './context/TccContext';
-import { TccProvider } from './context/TccContext';
-import DetalhesHeader from './components/DetalhesHeader';
 import FileItemTCC from './components/FileItemTCC';
 import CardTccDetalhes from './components/CardTccDetalhes';
 import CardEdit from './components/CardEdit';
+import CardProximoPassos from './components/CardProximoPassos';
 
 const MontaTela = () => {
 
@@ -16,11 +14,9 @@ const MontaTela = () => {
         (user?.id && tccData?.orientador?.id && user.id === tccData.orientador.id)
       );
 
-    // TODO: Ajustar lógica para ver se pode edita
-
     return (
 
-            <div className="p-4 max-w-screen-lg mx-auto bg-white mt-6 rounded-lg">
+            <div className="p-4 max-w-screen-lg mx-auto bg-white my-6 rounded-lg">
                 <div className="flex gap-4">
                     <div className="w-3/5">
                         <CardTccDetalhes />
@@ -31,6 +27,12 @@ const MontaTela = () => {
                         {isEditable && (
                             <CardEdit />
                         )}
+                        {isEditable && (
+                            <CardProximoPassos
+                            tccId={tccData?.id}
+                            isEditable={isEditable}
+                            />
+                            )}
                             <FileItemTCC 
                                 file={tccData?.documentoTCC} 
                                 tccId={tccData?.id} 
@@ -39,6 +41,7 @@ const MontaTela = () => {
                                 isEditable={isEditable}
                                 updateTccDetails={updateTccDetails}
                             />
+                            
                         </div>
                     
                 </div>

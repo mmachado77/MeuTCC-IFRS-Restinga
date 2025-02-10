@@ -115,12 +115,11 @@ const EditarForm = ({ buttonLabel = "Editar TCC", isCoordenador }) => {
     return (
         <div>
             <Button
-                className='w-full'
-                style={{ '--p-button-icon-margin-right': '0px' }}
+                className='w-full h-fit py-2'
                 label={buttonLabel}
                 icon="pi pi-pencil"
                 outlined
-                severity='info'
+                severity='secondary'
                 onClick={() => setIsDialogVisible(true)}
             />
             <Dialog

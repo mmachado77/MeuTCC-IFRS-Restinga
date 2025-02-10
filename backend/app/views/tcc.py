@@ -5,7 +5,8 @@ from rest_framework.exceptions import NotFound, PermissionDenied
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from django.db.models import Max, F, Q
-from app.enums import StatusTccEnum, UsuarioTipoEnum
+from ..services.status_mapping_service import get_status_mapping
+from app.enums import StatusTccEnum, UsuarioTipoEnum, RegraSessaoPublicaEnum
 from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre, Professor, Coordenador, Sessao, Banca, Tema, Curso
 from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer, TemaSerializer, TccEditSerializer, TccPublicSerializer, DetalhesTccPublicSerializer, TCCPendentesSerializer
 from app.services.proposta import PropostaService
@@ -634,3 +635,89 @@ class ExcluirTemaView(CustomAPIView):
 
         tema.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class TccProximosPassos(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        # Espera-se um DTO com, ao menos, o ID do TCC.
+        tccid = request.data.get("tccid")
+        if not tccid:
+            return Response(
+                {'status': 'error', "message": "TCC ID não fornecido."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Encontra o objeto Tcc
+        try:
+            tcc = Tcc.objects.get(id=tccid)
+        except Tcc.DoesNotExist:
+            return Response(
+                {'status': 'error', "message": "TCC não encontrado."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Busca o status atual do TCC (o mais recente, ordenado por dataStatus)
+        status_atual = TccStatus.objects.filter(tcc=tcc).order_by('-dataStatus').first()
+        if not status_atual:
+            return Response(
+                {'status': 'error', "message": "Status do TCC não encontrado."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        try:
+            curso = Curso.objects.get(id=tcc.curso.id)
+        except Curso.DoesNotExist:
+            return Response(
+                {'status': 'error', "message": "Curso não encontrado."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Obtém a regra de sessão do curso e converte para o enum adequado.
+        try:
+            regra_sessao = RegraSessaoPublicaEnum(curso.regra_sessao_publica)
+        except ValueError:
+            return Response(
+                {'status': 'error', "message": "Regra de sessão inválida no curso."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Obtém o mapping de status para o TCC conforme a regra do curso
+        mapping = get_status_mapping(regra_sessao)
+        
+        # Determina o status e a mensagem do status atual, bem como o próximo status obrigatório
+        current_status_value = status_atual.status  # Ex: "DESENVOLVIMENTO"
+        current_index = None
+        current_message = ""
+        next_required_status = None
+        next_required_instrucoes = None
+
+        for item in mapping:
+            if item["status"] == current_status_value:
+                current_index = item["index"]
+                current_message = item.get("mensagem", "")
+                break
+
+        if current_index is not None:
+            for item in mapping:
+                if item["index"] > current_index and item["required"]:
+                    next_required_status = item["status"]
+                    next_required_instrucoes = item.get("instrucoes", "")
+                    break
+        
+        # Sinaliza se o status atual for 'DESENVOLVIMENTO' e a sessão prévia for opcional (Regra OPCIONAL)
+        previa_opcional = False
+        if status_atual.status == StatusTccEnum.DESENVOLVIMENTO and regra_sessao == RegraSessaoPublicaEnum.OPCIONAL:
+            previa_opcional = True
+
+        # Monta e retorna a resposta, incluindo a mensagem do status atual e as instruções do próximo status
+        return Response({
+            "status_atual": {
+                "status": status_atual.status,
+                "dataStatus": status_atual.dataStatus,
+                "mensagem": current_message
+            },
+            "next_required_status": next_required_status,
+            "next_required_instrucoes": next_required_instrucoes,
+            "previa_opcional": previa_opcional,
+        }, status=status.HTTP_200_OK)

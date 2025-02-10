@@ -31,6 +31,7 @@ urlpatterns = [
     path('detalhes-usuario', views.DetalhesUsuario.as_view(), name='detalhes-usuario'),
     path('listar-usuarios', views.ListarUsuarios.as_view(), name='listar-usuarios'),
     path('detalhes-tcc/<int:tccid>/', views.DetalhesTCCView.as_view(), name='detalhes_tcc'),
+    path('proximos-passos', views.TccProximosPassos.as_view(), name='proximos-passos'),
     path('listar-tccs-pendente', views.ListarTccPendente.as_view(), name='listar-tccs'),
     path('tccs-by-aluno', views.TCCsByAluno.as_view(), name='tccs-by-aluno'),
     path('tccs-by-orientador', views.TCCsByOrientador.as_view(), name='tccs-by-orientador'),
