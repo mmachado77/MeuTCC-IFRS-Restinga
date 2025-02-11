@@ -1,45 +1,96 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Tag } from 'primereact/tag';
+import { Dialog } from 'primereact/dialog';
+import { Timeline } from 'primereact/timeline';
 import { Message } from 'primereact/message';
 
-const renderMessage = (statusMensagem) => {
+const renderMessage = (statusMensagem, date, corFundo, primaryColor, icon) => {
   return (
     <div className="card">
       <Message
           style={{
-              borderLeft: 'solid #cc8925',
-              backgroundColor: '#f5e6d0',
-              borderWidth: '0 0 0 6.5px',
-              color: '#cc8925',
+              backgroundColor: `${corFundo}`,
+              color: `${primaryColor}`,
+              padding: "0.5rem",
           }}
-          className="border-primary w-full justify-content-start text-sm"
-          severity="contrast"
-          text={statusMensagem}
+          className="w-full justify-content-start"
+          severity="success"
+          content={renderMessageContent(statusMensagem, primaryColor, date, icon)}
       />
     </div>
-  )
+  );
 }
 
-
-const StatusAtual = ({ options }) => {
+const renderMessageContent = (statusMensagem, primaryColor, date, icon) => {
   return (
-    <div className="card flex flex-col px-4 bg-gray-50 text-gray-600 rounded-md shadow-md">
+    <div className="flex items-center justify-between gap-1">
+      <div className='w-1/5 flex justify-center'>
+      <i className={`${icon}`} style={{ color: primaryColor, fontSize: '1.7rem'  }}></i>
+      </div>
+      <div className='w-4/5'>
+      <span className='text-[0.75rem]'>{statusMensagem}</span>
+      <div>
+      <span className="text-[0.75rem] text-end mb-3 italic">Última Atualização: {date}</span>
+      </div>
+      </div>
+    </div>
+  );
+}
+
+const StatusAtual = ({ props, historicoStatus, mostrarTimeline, reprovado }) => {
+  let primaryColor = "";
+  let messageColor = "";
+  let icon = "";
+
+  if(reprovado){
+    primaryColor = "#ef4444";
+    messageColor = "#f8e4e4b3";
+    icon = "pi pi-times-circle";
+  } else{
+    primaryColor = "#22c55e";
+    messageColor = "#e4f8f0b3";
+    icon = "pi pi-check-circle";
+  }
+  
+  const [isTimelineVisible, setIsTimelineVisible] = useState(false);
+
+  return (
+    <div className={`card flex flex-col px-4 mt-6 border border-dashed rounded-md shadow-md`}
+    style={{ borderColor: primaryColor }}>
       {/* Cabeçalho: Última Atualização do Projeto */}
       <div className="">
-        <div className='flex justify-between text-left'>
+        <div className='text-start -mt-[0.85rem]'>
           <Tag
-          className='text-sm text-center font-semibold -mt-3 h-fit'
-          value={options?.statusAtual}
-          style={{ backgroundColor: '#ffbf00', color: '#FFFFFF' }}
+            className='h-fit text-[0.85rem] font-semibold'
+            value={props?.statusAtual}
+            style={{ backgroundColor: `${primaryColor}`, color: '#FFFFFF', cursor: mostrarTimeline ? 'pointer' : 'default' }}
+            onClick={() => mostrarTimeline && setIsTimelineVisible(true)}
           />
-          <div className='mt-1'>
-            <span className="text-sm italic">{options.date}</span>
-          </div>
         </div>
-        <div className="flex items-center justify-between mb-2">
-          {renderMessage(options.statusMessage)}
+        <div className="flex items-center justify-between mt-1 mb-3">
+          {renderMessage(props?.statusMessage, props?.date, messageColor, primaryColor, icon)}
         </div>
       </div>
+
+      {/* Timeline Dialog */}
+      {mostrarTimeline && (
+        <Dialog
+          header="Timeline do TCC"
+          visible={isTimelineVisible}
+          style={{ width: '50vw' }}
+          onHide={() => setIsTimelineVisible(false)}
+        >
+          <Timeline 
+            value={historicoStatus.slice().reverse()} 
+            opposite={(item) => item.statusMensagem} 
+            content={(item) => (
+              <small className="text-color-secondary">
+                {new Date(item.dataStatus).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              </small>
+            )}
+          />
+        </Dialog>
+      )}
     </div>
   );
 };

@@ -262,7 +262,7 @@ const FileItemTCC = ({ file, tccId, prazoEntrega, user, updateTccDetails, isEdit
               </div>
 
               {/* Container das informações do arquivo (ocupa os 3/5 restantes) */}
-              <div className="ml-4 py-3 w-3/5 h-[150px] text-gray-600 flex flex-col justify-between py-1">
+              <div className="ml-4 py-5 w-3/5 h-[150px] text-[0.85rem] text-gray-600 flex flex-col justify-between">
                 <div>
                   <strong>Arquivo:</strong>
                   <span className="block">{truncateFileName(file.name)}</span>

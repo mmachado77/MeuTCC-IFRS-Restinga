@@ -1,9 +1,8 @@
 import { useTccContext } from '../context/TccContext'; // Contexto do TCC
-import StatusTag from './StatusTag'; 
+import CardEdit from './CardEdit';
 
-const CardTccDetalhes = () => {
+const CardTccDetalhes = ({isEditable}) => {
   const { tccData } = useTccContext();
-
   const {
     tema,
     autor,
@@ -44,61 +43,58 @@ const CardTccDetalhes = () => {
       {/* Linha pontilhada */}
       <hr className="border-dashed border-gray-300 w-full mb-4" />
 
-    <div className='text-gray-600 px-6'>
-     {/* Itens de detalhes */}
-     <div className='flex justify-between mb-4'>
-      <span className="text-xl font-semibold text-gray-600 ">
-        Detalhes:
-      </span>
-      <StatusTag
-              status={status?.[status.length - 1]?.statusMensagem || 'Indefinido'}
-            />
-      </div>
+      <div className='text-gray-600 px-6'>
+        {/* Itens de detalhes */}
 
-    <span className="mb-2 block">
-      <span className="font-bold">Autor: </span>
-      {aluno || 'Não definido'}
-    </span>
-
-    <span className="mb-2 block">
-      <span className="font-bold">Curso: </span>
-      {nomeCurso || 'Não definido'}
-    </span>
-
-    <span className="flex justify-between mb-2 block">
-      <span>
-        <span className="font-bold">Orientador: </span>
-        {nomeOrientador || 'Não definido'}
-      </span>
-      {nomeCoorientador && (
-        <span>
-          <span className="font-bold">Coorientador: </span>
-          {nomeCoorientador}
+        <span className="mb-2 block">
+          <span className="font-bold">Autor: </span>
+          {aluno || 'Não definido'}
         </span>
-      )}
-    </span>
 
-    <span className="flex justify-between mb-6 block">
-      <span>
-        <span className="font-bold">Semestre: </span>
-        {periodoSemestre || 'Não definido'}
-      </span>
-      <span>
-        <span className="font-bold">Data de Submissão: </span>
-        {dataSubmissao || 'Não definida'}
-      </span>
-    </span>
+        <span className="mb-2 block">
+          <span className="font-bold">Curso: </span>
+          {nomeCurso || 'Não definido'}
+        </span>
 
-    {/* Subtítulo Resumo */}
-    <span className="font-semibold text-gray-600 mb-2 block text-justify">
-      Resumo:
-    </span>
+        <span className="flex justify-between mb-2 block">
+          <span>
+            <span className="font-bold">Orientador: </span>
+            {nomeOrientador || 'Não definido'}
+          </span>
+          {nomeCoorientador && (
+            <span>
+              <span className="font-bold">Coorientador: </span>
+              {nomeCoorientador}
+            </span>
+          )}
+        </span>
 
-    <span className="text-gray-700 leading-relaxed">
-      {resumo || 'Nenhum resumo fornecido.'}
-    </span>
-    </div>
+        <span className="flex justify-between mb-6 block">
+          <span>
+            <span className="font-bold">Semestre: </span>
+            {periodoSemestre || 'Não definido'}
+          </span>
+          <span>
+            <span className="font-bold">Data de Submissão: </span>
+            {dataSubmissao || 'Não definida'}
+          </span>
+        </span>
 
+        {/* Subtítulo Resumo */}
+        <span className="font-semibold text-gray-600 mb-2 block text-justify">
+          Resumo:
+        </span>
+
+        <span className="text-gray-700 leading-relaxed">
+          {resumo || 'Nenhum resumo fornecido.'}
+        </span>
+        {isEditable &&(
+        <div className='flex justify-end'>
+          <CardEdit />
+        </div>
+        )}
+      </div>
+      
     </div>
   );
 };

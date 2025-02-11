@@ -19,7 +19,7 @@ const CardEdit = () => {
   const isCoordenador = user?.tipo === 'Coordenador';
 
   return (
-      <div className=''>
+      <div className='w-2/6'>
         <EditarForm
             buttonLabel="Editar TCC"
             isCoordenador={isCoordenador}

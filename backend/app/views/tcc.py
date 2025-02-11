@@ -357,15 +357,13 @@ class DetalhesTCCView(CustomAPIView):
         except Tcc.DoesNotExist:
             return Response({'status': 'error', "message": "TCC não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
-        # Verifica se existem sessões associadas ao TCC e recupera os usuários da banca
-        if Sessao.objects.filter(tcc=tcc).exists():
-            sessoes = Sessao.objects.filter(tcc=tcc)
-            for sessao in sessoes:
-                if Banca.objects.filter(sessao=sessao).exists():
-                    bancas.append(Banca.objects.get(sessao=sessao))
-            for banca in bancas:
-                for professor in banca.professores.all():
-                    users_banca.append(professor.user)
+        # Obtém o último status do TCC
+        ultimo_status = TccStatus.objects.filter(tcc=tcc).order_by('-dataStatus').first()
+        status_atual = ultimo_status.status if ultimo_status else None
+
+        # Determina as flags concluído e reprovado
+        concluido = status_atual in StatusTccEnum.statusTccConcluido()
+        reprovado = status_atual in StatusTccEnum.statusTccCancelado()
 
         user = request.user
         if user.is_authenticated:
@@ -373,22 +371,40 @@ class DetalhesTCCView(CustomAPIView):
 
             # Verifica se o usuário está relacionado ao TCC
             if (str(user) == 'admin') or (user == tcc.autor.user) or (user == tcc.orientador.user) or (
-                tcc.coorientador and user == tcc.coorientador.user) or (coord.exists()) or (user in users_banca):
+                tcc.coorientador and user == tcc.coorientador.user) or (coord.exists()):
                 # Usuário relacionado ao TCC - retorna detalhes completos
                 serializer = TccSerializer(tcc)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                data = serializer.data
+                data.update({'concluido': concluido, 'reprovado': reprovado})
+                return Response(data, status=status.HTTP_200_OK)
 
-        # Verifica se o último status permite acesso público
-        ultimo_status = TccStatus.objects.filter(tcc=tcc).order_by('-dataStatus').first()
-        if ultimo_status and ultimo_status.status in [StatusTccEnum.FINAL_AGENDADA, StatusTccEnum.APROVADO]:
-            # Usuário não relacionado - retorna apenas dados públicos
+            # Verifica se o usuário faz parte da banca
+            if Sessao.objects.filter(tcc=tcc).exists():
+                sessoes = Sessao.objects.filter(tcc=tcc)
+                for sessao in sessoes:
+                    if Banca.objects.filter(sessao=sessao).exists():
+                        bancas.append(Banca.objects.get(sessao=sessao))
+                for banca in bancas:
+                    for professor in banca.professores.all():
+                        users_banca.append(professor.user)
+
+            if user in users_banca:
+                serializer = TccSerializer(tcc)
+                data = serializer.data
+                data.update({'concluido': concluido, 'reprovado': reprovado})
+                return Response(data, status=status.HTTP_200_OK)
+
+        # Verifica se o status permite acesso público
+        if status_atual in [StatusTccEnum.FINAL_AGENDADA, StatusTccEnum.APROVADO]:
             serializer = DetalhesTccPublicSerializer(tcc)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
+            data = serializer.data
+            data.update({'concluido': concluido, 'reprovado': reprovado})
+            return Response(data, status=status.HTTP_200_OK)
 
         # Caso contrário, retorna uma mensagem de permissão negada
         return Response({'status': 'alert', "message": "Você não tem permissão para visualizar este TCC."},
                         status=status.HTTP_403_FORBIDDEN)
+
 
 
             

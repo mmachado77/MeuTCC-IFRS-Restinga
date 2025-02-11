@@ -60,6 +60,16 @@ class StatusTccEnum(models.TextChoices):
             StatusTccEnum.REPROVADO_PREVIA,
             StatusTccEnum.REPROVADO_FINAL
         ]
+    
+    @staticmethod
+    def statusTccConcluido():
+        return [
+            StatusTccEnum.PROPOSTA_RECUSADA_PROFESSOR,
+            StatusTccEnum.PROPOSTA_RECUSADA_COORDENADOR,
+            StatusTccEnum.REPROVADO_PREVIA,
+            StatusTccEnum.REPROVADO_FINAL,
+            StatusTccEnum.APROVADO,
+        ]
 
     def __str__(self):
         if self == StatusTccEnum.PROPOSTA_ANALISE_PROFESSOR:
