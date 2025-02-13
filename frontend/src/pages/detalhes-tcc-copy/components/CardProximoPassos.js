@@ -18,7 +18,7 @@ const CardProximoPassos = ({ tccId, isEditable }) => {
   }
 
   // Extrai os dados do objeto retornado pela API
-  const { status_atual, next_required_status, next_required_instrucoes, previa_opcional } = proximosPassos;
+  const { status_atual, previa_opcional, cta, checklist } = proximosPassos;
 
   // Formata a data da última atualização para um formato amigável
   const formattedDate = status_atual?.dataStatus ? new Date(status_atual.dataStatus).toLocaleString() : '';
@@ -29,7 +29,8 @@ const CardProximoPassos = ({ tccId, isEditable }) => {
         props={{
           statusAtual: statusMapping[status_atual.status],
           date: formattedDate,
-          statusMessage: status_atual.mensagem
+          statusMessage: status_atual.mensagem,
+          checklist: checklist
         }}
         historicoStatus={tccData?.status}
         mostrarTimeline={isEditable}
@@ -38,9 +39,9 @@ const CardProximoPassos = ({ tccId, isEditable }) => {
         { !tccData?.concluido && (
           <ProximaEtapa 
           props={{
-            proximoStatus: statusMapping[next_required_status],
             previaOpcional: previa_opcional,
-            instrucoes: next_required_instrucoes
+            instrucoes: status_atual?.instrucoes,
+            cta: cta
           }}/>
         )}        
     </div>

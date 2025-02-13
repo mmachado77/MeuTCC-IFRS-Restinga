@@ -2,8 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import TccService from '../../../services/TccService';
-import { Menubar } from 'primereact/menubar';
-import styles from '../assets/MyMenuBar.module.css'; // arquivo de estilos customizados
+
 
 const FileItemTCC = ({ file, tccId, prazoEntrega, user, updateTccDetails, isEditable }) => {
   const toast = useRef(null);
@@ -341,24 +340,6 @@ const FileItemTCC = ({ file, tccId, prazoEntrega, user, updateTccDetails, isEdit
       </div>
     )
   }
-
-
-  const items = [
-    {
-      label: 'Documento do TCC',
-      icon: 'pi pi-book',
-      className: activeTab === 'TCC' ? styles.activeItem : '',
-      command: () => setActiveTab('TCC')
-    },
-    {
-      label: 'Autorização de Publicação',
-      icon: 'pi pi-check',
-      className: activeTab === 'Autorizacao' ? styles.activeItem : '',
-      command: () => setActiveTab('Autorizacao')
-    }
-  ];
-
-
 
   return (
     <div className="border border-solid border-gray-300 rounded-md bg-white pb-6">

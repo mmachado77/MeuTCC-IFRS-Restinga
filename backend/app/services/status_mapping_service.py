@@ -1,5 +1,3 @@
-# services/status_mapping_service.py
-
 from typing import List, Dict
 from ..enums import StatusTccEnum, RegraSessaoPublicaEnum
 

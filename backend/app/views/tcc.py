@@ -6,8 +6,10 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from django.db.models import Max, F, Q
 from ..services.status_mapping_service import get_status_mapping
+from ..services.calcular_checklist_tcc import calcular_checklist_tcc
+from ..services.cta_tcc import get_cta
 from app.enums import StatusTccEnum, UsuarioTipoEnum, RegraSessaoPublicaEnum
-from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre, Professor, Coordenador, Sessao, Banca, Tema, Curso
+from app.models import Tcc, TccStatus, ProfessorInterno, Usuario, Estudante, Semestre, Professor, Coordenador, Sessao, Banca, Tema, Curso
 from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer, TemaSerializer, TccEditSerializer, TccPublicSerializer, DetalhesTccPublicSerializer, TCCPendentesSerializer
 from app.services.proposta import PropostaService
 from app.services.tcc import TccService
@@ -457,18 +459,6 @@ class TCCsPublicadosView(CustomAPIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from app.models.tema import Tema
-from app.models.usuario import Usuario
-from app.models.professorInterno import ProfessorInterno
-from app.models.estudante import Estudante
-from app.models.coordenador import Coordenador
-from app.enums.usuario_tipo_enum import UsuarioTipoEnum
-from app.serializers.tema import TemaSerializer
-from app.views.custom_api_view import CustomAPIView
-
 class TemasSugeridosView(CustomAPIView):
     """
     API para listar os temas sugeridos filtrados pelo curso do usuário.
@@ -705,35 +695,48 @@ class TccProximosPassos(APIView):
         current_status_value = status_atual.status  # Ex: "DESENVOLVIMENTO"
         current_index = None
         current_message = ""
-        next_required_status = None
-        next_required_instrucoes = None
+        instrucoes = None
 
         for item in mapping:
             if item["status"] == current_status_value:
                 current_index = item["index"]
-                current_message = item.get("mensagem", "")
+                current_message = item.get("mensagem", None)
                 break
 
         if current_index is not None:
             for item in mapping:
                 if item["index"] > current_index and item["required"]:
-                    next_required_status = item["status"]
-                    next_required_instrucoes = item.get("instrucoes", "")
+                    instrucoes = item.get("instrucoes", None)
                     break
         
         # Sinaliza se o status atual for 'DESENVOLVIMENTO' e a sessão prévia for opcional (Regra OPCIONAL)
         previa_opcional = False
         if status_atual.status == StatusTccEnum.DESENVOLVIMENTO and regra_sessao == RegraSessaoPublicaEnum.OPCIONAL:
             previa_opcional = True
+        
+        checklist = calcular_checklist_tcc(tcc)
 
-        # Monta e retorna a resposta, incluindo a mensagem do status atual e as instruções do próximo status
+        try:
+            cta_result = get_cta(checklist, status_atual) or {}  # Garante que cta_result é um dicionário
+            cta_key = cta_result.get("chave")  # Acessa diretamente as chaves sem nível extra
+            cta_value = cta_result.get("valor")
+        except Exception as e:
+            # Log do erro inesperado para facilitar o debug
+            print(f"Erro inesperado: {e}")
+            cta_key = None
+            cta_value = None
+        # Monta e retorna a resposta, incluindo a mensagem do status atual, as instruções do próximo status e o checklist
         return Response({
             "status_atual": {
                 "status": status_atual.status,
                 "dataStatus": status_atual.dataStatus,
-                "mensagem": current_message
+                "mensagem": current_message,
+                "instrucoes": instrucoes,
             },
-            "next_required_status": next_required_status,
-            "next_required_instrucoes": next_required_instrucoes,
             "previa_opcional": previa_opcional,
-        }, status=status.HTTP_200_OK)
+            "checklist": checklist,
+            "cta": {
+                "chave": cta_key,
+                "valor": cta_value
+            }
+            }, status=status.HTTP_200_OK)

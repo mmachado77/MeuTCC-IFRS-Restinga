@@ -12,6 +12,7 @@ module.exports = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
         'botao-gradient': 'linear-gradient(0deg, rgba(34,197,94,1) 0%, rgba(93,255,152,1) 100%)',
+        'checklist-gradient': 'linear-gradient(0deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.6) 36%, rgba(255,255,255,0) 100%)',
       },
     },
   },

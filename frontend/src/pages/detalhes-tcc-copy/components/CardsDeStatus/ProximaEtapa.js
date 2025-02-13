@@ -18,7 +18,7 @@ const renderMessageContent = (instrucoes, primaryColor, icon) => {
     );
 };
 
-const renderButtonCTA = (isPreviaChecked) => {
+const renderButtonCTA = (isPreviaChecked, cta) => {
     if (isPreviaChecked) {
         return (
             <Button
@@ -43,14 +43,14 @@ const renderButtonCTA = (isPreviaChecked) => {
                 }}
                 className='w-full flex justify-center text-[1rem]'
                 icon='pi pi-calendar'
-                label='Agendar Sessão Final'
+                label={cta?.valor}
                 severity='warning'
             />
         );
     }
 };
 
-const renderMessage = (instrucoes, previa, corFundo, primaryColor, icon, isPreviaChecked, onToggle) => {
+const renderMessage = (instrucoes, previa, corFundo, primaryColor, icon, isPreviaChecked, cta, onToggle) => {
     const renderTooltip = () => {
         return (
             <div className='flex flex-col gap-1'>
@@ -60,9 +60,6 @@ const renderMessage = (instrucoes, previa, corFundo, primaryColor, icon, isPrevi
             </div>
         )
     }
-
-
-        ;
     return (
         <div className="card">
             <div>
@@ -96,7 +93,15 @@ const renderMessage = (instrucoes, previa, corFundo, primaryColor, icon, isPrevi
                                 />
                             </label>
                             {/* Ícone com Tooltip */}
-                            <Tooltip target=".pi-question-circle"
+                            <Tooltip
+                                pt={{
+                                    text: {
+                                    style: { backgroundColor: primaryColor,
+                                        color: 'text-gray-700'
+                                     }
+                                    }
+                                }}
+                                target=".pi-question-circle"
                                 className='max-w-[320px] text-[0.85rem]'>
                                 {renderTooltip()}
                             </Tooltip>
@@ -112,8 +117,9 @@ const renderMessage = (instrucoes, previa, corFundo, primaryColor, icon, isPrevi
                     </div>
 
                     <div>
-                        {/* Exemplo de onde você pode usar o renderButtonCTA para alterar algum botão caso deseje */}
-                        {renderButtonCTA(isPreviaChecked)}
+                        {cta &&(
+                            renderButtonCTA(isPreviaChecked, cta)
+                        )}
                     </div>
                 </div>
             )}
@@ -168,6 +174,7 @@ const ProximaEtapa = ({ props }) => {
                         primaryColor,
                         icon,
                         isPreviaChecked,
+                        props?.cta,
                         handleTogglePrevia
                     )}
                 </div>
