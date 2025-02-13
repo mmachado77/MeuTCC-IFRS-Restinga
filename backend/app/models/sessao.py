@@ -35,7 +35,7 @@ class Sessao(PolymorphicModel):
     parecer_coordenador = models.TextField(null=True, blank=True)
     data_inicio = models.DateTimeField()
     tcc = models.ForeignKey(Tcc, on_delete=models.PROTECT)
-    documentoTCCSessao = models.FileField(upload_to='sessao/documento', null=True, blank=True)
+    documentoTCCSessao = models.TextField(null=True, blank=True)
     prazoEntregaDocumento = models.DateTimeField(default=datetime.now, null=True, blank=True)
     validacaoOrientador = models.BooleanField(default=False)
     validacaoCoordenador = models.BooleanField(default=False)

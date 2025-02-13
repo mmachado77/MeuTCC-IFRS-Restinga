@@ -21,17 +21,19 @@ const renderMessageContent = (instrucoes, primaryColor, icon) => {
 const renderButtonCTA = (isPreviaChecked, cta) => {
     if (isPreviaChecked) {
         return (
-            <Button
-                pt={{
-                    label: {
-                    style: { flex: 'none' }
-                    }
-                }}
-                className='w-full flex justify-center text-[1rem]'
-                icon='pi pi-calendar'
-                label='Agendar Sessão de Andamento'
-                severity='warning'
-            />
+            <div className=''>
+                <Button
+                    pt={{
+                        label: {
+                        style: { flex: 'none' }
+                        }
+                    }}
+                    className='w-full flex justify-center text-[1rem]'
+                    icon='pi pi-calendar'
+                    label='Agendar Sessão de Andamento'
+                    severity='warning'
+                />
+            </div>
         );
     } else {
         return (
@@ -77,7 +79,7 @@ const renderMessage = (instrucoes, previa, corFundo, primaryColor, icon, isPrevi
 
             {/* Renderização condicional da “prévia”: substituído o <span>previa opcional?</span> pelo InputSwitch */}
             {previa && (
-                <div className='flex flex-col gap-3 py-4'>
+                <div className='flex flex-col gap-3 pt-4'>
                     <div className="px-2 py-3 flex justify-between items-center text-[0.9rem] text-gray-600 border border-solid border-gray-300 rounded-md"
                     // style={{ color: primaryColor }}
                     >
@@ -117,11 +119,11 @@ const renderMessage = (instrucoes, previa, corFundo, primaryColor, icon, isPrevi
                     </div>
 
                     <div>
-                        {cta &&(
-                            renderButtonCTA(isPreviaChecked, cta)
-                        )}
                     </div>
                 </div>
+            )}
+            {cta &&(
+                renderButtonCTA(isPreviaChecked, cta)
             )}
         </div>
     );
