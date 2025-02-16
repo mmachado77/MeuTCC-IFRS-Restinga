@@ -63,7 +63,6 @@ const ProfilePage = () => {
     const [exibirDialogoGitHub, setExibirDialogoGitHub] = useState(false);
     const [linkTemp, setLinkTemp] = useState('');
     const toast = useRef(null);
-
     useEffect(() => {
         const fetchPerfil = async () => {
             try {

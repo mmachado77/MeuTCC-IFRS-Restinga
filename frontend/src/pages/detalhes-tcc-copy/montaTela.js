@@ -39,7 +39,11 @@ const MontaTela = () => {
                             updateTccDetails={updateTccDetails}
                         />
                         </div>
+                        
                     
+                </div>
+                <div className='mt-[600px]'>
+                    <h1>a</h1>
                 </div>
             </div>
 

@@ -79,10 +79,12 @@ def get_status_mapping(regra_sessao: RegraSessaoPublicaEnum) -> List[Dict]:
     index += 1
 
     # Status referentes à sessão prévia (somente se as sessões não estiverem desabilitadas)
-    if regra_sessao != RegraSessaoPublicaEnum.DESABILITAR:
+    if regra_sessao is not RegraSessaoPublicaEnum.DESABILITAR:
         # Se a sessão prévia for obrigatória, marca como obrigatória; se opcional, flag False.
-        previa_required = True if regra_sessao == RegraSessaoPublicaEnum.OBRIGATORIO else False
-
+        if regra_sessao is RegraSessaoPublicaEnum.OBRIGATORIO:
+            previa_required = True
+        else:
+            previa_required = False
         # 6. Sessão Prévia em Análise pelo Orientador
         mapping.append({
             "index": index,
@@ -159,7 +161,7 @@ def get_status_mapping(regra_sessao: RegraSessaoPublicaEnum) -> List[Dict]:
         "required": True,
         "status": StatusTccEnum.FINAL_COORDENADOR,
         "mensagem": "Os detalhes da Sessão Pública de Defesa estão sendo analisados pelo Coordenador do Curso.",
-        "instrucoes": "Aguarde que o Coordenador do Curso confirme o agendamento Sessão Pública de Defesa."
+        "instrucoes": "Aguarde que o Orientador encaminhe o agendamento Sessão Pública de Defesa."
     })
     index += 1
 
@@ -168,7 +170,7 @@ def get_status_mapping(regra_sessao: RegraSessaoPublicaEnum) -> List[Dict]:
         "required": True,
         "status": StatusTccEnum.FINAL_AGENDADA,
         "mensagem": "A Sessão Pública de Defesa foi agendada. Fique atento à data e horário.",
-        "instrucoes": "Prepare-se e esteja pronto na data agendada para a Sessão Pública de Defesa. Boa sorte!"
+        "instrucoes": "Aguarde que o Coordenador do Curso confirme o agendamento Sessão Pública de Defesa."
     })
     index += 1
 
@@ -195,7 +197,7 @@ def get_status_mapping(regra_sessao: RegraSessaoPublicaEnum) -> List[Dict]:
         "required": True,
         "status": StatusTccEnum.APROVADO,
         "mensagem": "Parabéns! Seu TCC foi aprovado e concluído com sucesso.",
-        "instrucoes": "Aguarde apreciação da banca avaliadora."
+        "instrucoes": "Prepare-se e esteja pronto na data agendada para a Sessão Pública de Defesa. Boa sorte!"
     })
 
     return mapping

@@ -73,6 +73,8 @@ export const TccProvider = ({ tccId, children }) => {
         loading,
         updateTccDetails,
         proximosPassos,
+        fetchData, 
+        fetchProximosPassosHandler, 
       }}
     >
       {children}

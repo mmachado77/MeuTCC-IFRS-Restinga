@@ -39,6 +39,12 @@ def calcular_checklist_tcc(tcc):
     # Recuperar o curso e determinar a regra da sessão
     curso = Curso.objects.get(id=tcc.curso.id)
     regra_sessao = RegraSessaoPublicaEnum(curso.regra_sessao_publica)
+
+    
+    for status_obj in status_objects:
+        if status_obj.status == StatusTccEnum.PREVIA_ORIENTADOR:
+            regra_sessao = RegraSessaoPublicaEnum.OBRIGATORIO
+            break
     
     # Obter o mapping de status para essa regra
     mapping = get_status_mapping(regra_sessao)

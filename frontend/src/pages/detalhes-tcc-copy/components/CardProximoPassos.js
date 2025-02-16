@@ -21,11 +21,13 @@ const CardProximoPassos = ({ tccId, isEditable }) => {
   const { status_atual, previa_opcional, cta, checklist } = proximosPassos;
 
   // Formata a data da última atualização para um formato amigável
-  const formattedDate = status_atual?.dataStatus ? new Date(status_atual.dataStatus).toLocaleString() : '';
+  const formattedDate = status_atual?.dataStatus
+    ? new Date(status_atual.dataStatus).toLocaleString()
+    : '';
 
   return (
-    <div className="border border-solid border-gray-300 rounded-md bg-white px-6 pb-6">   
-        <StatusAtual
+    <div className="border border-solid border-gray-300 rounded-md h-full flex flex-col justify-around bg-white px-6 pb-6">
+      <StatusAtual
         props={{
           statusAtual: statusMapping[status_atual.status],
           date: formattedDate,
@@ -35,15 +37,18 @@ const CardProximoPassos = ({ tccId, isEditable }) => {
         historicoStatus={tccData?.status}
         mostrarTimeline={isEditable}
         reprovado={tccData?.cancelado}
-        />
-        { !tccData?.concluido && (
-          <ProximaEtapa 
+      />
+      {!tccData?.concluido && (
+        <ProximaEtapa
+          key={status_atual?.dataStatus} // Força a remontagem quando os dados mudarem
           props={{
             previaOpcional: previa_opcional,
             instrucoes: status_atual?.instrucoes,
-            cta: cta
-          }}/>
-        )}        
+            cta: cta,
+            valor: cta?.valor
+          }}
+        />
+      )}
     </div>
   );
 };

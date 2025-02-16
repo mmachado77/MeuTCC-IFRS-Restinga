@@ -37,32 +37,32 @@ class EstudanteListaSerializer(UsuarioListaSerializer):
     """Serializer para listar estudantes."""
     class Meta:
         model = Estudante
-        fields = ["id", "nome", "email", "tipo", "status_cadastro"]
+        fields = ["id", "nome", "email", "tipo", "status_cadastro", "avatar"]
 
 
 class ProfessorListaSerializer(UsuarioListaSerializer):
     """Serializer para listar professores."""
     class Meta:
         model = Professor
-        fields = ["id", "nome", "email", "tipo", "status_cadastro"]
+        fields = ["id", "nome", "email", "tipo", "status_cadastro", "avatar"]
 
 
 class ProfessorInternoListaSerializer(UsuarioListaSerializer):
     """Serializer para listar professores internos."""
     class Meta:
         model = ProfessorInterno
-        fields = ["id", "nome", "email", "tipo", "status_cadastro"]
+        fields = ["id", "nome", "email", "tipo", "status_cadastro", "avatar"]
 
 
 class ProfessorExternoListaSerializer(UsuarioListaSerializer):
     """Serializer para listar professores externos."""
     class Meta:
         model = ProfessorExterno
-        fields = ["id", "nome", "email", "tipo", "status_cadastro"]
+        fields = ["id", "nome", "email", "tipo", "status_cadastro", "avatar"]
 
 
 class CoordenadorListaSerializer(UsuarioListaSerializer):
     """Serializer para listar coordenadores."""
     class Meta:
         model = Coordenador
-        fields = ["id", "nome", "email", "tipo", "status_cadastro"]
+        fields = ["id", "nome", "email", "tipo", "status_cadastro", "avatar"]

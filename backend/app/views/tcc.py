@@ -687,7 +687,12 @@ class TccProximosPassos(APIView):
                 {'status': 'error', "message": "Regra de sessão inválida no curso."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+        status_objects = TccStatus.objects.filter(tcc=tcc)
+        for status_obj in status_objects:
+            if status_obj.status == StatusTccEnum.PREVIA_ORIENTADOR:
+                regra_sessao = RegraSessaoPublicaEnum.OBRIGATORIO
+                break
+
         # Obtém o mapping de status para o TCC conforme a regra do curso
         mapping = get_status_mapping(regra_sessao)
         

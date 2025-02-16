@@ -221,7 +221,6 @@ class SessaoEditOrientadorView(CustomAPIView):
 class SessaoCreateView(CustomAPIView):
     """
     API para criar uma nova sessão.
-
     Métodos:
         post(request): Cria uma nova sessão.
     """
@@ -232,22 +231,29 @@ class SessaoCreateView(CustomAPIView):
     def post(self, request):
         """
         Cria uma nova sessão.
-
         Args:
             request (Request): A requisição HTTP.
-
         Retorna:
             Response: Resposta HTTP confirmando a criação ou mensagem de erro.
         """
         try:
             data = request.data
-
             tcc = data['idTCC']
 
-            if data['tipo'] == 'previa' and SessaoPrevia.objects.filter(tcc__id=tcc).exists():
+            # Mapeia os valores do front para os esperados no backend
+            tipo_mapping = {
+                'ANDAMENTO': 'previa',
+                'DEFESA': 'final'
+            }
+            # Converte para uppercase e mapeia
+            tipo = tipo_mapping.get(data['tipo'].upper())
+            if not tipo:
+                return Response("Tipo de sessão inválido", status=status.HTTP_400_BAD_REQUEST)
+
+            # Verifica se já existe sessão para o TCC
+            if tipo == 'previa' and SessaoPrevia.objects.filter(tcc__id=tcc).exists():
                 return Response("Já existe uma sessão de prévia para este TCC", status=status.HTTP_400_BAD_REQUEST)
-            
-            if data['tipo'] == 'final' and SessaoFinal.objects.filter(tcc__id=tcc).exists():
+            if tipo == 'final' and SessaoFinal.objects.filter(tcc__id=tcc).exists():
                 return Response("Já existe uma sessão final para este TCC", status=status.HTTP_400_BAD_REQUEST)
 
             dataInicio = parse(data['dataInicio'])
@@ -259,29 +265,29 @@ class SessaoCreateView(CustomAPIView):
             tccInstance = Tcc.objects.get(pk=tcc)
 
             sessao = None
-            if data['tipo'] == 'previa':
+            if tipo == 'previa':
                 sessao = SessaoPrevia.objects.create(
-                    data_inicio = dataInicio,
-                    local = local,
-                    forma_apresentacao = formaApresentacao,
-                    prazoEntregaDocumento = prazoEntregaDocumento,
-                    tcc = tccInstance
+                    data_inicio=dataInicio,
+                    local=local,
+                    forma_apresentacao=formaApresentacao,
+                    prazoEntregaDocumento=prazoEntregaDocumento,
+                    tcc=tccInstance
                 )
                 self.tccService.atualizarStatus(tcc, StatusTccEnum.PREVIA_ORIENTADOR)
-            elif data['tipo'] == 'final':
+            elif tipo == 'final':
                 sessao = SessaoFinal.objects.create(
-                    data_inicio = dataInicio,
-                    local = local,
-                    forma_apresentacao = formaApresentacao,
-                    prazoEntregaDocumento = prazoEntregaDocumento,
-                    tcc = tccInstance
+                    data_inicio=dataInicio,
+                    local=local,
+                    forma_apresentacao=formaApresentacao,
+                    prazoEntregaDocumento=prazoEntregaDocumento,
+                    tcc=tccInstance
                 )
                 self.tccService.atualizarStatus(tcc, StatusTccEnum.FINAL_ORIENTADOR)
 
-            banca = Banca.objects.create(
-                sessao=sessao,
-            )
+            if not sessao:
+                return Response("Erro ao criar a sessão", status=status.HTTP_400_BAD_REQUEST)
 
+            banca = Banca.objects.create(sessao=sessao)
             banca.professores.set([avaliador1, avaliador2])
 
             self.notificacaoService.enviarNotificacaoAgendamentoBanca(request.user, sessao, banca)

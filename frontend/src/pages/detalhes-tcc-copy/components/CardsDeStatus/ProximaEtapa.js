@@ -4,127 +4,18 @@ import { Message } from 'primereact/message';
 import { Button } from 'primereact/button';
 import { InputSwitch } from 'primereact/inputswitch';
 import { Tooltip } from 'primereact/tooltip';
+import { Dialog } from 'primereact/dialog';
+import FormSessaoDialog from '../Sessao/FormSessaoDialog';
 
 const renderMessageContent = (instrucoes, primaryColor, icon) => {
     return (
         <div className="flex flex-col text-center items-center justify-between py-3">
-            <div className=''>
+            <div>
                 <i className={`${icon}`} style={{ color: primaryColor, fontSize: '1.7rem' }}></i>
             </div>
-            <div className=''>
+            <div>
                 <span className='text-[1.2rem]'>{instrucoes}</span>
             </div>
-        </div>
-    );
-};
-
-const renderButtonCTA = (isPreviaChecked, cta) => {
-    if (isPreviaChecked) {
-        return (
-            <div className=''>
-                <Button
-                    pt={{
-                        label: {
-                        style: { flex: 'none' }
-                        }
-                    }}
-                    className='w-full flex justify-center text-[1rem]'
-                    icon='pi pi-calendar'
-                    label='Agendar Sessão de Andamento'
-                    severity='warning'
-                />
-            </div>
-        );
-    } else {
-        return (
-            <Button
-                pt={{
-                    label: {
-                    style: { flex: 'none' }
-                    }
-                }}
-                className='w-full flex justify-center text-[1rem]'
-                icon='pi pi-calendar'
-                label={cta?.valor}
-                severity='warning'
-            />
-        );
-    }
-};
-
-const renderMessage = (instrucoes, previa, corFundo, primaryColor, icon, isPreviaChecked, cta, onToggle) => {
-    const renderTooltip = () => {
-        return (
-            <div className='flex flex-col gap-1'>
-                <span className='block'>O seu curso não exige a apresentação do TCC em uma Sessão Pública de Andamento.</span>
-                <span className='block'>Entretanto, pode ser uma boa oportunidade para colher feedback sobre o desenvolvimento do seu trabalho.</span>
-                <span className='block'>Marque essa opção para agendar sua Sessão Pública de Andamento.</span>
-            </div>
-        )
-    }
-    return (
-        <div className="card">
-            <div>
-                <Message
-                    style={{
-                        backgroundColor: `${corFundo}`,
-                        color: `${primaryColor}`,
-                        padding: "0.5rem",
-                    }}
-                    className="w-full justify-content-start"
-                    severity="success"
-                    content={renderMessageContent(instrucoes, primaryColor, icon)}
-                />
-            </div>
-
-            {/* Renderização condicional da “prévia”: substituído o <span>previa opcional?</span> pelo InputSwitch */}
-            {previa && (
-                <div className='flex flex-col gap-3 pt-4'>
-                    <div className="px-2 py-3 flex justify-between items-center text-[0.9rem] text-gray-600 border border-solid border-gray-300 rounded-md"
-                    // style={{ color: primaryColor }}
-                    >
-                        <div className='w-2/4 p-1'>
-                            {/* Label */}
-                            <label htmlFor="publicaSwitch" className="font-medium">
-                                <span className='block'>Sessão Pública</span>
-                                <span>de Andamento</span>
-                                <i
-                                    className="pi pi-question-circle p-1"
-                                    data-pr-position="top"
-                                    style={{ cursor: 'pointer', fontSize: "0.9rem" }}
-                                />
-                            </label>
-                            {/* Ícone com Tooltip */}
-                            <Tooltip
-                                pt={{
-                                    text: {
-                                    style: { backgroundColor: primaryColor,
-                                        color: 'text-gray-700'
-                                     }
-                                    }
-                                }}
-                                target=".pi-question-circle"
-                                className='max-w-[320px] text-[0.85rem]'>
-                                {renderTooltip()}
-                            </Tooltip>
-                        </div>
-
-                        {/* InputSwitch */}
-                        <InputSwitch
-                            className='mr-2'
-                            id="publicaSwitch"
-                            checked={isPreviaChecked}
-                            onChange={(e) => onToggle(e.value)}
-                        />
-                    </div>
-
-                    <div>
-                    </div>
-                </div>
-            )}
-            {cta &&(
-                renderButtonCTA(isPreviaChecked, cta)
-            )}
         </div>
     );
 };
@@ -133,24 +24,184 @@ const ProximaEtapa = ({ props }) => {
     const primaryColor = "#f97316";
     const messageColor = "#fff2e2b3";
     const icon = "pi pi-exclamation-circle";
+    const ctaRecebido = props?.valor; // Valor inicial (pode ser null)
 
-    // 1) Criar estado para isPreviaChecked
+    // Estado para alternar se a prévia está marcada ou não
     const [isPreviaChecked, setIsPreviaChecked] = useState(false);
 
-    // 2) Criar estado para armazenar instrucoes (valor inicial via props)
+    // Estado para armazenar instruções (valor inicial via props)
     const [instrucoesState, setInstrucoesState] = useState(props?.instrucoes);
+    // Novo estado para a CTA; inicialmente, se não houver valor recebido, será null
+    const [ctaState, setCtaState] = useState(ctaRecebido);
 
-    // Função que será chamada ao togglar o InputSwitch
+    // Estados para controlar o diálogo de sessão
+    const [openDialog, setOpenDialog] = useState(false);
+    const [tipoSessaoDialog, setTipoSessaoDialog] = useState(null);
+    const [editFormState, setEditFormState] = useState(false);
+
     const handleTogglePrevia = (checked) => {
         setIsPreviaChecked(checked);
-
-        // 3) Se marcado, troca instrucoesState para a mensagem específica
-        //    Se desmarcado, volta para instruções originais via props
         if (checked) {
             setInstrucoesState("Você já pode agendar sua Sessão Pública de Andamento.");
+            setCtaState("Agendar Sessão de Andamento");
         } else {
+            setCtaState(ctaRecebido);
             setInstrucoesState(props?.instrucoes);
         }
+    };
+
+    const renderDialog = () => {
+        return (
+            <Dialog
+                visible={openDialog}
+                closeOnEscape
+                header={ctaState}
+                pt={{
+                    header: {
+                        style: {
+                            padding: '1.6rem'
+                        }
+                    },
+                    headerTitle: {
+                        className: 'text-3xl font-bold text-center text-gray-700'
+                    },
+                    content: {
+                        style: {
+                            paddingRight: '2rem',
+                            paddingBottom: '2rem',
+                            paddingLeft: '2rem',
+                        }
+                    }
+                }}
+                onHide={() => {
+                    setOpenDialog(false);
+                    setEditFormState(false);
+                }}
+                className='max-w-screen-lg'
+            >
+                {/* Render do FormSessaoDialog, controlado pelo estado openDialog */}
+                <FormSessaoDialog tipoSessao={tipoSessaoDialog} onClose={setOpenDialog}/>
+            </Dialog>
+        );
+    };
+
+    const handleCtaClick = (chave) => {
+        switch (chave) {
+            case "PROPOSTA":
+                console.log("Handler para Sessão de Proposta");
+                break;
+            case "ANDAMENTO":
+                // Abre o diálogo de sessão de andamento
+                setTipoSessaoDialog(chave);
+                setOpenDialog(true);
+                break;
+            case "DOCANDAMENTO":
+                console.log("Handler para Enviar Documento para Sessão de Andamento");
+                break;
+            case "DEFESA":
+                setTipoSessaoDialog(chave);
+                setOpenDialog(true);
+                console.log("Handler para Agendar Sessão de Defesa");
+                break;
+            case "DOCFINAL":
+                console.log("Handler para Enviar Documento para Sessão Final");
+                break;
+            case "AJUSTE":
+                console.log("Handler para Enviar Ajuste");
+                break;
+            case "TERMO":
+                console.log("Handler para Submeter Termo de Autorização de Publicação");
+                break;
+            default:
+                console.log("Ação não definida para a chave:", chave);
+        }
+    };
+
+    const renderTooltip = () => {
+        return (
+            <div className='flex flex-col gap-1'>
+                <span>O seu curso não exige a apresentação do TCC em uma Sessão Pública de Andamento.</span>
+                <span>Entretanto, pode ser uma boa oportunidade para colher feedback sobre o desenvolvimento do seu trabalho.</span>
+                <span>Marque essa opção para agendar sua Sessão Pública de Andamento.</span>
+            </div>
+        );
+    };
+
+    const renderMessage = (instrucoes, previa, corFundo, primaryColor, icon, isPreviaChecked, cta, onToggle) => {
+        return (
+            <div className="card">
+                <div>
+                    <Message
+                        style={{
+                            backgroundColor: `${corFundo}`,
+                            color: `${primaryColor}`,
+                            padding: "0.5rem",
+                        }}
+                        className="w-full justify-content-start"
+                        severity="success"
+                        content={renderMessageContent(instrucoes, primaryColor, icon)}
+                    />
+                </div>
+
+                {previa && (
+                    <div className='flex flex-col gap-3 pt-4'>
+                        <div className="px-2 py-3 flex justify-between items-center text-[0.9rem] text-gray-600 border border-solid border-gray-300 rounded-md">
+                            <div className='w-2/4 p-1'>
+                                <label htmlFor="publicaSwitch" className="font-medium">
+                                    <span className='block'>Sessão Pública</span>
+                                    <span>de Andamento</span>
+                                    <i
+                                        className="pi pi-question-circle p-1"
+                                        data-pr-position="top"
+                                        style={{ cursor: 'pointer', fontSize: "0.9rem" }}
+                                    />
+                                </label>
+                                <Tooltip
+                                    pt={{
+                                        text: {
+                                            style: { backgroundColor: primaryColor, color: 'text-gray-700' }
+                                        }
+                                    }}
+                                    target=".pi-question-circle"
+                                    className='max-w-[320px] text-[0.85rem]'
+                                >
+                                    {renderTooltip()}
+                                </Tooltip>
+                            </div>
+
+                            <InputSwitch
+                                className='mr-2'
+                                id="publicaSwitch"
+                                checked={isPreviaChecked}
+                                onChange={(e) => onToggle(e.value)}
+                            />
+                        </div>
+                    </div>
+                )}
+
+                {/* Renderiza o botão somente se houver um valor definido em ctaState */}
+                {ctaState && (
+                    <div className='mt-3'>
+                        <Button
+                            onClick={() =>
+                                isPreviaChecked
+                                    ? handleCtaClick("ANDAMENTO")
+                                    : handleCtaClick(cta.chave)
+                            }
+                            pt={{
+                                label: {
+                                    style: { flex: 'none' }
+                                }
+                            }}
+                            className='w-full flex justify-center text-[1rem]'
+                            icon='pi pi-calendar'
+                            label={ctaState}
+                            severity='warning'
+                        />
+                    </div>
+                )}
+            </div>
+        );
     };
 
     return (
@@ -158,28 +209,27 @@ const ProximaEtapa = ({ props }) => {
             className={`card flex flex-col px-4 mt-10 border border-dashed rounded-md shadow-md`}
             style={{ borderColor: primaryColor }}
         >
-            {/* Cabeçalho: Próximos passos */}
+            <div className='text-start -mt-[0.85rem]'>
+                <Tag
+                    className='h-fit text-[1rem] font-semibold'
+                    value="Próximos passos"
+                    style={{ backgroundColor: `${primaryColor}`, color: '#FFFFFF' }}
+                />
+            </div>
+            <div className="flex items-center justify-between mt-2 mb-3">
+                {renderMessage(
+                    instrucoesState,
+                    props?.previaOpcional,
+                    messageColor,
+                    primaryColor,
+                    icon,
+                    isPreviaChecked,
+                    props?.cta,
+                    handleTogglePrevia
+                )}
+            </div>
             <div>
-                <div className='text-start -mt-[0.85rem]'>
-                    <Tag
-                        className='h-fit text-[1rem] font-semibold'
-                        value="Próximos passos"
-                        style={{ backgroundColor: `${primaryColor}`, color: '#FFFFFF' }}
-                    />
-                </div>
-                <div className="flex items-center justify-between mt-2 mb-3">
-                    {/* Chamando renderMessage com instrucoesState e isPreviaChecked */}
-                    {renderMessage(
-                        instrucoesState,
-                        props?.previaOpcional,   // continua respeitando a lógica anterior de exibir ou não a seção
-                        messageColor,
-                        primaryColor,
-                        icon,
-                        isPreviaChecked,
-                        props?.cta,
-                        handleTogglePrevia
-                    )}
-                </div>
+                {renderDialog()}
             </div>
         </div>
     );

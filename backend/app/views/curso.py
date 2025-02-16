@@ -479,8 +479,11 @@ class ProfessoresInternosCursoView(APIView):
             try:
                 usuario = Coordenador.objects.get(user=request.user)
             except Coordenador.DoesNotExist:
-                return Response({"detail": "Usuário não encontrado como Estudante ou Coordenador."}, status=404)
+                pass
+        if SuperAdmin.objects.filter(user=request.user).exists():
+            return Response({"detail: Não foi possível identificar o seu curso. Repita a operação com a conta de Coordenador."}, status=404)
 
+        
         # Obtém o curso associado ao usuário encontrado
         curso = usuario.curso
         professores_internos = ProfessorInterno.objects.filter(cursos=curso, status__aprovacao=True)  # Apenas aprovados

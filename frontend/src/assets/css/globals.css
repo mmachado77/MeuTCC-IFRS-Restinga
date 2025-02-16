@@ -83,6 +83,22 @@ body {
 
 .p-inputswitch.p-highlight .p-inputswitch-slider {
   background: #f97316;
+  border: #f97316;
+}
+
+#dataSessao .p-button{
+  background-color: #f97316;
+  border: 1px solid #f97316;
+}
+
+#horaSessao .p-button{
+  background-color: #f97316;
+  border: 1px solid #f97316;
+}
+
+#agendarSessao .p-button{
+  background-color: #f97316;
+  border: 1px solid #f97316;
 }
 
 .suggestions-container {
