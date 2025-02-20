@@ -9,9 +9,10 @@ from app.services.avaliacao import AvaliacaoService
 from app.models import Tcc, Sessao, SessaoFinal, Avaliacao
 from django.http import FileResponse
 import datetime
+from ..enums import StatusTccEnum
 from meutcc.services import GoogleDriveService
 from meutcc import settings
-from app.models import Credenciais
+from app.models import SessaoFinal, SessaoPrevia, TccStatus
 from google.oauth2.credentials import Credentials
 
 class UploadDocumentoTCCView(CustomAPIView):
@@ -30,15 +31,44 @@ class UploadDocumentoTCCView(CustomAPIView):
             file_name = request.FILES['file'].name
             file_size = request.FILES['file'].size
             
-            # Armazena os metadados como JSON no campo do TCC
+            # Cria os metadados em JSON
             file_metadata = {
                 "id": file_id,
                 "name": file_name,
                 "size": file_size,
                 "dataModificacao": datetime.datetime.now().isoformat()
             }
+            
+            # Obtém o último status do TCC
+            ultimo_status = TccStatus.objects.filter(tcc=tcc).order_by('-dataStatus').first()
+            # Define os statuses para sessão prévia e final usando o enum
+            previa_statuses = [
+                StatusTccEnum.PREVIA_ORIENTADOR,
+                StatusTccEnum.PREVIA_COORDENADOR,
+                StatusTccEnum.PREVIA_AGENDADA
+            ]
+            final_statuses = [
+                StatusTccEnum.FINAL_ORIENTADOR,
+                StatusTccEnum.FINAL_COORDENADOR,
+                StatusTccEnum.FINAL_AGENDADA
+            ]
+            
+            # Atualiza o documento da sessão de acordo com o status atual
+            if ultimo_status and ultimo_status.status in previa_statuses:
+                sessao_previa = SessaoPrevia.objects.filter(tcc=tcc).first()
+                if sessao_previa:
+                    sessao_previa.documentoTCCSessao = json.dumps(file_metadata)
+                    sessao_previa.save()
+            elif ultimo_status and ultimo_status.status in final_statuses:
+                sessao_final = SessaoFinal.objects.filter(tcc=tcc).first()
+                if sessao_final:
+                    sessao_final.documentoTCCSessao = json.dumps(file_metadata)
+                    sessao_final.save()
+            
+            # Atualiza o campo documento do TCC
             tcc.documentoTCC = json.dumps(file_metadata)
             tcc.save()
+            
             return Response({'status': 'success', 'message': 'Upload realizado com sucesso!'}, status=status.HTTP_200_OK)
         except Tcc.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)

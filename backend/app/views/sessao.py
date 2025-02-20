@@ -318,7 +318,7 @@ class AvaliarPreviaView(CustomAPIView):
                     self.tccService.atualizarStatus(sessao.tcc.id, StatusTccEnum.PREVIA_OK)
                 else:
                     self.tccService.atualizarStatus(sessao.tcc.id, StatusTccEnum.REPROVADO_PREVIA, request.data.get('parecer_orientador'))
-                sessao.avaliado = True;
+                sessao.avaliado = True
         elif user == banca.professores.all()[0].user:
             sessao.comentarios_avaliador1 = request.data.get('comentarios_adicionais')
         elif user == banca.professores.all()[1].user:

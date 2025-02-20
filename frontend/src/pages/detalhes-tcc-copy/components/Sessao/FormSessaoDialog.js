@@ -154,9 +154,9 @@ const FormSessao = ({ tipoSessao, viewOnly = false, onClose }) => {
 
   // Função que renderiza o formulário
   const renderForm = () => (
-    <div className="flex flex-col p-4 border border-[#f97316] border-dashed rounded-md shadow-md">
-      <div className="flex flex-col gap-8">
-        <Tag severity="warning" className="text-[1.6rem] p-3">
+    <div className="flex flex-col h-full p-6 border border-[#f97316] border-dashed rounded-md shadow-md">
+      <div className="flex flex-col justify-between gap-8">
+        <Tag severity="warning" className="text-[1.3rem] p-3">
           Agendamento de Sessão
         </Tag>
         {/* Linha 1: Calendários de Data e Hora */}
@@ -263,16 +263,21 @@ const FormSessao = ({ tipoSessao, viewOnly = false, onClose }) => {
     sessaoData.agendamento;
 
   return isFormFilled ? (
-    <div className="flex gap-4 pb-3 transition-all duration-550 ease-out">
-      <div className="w-[40%] transition-all duration-550 ease-out">
+    <div className="flex gap-4 pb-3 transition duration-500">
+      <div className="w-[40%] transition duration-500">
         {renderForm()}
       </div>
-      <div className="w-[60%] transition-all duration-550 ease-out">
-        <CardSessao onHandleLimpar={handleLimpar} onHandleCriar={handleCriarSessao} sessaoData={sessaoData} />
+      <div className="w-[60%] transition duration-500">
+      <CardSessao
+        sessaoData={sessaoData} 
+        onHandleLimpar={handleLimpar}
+        onHandleCriar={handleCriarSessao}
+        readOnly={false}
+      />
       </div>
     </div>
   ) : (
-    <div className="flex justify-center pb-3 transition-all duration-550 ease-out">
+    <div className="flex justify-center pb-3 transition duration-500">
       <div className="max-w-[430px]">{renderForm()}</div>
     </div>
   );

@@ -52,7 +52,6 @@ const CadastroPage = () => {
     };
 
     const submitCadastro = async () => {
-        //console.log('Dados enviados:', userData);
         await UsuarioService.criarUsuario(userData);
     };
 

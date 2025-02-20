@@ -10,7 +10,7 @@ ACAO_MAPPING = {
     "DEFESA": "Agendar Sessão de Defesa",
     "DOCFINAL": "Enviar Documento para Sessão Final",
     "AJUSTE": "Enviar Ajuste",
-    "TERMO": "Submeter Termo de Autorização de Publicação"
+    "TERMO": "Enviar Autorização de Publicação"
 }
 
 def calcular_checklist_tcc(tcc):

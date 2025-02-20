@@ -191,7 +191,7 @@ const SessoesComponent = ({ estudante, orientador, sessoes, status, user, onSuge
                             <p className="mb-7"><b>Parecer Orientador: </b>{sessao.parecer_orientador}</p>
                             <p className="mb-7"><b>Parecer Coordenador: </b> {sessao.parecer_coordenador}</p>
                             <p><b>Documento TCC {sessao.tipo}:</b></p>
-                            <FileItem file={sessao.documentoTCCSessao} prazoEntrega={sessao.prazoEntregaDocumento} user={user} onFileUpload={onFileUpload} onFileDelete={onFileDelete} onFileDownload={onFileDownload} sessaoId={sessao.id} />
+                            {/* <FileItem file={sessao.documentoTCCSessao} prazoEntrega={sessao.prazoEntregaDocumento} user={user} onFileUpload={onFileUpload} onFileDelete={onFileDelete} onFileDownload={onFileDownload} sessaoId={sessao.id} /> */}
                             {(sessao.tipo === 'Sessão Final' && new Date(sessao.data_inicio) < new Date()) && (
                                 <>
                                     <p><b>Ficha Avaliação:</b></p>
@@ -643,7 +643,6 @@ const DetalhesTCC = () => {
     const handleFileUpload = async (file, sessaoId, avaliacaoId, avaliacaoAjusteId) => {
         const formData = new FormData();
         formData.append('file', file);
-        console.log("Sessão Id: " + sessaoId + " Avaliação Id: " + avaliacaoId + " Avaliação Ajuste Id: " + avaliacaoAjusteId);
         try {
             if (avaliacaoId) {
                 await AvaliacaoService.uploadFichaAvaliacao(avaliacaoId, formData);

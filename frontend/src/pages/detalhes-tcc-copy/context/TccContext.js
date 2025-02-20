@@ -7,6 +7,8 @@ const TccContext = createContext();
 export const TccProvider = ({ tccId, children }) => {
   const [tccData, setTccData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [sessaoPrevia, setSessaoPrevia] = useState(null);
+  const [sessaoFinal, setSessaoFinal] = useState(null);
   const [proximosPassos, setProximosPassos] = useState(null);
   const { user } = useAuth();
 
@@ -15,6 +17,13 @@ export const TccProvider = ({ tccId, children }) => {
     try {
       const data = await fetchDetalhesTCC(tccId);
       setTccData(data);
+      // Se houver sessões, extraímos as sessões prévia e final.
+      if (data && data.sessoes && Array.isArray(data.sessoes)) {
+        const previa = data.sessoes.find(s => s.tipo.toLowerCase().includes("sessão prévia"));
+        const final = data.sessoes.find(s => s.tipo.toLowerCase().includes("sessão final"));
+        setSessaoPrevia(previa || null);
+        setSessaoFinal(final || null);
+      }
     } catch (error) {
       console.error('Erro ao buscar detalhes do TCC:', error);
     } finally {
@@ -22,7 +31,7 @@ export const TccProvider = ({ tccId, children }) => {
     }
   };
 
-  // Função para buscar os próximos passos do TCC e atualizar o state
+  // Função para buscar os próximos passos do TCC
   const fetchProximosPassosHandler = async () => {
     try {
       const data = await getProximosPassos(tccId);
@@ -32,26 +41,18 @@ export const TccProvider = ({ tccId, children }) => {
     }
   };
 
-  // Busca os detalhes do TCC quando o tccId estiver disponível
   useEffect(() => {
     if (tccId) {
       fetchData();
     }
   }, [tccId]);
 
-  // Após obter os detalhes do TCC, busca os próximos passos
   useEffect(() => {
     if (tccData) {
       fetchProximosPassosHandler();
     }
   }, [tccData]);
 
-  /**
-   * Atualiza os detalhes do TCC no backend e atualiza os estados locais:
-   * - tccData é recarregado com os dados atualizados.
-   * - proximosPassos é atualizado em seguida.
-   * @param {Object} updatedData - Dados atualizados do TCC.
-   */
   const updateTccDetails = async (updatedData) => {
     setLoading(true);
     try {
@@ -72,9 +73,10 @@ export const TccProvider = ({ tccId, children }) => {
         user,
         loading,
         updateTccDetails,
+        fetchData,
         proximosPassos,
-        fetchData, 
-        fetchProximosPassosHandler, 
+        sessaoPrevia,
+        sessaoFinal,
       }}
     >
       {children}

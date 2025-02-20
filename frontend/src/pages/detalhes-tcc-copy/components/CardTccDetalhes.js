@@ -88,13 +88,14 @@ const CardTccDetalhes = ({isEditable}) => {
         <span className="text-gray-700 leading-relaxed">
           {resumo || 'Nenhum resumo fornecido.'}
         </span>
+        
+      </div>
+      <hr className="border-dashed border-gray-300 w-full mb-4" />
         {isEditable &&(
-        <div className='flex justify-end'>
+        <div className='flex justify-end px-6'>
           <CardEdit />
         </div>
         )}
-      </div>
-      
     </div>
   );
 };

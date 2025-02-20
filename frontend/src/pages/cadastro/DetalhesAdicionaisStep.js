@@ -214,7 +214,6 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
     
             UsuarioService.criarUsuario(formData)
                 .then(response => {
-                    console.log('Usuário criado com sucesso:', response);
                     window.location.pathname = '/';
                 })
                 .catch(error => {
@@ -250,7 +249,6 @@ const DetalhesAdicionaisStep = ({ IsInterno, userData, setUserData, grausAcademi
 
     return (
         <div className='py-6 px-9'>
-            {console.log(userData)}
             <Toast ref={toast} />
             <div className='max-w-screen-md mx-auto bg-white m-3 mt-6 flex flex-col py-6 px-9'>
                 <div className='py-3 border-0 border-b border-dashed border-gray-200'>

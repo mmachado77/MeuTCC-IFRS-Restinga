@@ -49,7 +49,6 @@ const SugestoesTemasTccPage = () => {
                 ? await TccService.getSugestoes()
                 : await TccService.getMinhasSugestoes();
             setSugestoes(data);
-            console.log(data);
         } catch (error) {
             console.error('Erro ao buscar as sugestões de temas', error);
         }

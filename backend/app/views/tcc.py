@@ -138,29 +138,31 @@ class TCCsByAluno(CustomAPIView):
 
 class TCCsByOrientador(CustomAPIView):
     """
-    API para listar todos os TCCs de um orientador.
-
-    Métodos:
-        get(request): Retorna todos os TCCs do orientador autenticado.
+    API para listar todos os TCCs relacionados ao professor autenticado.
+    Isso inclui TCCs em que ele atua como orientador, coorientador ou avaliador.
     """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         """
-        Retorna todos os TCCs do orientador autenticado.
-
-        Args:
-            request (Request): A requisição HTTP.
-
-        Retorna:
-            Response: Resposta HTTP com todos os TCCs do orientador ou mensagem de erro.
+        Retorna todos os TCCs relacionados ao professor autenticado.
+        Filtra TCCs onde:
+          - o professor é orientador (campo 'orientador'),
+          - o professor é coorientador (campo 'coorientador') ou
+          - o professor é avaliador, isto é, consta na lista de professores da banca associada
+            a alguma sessão do TCC (usando os related_names 'sessoes' em Tcc e 'bancas' em Sessao).
         """
         usuario = Usuario.objects.get(user=request.user)
-        
-        tccs = Tcc.objects.filter(Q(orientador=usuario) | Q(coorientador=usuario))
-        
+        tccs = Tcc.objects.filter(
+            Q(orientador=usuario) |
+            Q(coorientador=usuario) |
+            Q(sessoes__bancas__professores=usuario)
+        ).distinct()
+
         serializer = TCCPendentesSerializer(tccs, many=True)
         return Response(serializer.data)
+
+
     
 class PossuiProposta(CustomAPIView):
     """
@@ -713,7 +715,6 @@ class TccProximosPassos(APIView):
                 if item["index"] > current_index and item["required"]:
                     instrucoes = item.get("instrucoes", None)
                     break
-        
         # Sinaliza se o status atual for 'DESENVOLVIMENTO' e a sessão prévia for opcional (Regra OPCIONAL)
         previa_opcional = False
         if status_atual.status == StatusTccEnum.DESENVOLVIMENTO and regra_sessao == RegraSessaoPublicaEnum.OPCIONAL:

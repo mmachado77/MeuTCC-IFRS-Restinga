@@ -4,7 +4,7 @@ import StatusAtual from './CardsDeStatus/StatusAtual';
 import statusMapping from 'meutcc/core/utils/statusMapping';
 import ProximaEtapa from './CardsDeStatus/ProximaEtapa';
 
-const CardProximoPassos = ({ tccId, isEditable }) => {
+const CardProximoPassos = ({ tccId, isEditable, fileItemRef }) => {
   const { tccData, proximosPassos } = useTccContext();
   const [realizarPrevia, setRealizarPrevia] = useState(false);
 
@@ -47,6 +47,7 @@ const CardProximoPassos = ({ tccId, isEditable }) => {
             cta: cta,
             valor: cta?.valor
           }}
+          fileItemRef={fileItemRef}
         />
       )}
     </div>

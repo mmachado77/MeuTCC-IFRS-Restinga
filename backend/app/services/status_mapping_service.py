@@ -101,7 +101,7 @@ def get_status_mapping(regra_sessao: RegraSessaoPublicaEnum) -> List[Dict]:
             "required": previa_required,
             "status": StatusTccEnum.PREVIA_COORDENADOR,
             "mensagem": "Os detalhes da Sessão Pública de Andamento estão sendo analisados pelo Coordenador do Curso.",
-            "instrucoes": "Aguarde que o Coordenador do Curso confirme o agendamento Sessão Pública de Andamento."
+            "instrucoes": "Aguarde que o Orientador encaminhe o agendamento Sessão Pública de Andamento."
         })
         index += 1
 
@@ -111,7 +111,7 @@ def get_status_mapping(regra_sessao: RegraSessaoPublicaEnum) -> List[Dict]:
             "required": previa_required,
             "status": StatusTccEnum.PREVIA_AGENDADA,
             "mensagem": "A Sessão Pública de Andamento foi agendada. Fique atento à data e horário.",
-            "instrucoes": "Prepare-se e esteja pronto na data agendada para a Sessão Pública de Andamento."
+            "instrucoes": "Aguarde que o Coordenador aceite o agendamento Sessão Pública de Andamento."
         })
         index += 1
 
