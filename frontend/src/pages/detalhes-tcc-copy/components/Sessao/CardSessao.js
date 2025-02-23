@@ -56,7 +56,7 @@ const CardSessao = ({
   const avaliador2 = session?.banca?.professores?.[1] || session.avaliador2;
 
   return (
-    <div className="pt-8 px-6 pb-7 gap-6 border min-h-[100%] max-w-[100%] flex flex-col justify-between border-[#f97316] bg-verde-gradient border-dashed rounded-md shadow-md">
+    <div className={`pt-8 px-6 pb-7 gap-6 border min-h-[100%] max-w-[100%] flex flex-col ${readOnly ? 'justify-around' : 'justify-between'} border-[#f97316] bg-verde-gradient border-dashed rounded-md shadow-md`}>
       <div className="flex gap-4 w-fill mt-1">
         <div className="card flex w-[40%] flex-col justify-between py-6 px-4 border-2 border-dashed border-[#22c55e] bg-cardContent-gradient rounded-md shadow-md">
           <div className="text-start -mt-[2.6rem] w-fit">
@@ -111,7 +111,7 @@ const CardSessao = ({
             <InputText
               value={session?.local}
               onChange={() => { /* se for edição, implementar */ }}
-              className="pointer-events-none text-md self-center p-2 bg-none w-full"
+              className=" text-md self-center p-2 bg-none w-full"
             />
           </div>
         </div>

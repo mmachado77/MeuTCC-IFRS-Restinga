@@ -114,7 +114,7 @@ const FileItemSessao = ({ tipoSessao }) => {
                     <div className="w-full">
                         <div className="p-1 border border-dashed border-[#22c55e] shadow-md flex justify-between rounded-xl">
                             <div className="flex flex-col w-full">
-                                <div className="text-center -mt-[1.4rem] pl-7 w-fit">
+                                <div className="text-center -mt-[1.4rem] pl-4 w-fit">
                                     <Tag
                                         icon="pi pi-file-pdf text-lg ml-2"
                                         className="h-fit text-[1.15rem] font-medium gap-2 px-"
@@ -145,7 +145,7 @@ const FileItemSessao = ({ tipoSessao }) => {
                                             )}
                                         </div>
                                     </div>
-                                    <div className="mx-4 py-4 w-3/5 h-fit gap-4  text-[0.85rem] text-gray-600 flex flex-col justify-between">
+                                    <div className="mx-4 py-6 w-3/5 h-fit gap-2  text-[0.85rem] text-gray-600 flex flex-col justify-between">
                                         <div>
                                             <strong>Arquivo:</strong>
                                             <span className="block">{truncateFileName(fileData.name)}</span>
@@ -169,7 +169,8 @@ const FileItemSessao = ({ tipoSessao }) => {
                                                 aria-label="Baixar"
                                                 onClick={handleFileDownload}
                                                 loading={downloadLoading}
-                                                className="w-full"
+                                                pt={{ label: { style: { flex: 'none' } } }}
+                                                className='py-1 flex justify-center'
                                             />
                                         </div>
                                     </div>

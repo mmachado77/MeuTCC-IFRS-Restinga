@@ -181,7 +181,8 @@ const FileItemTCC = forwardRef(
                   aria-label="Atualizar"
                   onClick={handleFileUpdate}
                   loading={uploadLoading || deleteLoading}
-                  className='w-full'
+                  pt={{ label: { style: { flex: 'none' } } }}
+                  className='w-full flex justify-center'
                 />
               </div>
               <div className='flex justify-between gap-2'>
@@ -193,7 +194,8 @@ const FileItemTCC = forwardRef(
                     aria-label="Baixar"
                     onClick={handleFileDownload}
                     loading={downloadLoading}
-                    className='w-full'
+                    pt={{ label: { style: { flex: 'none' } } }}
+                  className='w-full flex justify-center'
                   />
                 </div>
                 <div className='w-2/5'>
@@ -204,7 +206,8 @@ const FileItemTCC = forwardRef(
                     aria-label="Excluir"
                     onClick={handleFileDelete}
                     loading={deleteLoading}
-                    className='w-full'
+                    pt={{ label: { style: { flex: 'none' } } }}
+                  className='w-full flex justify-center'
                   />
                 </div>
               </div>

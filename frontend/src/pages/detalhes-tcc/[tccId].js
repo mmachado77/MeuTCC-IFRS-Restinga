@@ -199,7 +199,7 @@ const SessoesComponent = ({ estudante, orientador, sessoes, status, user, onSuge
                                 </>
                             )}
                             <p className="mb-7"><b>Prazo Para Entrega do Documento:</b> {format(sessao.prazoEntregaDocumento || new Date(), 'dd/MM/yyyy HH:mm')}</p>
-                            {(sessao.validacaoCoordenador == true && sessao.tipo === 'Sessão Final' && new Date(sessao.data_inicio) < new Date() && sessao.avaliacao.ficha_avaliacao.url == null && (user.id === orientador.id || sessao.banca.professores.map(professor => professor.id).includes(user.id))) && (
+                            {(sessao.validacaoCoordenador == true && sessao.tipo === 'Sessão Final' && new Date(sessao.data_inicio) < new Date() && (user.id === orientador.id || sessao.banca.professores.map(professor => professor.id).includes(user.id))) && (
                                 <div>
                                     {sessao.avaliacao.avaliado_orientador == true && sessao.avaliacao.avaliado_avaliador1 == true && sessao.avaliacao.avaliado_avaliador2 == true ? (
                                         <div className='flex flex-column'>

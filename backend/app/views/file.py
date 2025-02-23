@@ -436,5 +436,32 @@ class DownloadFichaAvaliacaoView(CustomAPIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+class DownloadFichaAvaliacaoPreenchidaView(CustomAPIView):
+    """
+    API para download de fichas de avaliação preenchidas.
+
+    Métodos:
+        get(request, avaliacaoId): Realiza o download de uma ficha de avaliação preenchida.
+    """
+    avaliacaoService = AvaliacaoService()
+    def get(self, request, avaliacaoId):
+        """
+        Realiza o download de uma ficha de avaliação preenchida.
+
+        Args:
+            request (Request): A requisição HTTP.
+            avaliacaoId (int): ID da avaliação.
+
+        Retorna:
+            FileResponse: Resposta HTTP com o arquivo preenchido para download ou mensagem de erro.
+        """
+        try:
+            avaliacao = Avaliacao.objects.get(id=avaliacaoId)
+            return self.avaliacaoService.preencherFichaAvaliacao(avaliacao)
+        except Avaliacao.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 

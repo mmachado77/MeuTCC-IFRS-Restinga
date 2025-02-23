@@ -157,7 +157,7 @@ export const AppLayout = ({ children, guards }) => {
             <footer className='bg-green-900 text-white' style={{ background: 'rgb(0 49 21)' }}>
                 <div className="max-w-screen-lg mx-auto flex flex-col-reverse md:flex-row items-center justify-between">
                     <div className="md:max-w-80 p-10 text-xs border-0 border-r-2 border-dashed text-gray-300 bg-black/20 border-black/20">
-                        <Image src="/if.png" width={70} height={95} />
+                        <Image src="/if.png" width={70} height={95}  alt="Logo ifrs"/>
                         <p>
                             <b>Desenvolvido por:</b>
                         </p>

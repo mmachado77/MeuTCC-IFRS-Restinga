@@ -177,7 +177,7 @@ const ProximaEtapa = ({ props, fileItemRef }) => {
                   : handleCtaClick(props?.cta?.chave)
               }
               pt={{ label: { style: { flex: 'none' } } }}
-              className='w-full flex justify-center text-[0.75rem]'
+              className='w-full flex justify-center text-[0.70rem]'
               icon='pi pi-exclamation-circle'
               label={ctaState}
               severity='warning'

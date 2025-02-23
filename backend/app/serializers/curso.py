@@ -40,6 +40,7 @@ class CursoSerializer(serializers.ModelSerializer):
             'prazo_propostas_fim',
             'ultima_atualizacao',
             'data_criacao',
+            'tipo_avaliacao'
         ]
 
 class CoordenadorNomeSerializer(serializers.Serializer):

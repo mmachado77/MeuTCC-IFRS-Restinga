@@ -1,13 +1,12 @@
 from django.db import models
 from django.utils.timezone import now
 from .professor import Professor
-from app.enums import RegraSessaoPublicaEnum
-
+from app.enums import RegraSessaoPublicaEnum, TipoAvaliacaoEnum
 
 class Curso(models.Model):
     """
     Modelo que representa um curso no sistema.
-
+    
     Atributos:
         nome (CharField): Nome completo do curso.
         sigla (CharField): Sigla do curso (ex: ADS, ENG).
@@ -20,24 +19,9 @@ class Curso(models.Model):
         prazo_propostas_inicio (DateField): Data de início do prazo para envio de propostas.
         prazo_propostas_fim (DateField): Data de fim do prazo para envio de propostas.
         professores (ManyToManyField): Professores associados ao curso.
+        tipo_avaliacao (CharField): Define se será usado o padrão ADS ou não avaliar via sistema.
         template_avaliacao (OneToOneField): Template de avaliação associado ao curso.
         historico_coordenadores (Reverse Relationship): Histórico de coordenadores associados ao curso.
-
-    Métodos:
-        get_coordenador_atual():
-            Retorna o coordenador atual do curso com base no histórico de coordenadores.
-
-        is_prazo_propostas_aberto():
-            Retorna um booleano indicando se o período para envio de propostas está aberto.
-
-        get_template_avaliacao():
-            Retorna o template de avaliação associado ao curso. Retorna None caso não exista um template.
-
-        get_historico_coordenadores():
-            Retorna o histórico completo de coordenadores do curso, incluindo o nome e a data de alteração, ordenados do mais recente ao mais antigo.
-
-        __str__():
-            Retorna uma representação em string do curso com o nome e a sigla.
     """
 
     nome = models.CharField(max_length=255, verbose_name="Nome do curso")
@@ -45,7 +29,6 @@ class Curso(models.Model):
     descricao = models.TextField(null=True, blank=True, verbose_name="Descrição")
     ultima_atualizacao = models.DateTimeField(auto_now=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
-
     limite_orientacoes = models.IntegerField(
         verbose_name="Limite de orientações por professor", default=5
     )
@@ -62,11 +45,18 @@ class Curso(models.Model):
     prazo_propostas_fim = models.DateField(
         verbose_name="Fim do prazo para envio de propostas"
     )
-
     professores = models.ManyToManyField(
         Professor,
         related_name="cursos",
         verbose_name="Professores associados ao curso",
+    )
+
+    # Adiciona o enum de avaliação com o padrão ADS como default.
+    tipo_avaliacao = models.CharField(
+        max_length=100,
+        choices=TipoAvaliacaoEnum.choices,
+        default=TipoAvaliacaoEnum.ADS,
+        verbose_name="Tipo de Avaliação"
     )
 
     def __str__(self):
@@ -77,7 +67,6 @@ class Curso(models.Model):
             "Análise e Desenvolvimento de Sistemas (ADS)"
         """
         return f"{self.nome} ({self.sigla})"
-
 
     def get_coordenador_atual(self):
         """
@@ -106,7 +95,6 @@ class Curso(models.Model):
             for item in historico
         ]
 
-
     def is_prazo_envio_propostas_aberto(self):
         """
         Verifica se o período para envio de propostas está aberto.
@@ -127,8 +115,6 @@ class Curso(models.Model):
         """
         return getattr(self, 'template_avaliacao', None)
 
-
     class Meta:
         verbose_name = "Curso"
-        verbose_name_plural = "Cursos"    
-
+        verbose_name_plural = "Cursos"

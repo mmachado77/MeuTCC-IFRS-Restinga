@@ -19,7 +19,8 @@ module.exports = {
         'verde-gradient' : 'linear-gradient(43deg, rgba(228,248,240,1) 0%, rgba(228,248,240,1) 30%, rgba(228,248,240,1) 60%, rgba(228,248,240,1) 90%);',
         'data-gradient' : 'linear-gradient(0deg, rgba(34,197,94,1) 28%, rgba(24,164,76,1) 65%);',
         'hora-gradient' : 'linear-gradient(90deg, rgba(34,197,94,1) 0%, rgba(24,164,76,1) 90%);',
-        'relogio-gradient' : 'linear-gradient(270deg, rgba(34,197,94,1) 0%, rgba(24,164,76,1) 90%);'
+        'relogio-gradient' : 'linear-gradient(270deg, rgba(34,197,94,1) 0%, rgba(24,164,76,1) 90%);',
+        'avaliacao-gradient' : 'linear-gradient(45deg, rgba(229,231,235,1) 25%, rgba(255,255,255,1) 71%);'
       },
     },
   },
