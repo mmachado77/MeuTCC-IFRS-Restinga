@@ -38,7 +38,7 @@ const CardProximoPassos = ({ tccId, isEditable, fileItemRef }) => {
         mostrarTimeline={isEditable}
         reprovado={tccData?.cancelado}
       />
-      {!tccData?.concluido && (
+      {(!tccData?.concluido || !tccData?.autorizacaoPublicacao) && (
         <ProximaEtapa
           key={status_atual?.dataStatus} // Força a remontagem quando os dados mudarem
           props={{

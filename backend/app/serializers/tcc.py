@@ -28,7 +28,7 @@ class TccSerializer(serializers.ModelSerializer):
     semestre = SemestreSerializer()
     documentoTCC = FileDetailSerializer()
     curso = CursoSerializer()
-    autorizacaoPublicacao = ''
+    autorizacaoPublicacao = FileDetailSerializer()
     status = serializers.SerializerMethodField(method_name='get_status')
     sessoes = serializers.SerializerMethodField(method_name='get_sessoes')
 
@@ -51,6 +51,16 @@ class TccSerializer(serializers.ModelSerializer):
         """
         sessoes_objects = Sessao.objects.filter(tcc=obj)
         return SessaoPolymorphicSerializer(sessoes_objects, many=True).data
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Se o documentoTCC estiver vazio, retorna null
+        if not instance.documentoTCC:
+            data['documentoTCC'] = None
+        # Se a autorização de publicação estiver vazia, retorna null
+        if not instance.autorizacaoPublicacao:
+            data['autorizacaoPublicacao'] = None
+        return data
 
     class Meta:
         model = Tcc

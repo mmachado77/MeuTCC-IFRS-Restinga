@@ -27,7 +27,7 @@ const BancaComentariosDialog = ({ session }) => {
     return (
       <div>
         <Tag
-        style={{background: 'linear-gradient(43deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 30%, rgba(255,255,255,0.7) 60%, rgba(255,255,255,0.4) 90%);'}}
+        style={{background: 'linear-gradient(43deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 30%, rgba(255,255,255,0.7) 60%, rgba(255,255,255,0.4) 90%)'}}
         className="bg-transparent w-full justify-start shadow-md shadow-[#22c55e]/50">
           <div className="flex justify-between gap-2 p-2 bg-none">
             <Avatar

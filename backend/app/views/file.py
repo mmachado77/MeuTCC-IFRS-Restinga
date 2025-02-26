@@ -287,9 +287,10 @@ class UploadAutorizacaoPublicacaoView(CustomAPIView):
     API para upload de autorização de publicação do TCC.
 
     Métodos:
-        post(request, tccId): Realiza o upload da autorização de publicação do TCC.
+        post(request, tccId): Realiza o upload da autorização de publicação do TCC via Google Drive.
     """
     parser_classes = (MultiPartParser, FormParser)
+    googleDriveService = GoogleDriveService()
 
     def post(self, request, tccId, *args, **kwargs):
         """
@@ -304,13 +305,27 @@ class UploadAutorizacaoPublicacaoView(CustomAPIView):
         """
         try:
             tcc = Tcc.objects.get(id=tccId)
-            tcc.autorizacaoPublicacao = request.data['file']
+            file = request.FILES['file']
+            file_id = self.googleDriveService.upload_file(file)
+            if file_id is None:
+                return Response({"error": "Falha no upload para o Google Drive"}, status=status.HTTP_400_BAD_REQUEST)
+
+            file_metadata = {
+                "id": file_id,
+                "name": file.name,
+                "size": file.size,
+                "dataModificacao": datetime.datetime.now().isoformat()
+            }
+            # Salva apenas os metadados (em formato JSON) no campo autorizacaoPublicacao do TCC
+            tcc.autorizacaoPublicacao = json.dumps(file_metadata)
             tcc.save()
-            return Response(status=status.HTTP_200_OK)
+
+            return Response({'status': 'success', 'message': 'Upload realizado com sucesso!'}, status=status.HTTP_200_OK)
         except Tcc.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
         
 class DownloadDocumentoTCCView(CustomAPIView):
     """

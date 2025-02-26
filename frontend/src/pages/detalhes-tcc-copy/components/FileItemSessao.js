@@ -117,7 +117,7 @@ const FileItemSessao = ({ tipoSessao }) => {
                                 <div className="text-center -mt-[1.4rem] pl-4 w-fit">
                                     <Tag
                                         icon="pi pi-file-pdf text-lg ml-2"
-                                        className="h-fit text-[1.15rem] font-medium gap-2 px-"
+                                        className="h-fit text-[1.15rem] font-medium gap-2"
                                         value="Documento da Sessão"
                                         style={{ backgroundColor: '#22c55e', color: '#FFFFFF' }}
                                     />

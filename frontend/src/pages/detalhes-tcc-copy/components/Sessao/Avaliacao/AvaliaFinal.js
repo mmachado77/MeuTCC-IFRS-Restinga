@@ -187,7 +187,7 @@ const AvaliaFinal = ({ session }) => {
               </div>
               <div className="grid grid-cols-2 gap-8 mt-5">
                 <div className="flex flex-col gap-2 items-start w-full">
-                  <label htmlFor="estrutura_trabalho"><b>Estrutura do Trabalho</b></label>
+                  <label className='text-[0.9rem]' htmlFor="estrutura_trabalho"><b>Estrutura do Trabalho</b></label>
                   <InputNumber
                     className="w-full"
                     id="estrutura_trabalho"
@@ -203,7 +203,7 @@ const AvaliaFinal = ({ session }) => {
                   {notaEstruturaMensagemErro && <small className="px-2 py-1 text-red-500">{notaEstruturaMensagemErro}</small>}
                 </div>
                 <div className="flex flex-col gap-2 items-start w-full">
-                  <label htmlFor="relevancia_originalidade_qualidade"><b>Relevância, Originalidade e Qualidade do Conteúdo</b></label>
+                  <label className='text-[0.9rem]' htmlFor="relevancia_originalidade_qualidade"><b>Relevância, Originalidade e Qualidade do Conteúdo</b></label>
                   <InputNumber
                     className="w-full"
                     id="relevancia_originalidade_qualidade"
@@ -221,7 +221,7 @@ const AvaliaFinal = ({ session }) => {
               </div>
               <div className="grid grid-cols-2 gap-8 mt-5">
                 <div className="flex flex-col gap-2 items-start w-full">
-                  <label htmlFor="grau_conhecimento"><b>Grau de Conhecimento</b></label>
+                  <label className='text-[0.9rem]' htmlFor="grau_conhecimento"><b>Grau de Conhecimento</b></label>
                   <InputNumber
                     className="w-full"
                     id="grau_conhecimento"
@@ -237,7 +237,7 @@ const AvaliaFinal = ({ session }) => {
                   {notaConhecimentoMensagemErro && <small className="px-2 py-1 text-red-500">{notaConhecimentoMensagemErro}</small>}
                 </div>
                 <div className="flex flex-col gap-2 items-start w-full">
-                  <label htmlFor="bibliografia_apresentada"><b>Bibliografia Apresentada</b></label>
+                  <label className='text-[0.9rem]' htmlFor="bibliografia_apresentada"><b>Bibliografia Apresentada</b></label>
                   <InputNumber
                     className="w-full"
                     id="bibliografia_apresentada"
@@ -267,7 +267,7 @@ const AvaliaFinal = ({ session }) => {
               </div>
               <div className="grid grid-cols-2 gap-8 mt-5">
                 <div className="flex flex-col gap-2 items-start w-full">
-                  <label htmlFor="utilizacao_recursos_didaticos"><b>Utilização de Recursos Didáticos</b></label>
+                  <label className='text-[0.9rem]' htmlFor="utilizacao_recursos_didaticos"><b>Utilização de Recursos Didáticos</b></label>
                   <InputNumber
                     className="w-full"
                     id="utilizacao_recursos_didaticos"
@@ -283,7 +283,7 @@ const AvaliaFinal = ({ session }) => {
                   {notaRecursosMensagemErro && <small className="px-2 py-1 text-red-500">{notaRecursosMensagemErro}</small>}
                 </div>
                 <div className="flex flex-col gap-2 items-start w-full">
-                  <label htmlFor="conteudo_apresentacao"><b>Conteúdo da Apresentação</b></label>
+                  <label className='text-[0.9rem]' htmlFor="conteudo_apresentacao"><b>Conteúdo da Apresentação</b></label>
                   <InputNumber
                     className="w-full"
                     id="conteudo_apresentacao"
@@ -301,7 +301,7 @@ const AvaliaFinal = ({ session }) => {
               </div>
               <div className="grid grid-cols-2 gap-8 mt-5">
                 <div className="flex flex-col gap-2 items-start w-full">
-                  <label htmlFor="utilizacao_tempo_sintese"><b>Utilização do Tempo e Poder de Síntese</b></label>
+                  <label className='text-[0.9rem]' htmlFor="utilizacao_tempo_sintese"><b>Utilização do Tempo e Poder de Síntese</b></label>
                   <InputNumber
                     className="w-full"
                     id="utilizacao_tempo_sintese"
@@ -338,13 +338,13 @@ const AvaliaFinal = ({ session }) => {
                       onChange={handleAdequacoesChange}
                       checked={necessarioAdequacoes}
                     />
-                    <label htmlFor="adequacoes" className="ml-2">
+                    <label className='text-[0.9rem] ml-2' htmlFor="adequacoes" >
                       O Trabalho de Conclusão de Curso (TCC) necessita de adequações para aprovação da versão final
                     </label>
                   </div>
                   <div className="grid grid-cols-2 gap-8" style={{ display: necessarioAdequacoes ? 'flex' : 'none' }}>
                     <div className="flex flex-col gap-2 items-start w-full">
-                      <label htmlFor="data_entrega"><b>Data</b></label>
+                      <label className='text-[0.9rem]' htmlFor="data_entrega"><b>Data</b></label>
                       <Calendar
                         className="w-full"
                         id="data_entrega"
@@ -359,7 +359,7 @@ const AvaliaFinal = ({ session }) => {
                       {dataEntregaMensagemErro && <small className="px-2 py-1 text-red-500">{dataEntregaMensagemErro}</small>}
                     </div>
                     <div className="flex flex-col gap-2 items-start w-full">
-                      <label htmlFor="horario_entrega"><b>Horário</b></label>
+                      <label className='text-[0.9rem]' htmlFor="horario_entrega"><b>Horário</b></label>
                       <Calendar
                         className="w-full"
                         id="horario_entrega"
@@ -374,7 +374,7 @@ const AvaliaFinal = ({ session }) => {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2 my-3 items-start" style={{ display: necessarioAdequacoes ? 'flex' : 'none' }}>
-                    <label htmlFor="adequacoes_necessarias" className="ml-2"><b>Adequações Necessárias</b></label>
+                    <label className='text-[0.9rem] ml-2' htmlFor="adequacoes_necessarias" ><b>Adequações Necessárias</b></label>
                     <InputTextarea
                       id="adequacoes_necessarias"
                       name="adequacoes_necessarias"
@@ -387,7 +387,7 @@ const AvaliaFinal = ({ session }) => {
                 </>
               )}
               <div className="flex flex-wrap gap-2 my-3 items-start">
-                <label htmlFor="comentarios_adicionais" className="ml-2"><b>Comentários Adicionais</b></label>
+                <label className='text-[0.9rem] ml-2' htmlFor="comentarios_adicionais"><b>Comentários Adicionais</b></label>
                 <InputTextarea
                   id="comentarios_adicionais"
                   name="comentarios_adicionais"

@@ -720,6 +720,11 @@ class TccProximosPassos(APIView):
         if status_atual.status == StatusTccEnum.DESENVOLVIMENTO and regra_sessao == RegraSessaoPublicaEnum.OPCIONAL:
             previa_opcional = True
         
+        if status_atual.status == StatusTccEnum.AJUSTE:
+            instrucoes = "Realize os ajustes e solicite nova avaliação."
+        if status_atual.status == StatusTccEnum.APROVADO:
+            instrucoes = "Providencie, assine e submeta o Termo de Autorização de Publicação."
+
         checklist = calcular_checklist_tcc(tcc)
 
         try:

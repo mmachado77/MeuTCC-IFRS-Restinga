@@ -9,6 +9,7 @@ import AvaliaPreviaOrientador from './Sessao/Avaliacao/AvaliaPreviaOrientador';
 import AvaliaFinal from './Sessao/Avaliacao/AvaliaFinal';
 import StatusAvaliacaoMeteor from './Sessao/Avaliacao/StatusAvaliacaoMeteor';
 import BancaComentariosDialog from './Sessao/Avaliacao/BancaComentariosDialog';
+import BotoesAvaliacao from './Sessao/Avaliacao/BotoesAvaliacao';
 
 const renderAvaliacao = (session) => {
   const { user, tccData } = useTccContext();
@@ -52,40 +53,10 @@ const renderAvaliacao = (session) => {
       user?.id === session?.banca?.professores[1]?.id ||
       user?.id === tccData?.orientador?.id
     ) {
-      if(avaliado){
-        return (
-          <div className='gap-2 pt-2 px-2 flex w-full'>
-            <div className={isOrientador? 'w-5/8' : 'w-full text-lg'}>
-              <Button
-                label="Baixar Avaliação"
-                pt={{ label: { style: { flex: 'none' } } }}
-                icon="pi pi-file-check"
-                outlined={isOrientador}
-                className="py-1 flex justify-center items-center text-sm w-full p-button-success"
-                onClick=""
-              />
-            </div>
-            {isOrientador &&
-            <div className='w-3/8'>
-              <Button
-                label="Anexar Ficha"
-                pt={{ label: { style: { flex: 'none' } } }}
-                icon="pi pi-file-arrow-up"
-                className="py-1 flex justify-center items-center text-sm w-full p-button-warning"
-                onClick=""
-              />
-            </div>
-            }
-          </div>
-        )
-      } else{
-        return(
-          <div className='px-2 pt-4'>
-            <AvaliaFinal session={session} />
-          </div>
-        );
-      }
-      
+      return (
+        <BotoesAvaliacao isOrientador={isOrientador} session={session} avaliado={avaliado} />
+      );
+
     }
     return null;
   } else {

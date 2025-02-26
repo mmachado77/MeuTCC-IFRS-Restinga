@@ -197,7 +197,7 @@ def get_status_mapping(regra_sessao: RegraSessaoPublicaEnum) -> List[Dict]:
         "required": True,
         "status": StatusTccEnum.APROVADO,
         "mensagem": "Parabéns! Seu TCC foi aprovado e concluído com sucesso.",
-        "instrucoes": "Prepare-se e esteja pronto na data agendada para a Sessão Pública de Defesa. Boa sorte!"
+        "instrucoes": "Aguarde o resultado da avaliação da banca."
     })
 
     return mapping

@@ -4,6 +4,13 @@ import FileItemTCC from './components/FileItemTCC';
 import CardTccDetalhes from './components/CardTccDetalhes';
 import CardProximoPassos from './components/CardProximoPassos';
 import SessoesDetalhes from './components/SessoesDetalhes';
+import Ajuste from './components/Sessao/Avaliacao/Ajuste';
+
+const renderAjuste = () =>{
+  return(
+    <Ajuste/>
+  )
+}
 
 const MontaTela = () => {
   const { tccData, user, updateTccDetails, sessaoPrevia, sessaoFinal } = useTccContext();
@@ -14,12 +21,18 @@ const MontaTela = () => {
       (user.id && tccData.autor?.id && user.id === tccData.autor.id) ||
       (user.id && tccData.orientador?.id && user.id === tccData.orientador.id));
 
+  const inAjuste = 
+  tccData?.status?.[tccData.status.length - 1]?.status === "AJUSTE" &&
+  (user?.id === tccData.autor?.id || user?.id === tccData.orientador?.id);
+    
   // Cria a ref para acessar os métodos do FileItemTCC
   const fileItemRef = useRef(null);
 
-
   return (
-    <div className="p-4 max-w-screen-lg mx-auto bg-white my-6 rounded-lg">
+    <div className="p-8 max-w-screen-lg mx-auto bg-white my-6 rounded-lg flex flex-col gap-6">
+      <div className='flex flex-col'>
+        {inAjuste && renderAjuste()}
+        </div>
       <div className="flex gap-4">
         <div className="w-3/5">
           <CardTccDetalhes isEditable={isEditable} />

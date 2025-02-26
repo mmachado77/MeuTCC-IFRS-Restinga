@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Tag } from 'primereact/tag';
 import { Message } from 'primereact/message';
 import { Button } from 'primereact/button';
@@ -6,6 +6,9 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { Tooltip } from 'primereact/tooltip';
 import { Dialog } from 'primereact/dialog';
 import FormSessaoDialog from '../Sessao/FormSessaoDialog';
+import TccService from '../../../../services/TccService'
+import { useTccContext } from '../../context/TccContext';
+import { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
 
 const renderMessageContent = (instrucoes, primaryColor, icon) => {
   return (
@@ -26,23 +29,25 @@ const ProximaEtapa = ({ props, fileItemRef }) => {
   const icon = "pi pi-exclamation-circle";
   const ctaRecebido = props?.valor; // Valor inicial (pode ser null)
 
-  // Estado para alternar se a prévia está marcada ou não
+  // Obtenha os dados do TCC via contexto
+  const { tccData, fetchData } = useTccContext();
+
+  // Estados de controle
   const [isPreviaChecked, setIsPreviaChecked] = useState(false);
-  // Estado para armazenar instruções (valor inicial via props)
   const [instrucoesState, setInstrucoesState] = useState(props?.instrucoes);
-  // Estado para a CTA; inicialmente, se não houver valor recebido, será null
   const [ctaState, setCtaState] = useState(ctaRecebido);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [tipoSessaoDialog, setTipoSessaoDialog] = useState(null);
+  const [editFormState, setEditFormState] = useState(false);
+  const [uploadTermoLoading, setUploadTermoLoading] = useState(false);
+
+  // Ref para input de upload do Termo de Autorização de Publicação
+  const termoFileRef = useRef(null);
 
   useEffect(() => {
     setCtaState(props?.valor);
     setInstrucoesState(props?.instrucoes);
   }, [props?.valor, props?.instrucoes]);
-
-  // Estados para controlar o diálogo de sessão
-  const [openDialog, setOpenDialog] = useState(false);
-  const [tipoSessaoDialog, setTipoSessaoDialog] = useState(null);
-  const [editFormState, setEditFormState] = useState(false);
-  
 
   const handleTogglePrevia = (checked) => {
     setIsPreviaChecked(checked);
@@ -104,7 +109,10 @@ const ProximaEtapa = ({ props, fileItemRef }) => {
         console.log("Handler para Enviar Ajuste");
         break;
       case "TERMO":
-        console.log("Handler para Submeter Termo de Autorização de Publicação");
+        // Aciona o input oculto para upload do Termo de Autorização de Publicação
+        if (termoFileRef && termoFileRef.current) {
+          termoFileRef.current.click();
+        }
         break;
       default:
         console.log("Ação não definida para a chave:", chave);
@@ -188,11 +196,43 @@ const ProximaEtapa = ({ props, fileItemRef }) => {
     );
   };
 
+  // Handler para o upload do Termo de Autorização de Publicação
+  const handleTermoFileChange = async (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      setUploadTermoLoading(true);
+      try {
+        await TccService.uploadAutorizacaoPublicacao(tccData?.id, formData);
+        handleApiResponse({ data: { message: "Upload do Termo realizado com sucesso!" } });
+        await fetchData({});
+      } catch (error) {
+        handleApiResponse(error.response);
+        console.error("Erro no upload do Termo:", error);
+      } finally {
+        setUploadTermoLoading(false);
+        if (termoFileRef.current) {
+          termoFileRef.current.value = null;
+        }
+      }
+    }
+  };
+  
+
   return (
     <div
       className={`card flex flex-col px-4 mt-10 border border-dashed rounded-md shadow-md`}
       style={{ borderColor: primaryColor }}
     >
+      {/* Input oculto para upload do Termo */}
+      <input
+        type="file"
+        accept="application/pdf"
+        style={{ display: 'none' }}
+        ref={termoFileRef}
+        onChange={handleTermoFileChange}
+      />
       <div className='text-start -mt-[0.85rem]'>
         <Tag
           className='h-fit text-[1rem] font-semibold'

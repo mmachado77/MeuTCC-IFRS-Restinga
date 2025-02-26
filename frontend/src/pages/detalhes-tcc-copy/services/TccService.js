@@ -23,19 +23,14 @@ export async function fetchDetalhesTCC(tccId) {
 export async function updateDetalhesTCC(tccId, data) {
     try {
         const response = await apiClient.patch(`/app/editar-tcc/${tccId}/`, data);
-        return response.data; // Retorna os dados apenas em caso de sucesso
+        return response.data;
     } catch (error) {
-        throw error.response?.data || error.message; // Propaga o erro
+        throw error.response?.data || error.message;
     }
 }
 
 /**
  * Busca os próximos passos do TCC com base no ID fornecido.
- *
- * Essa função retorna informações sobre o fluxo de status do TCC, 
- * incluindo o status atual, a mensagem associada e o próximo status obrigatório, 
- * conforme as regras do curso.
- *
  * @param {string} tccId - ID do TCC para o qual os próximos passos serão buscados.
  * @returns {Promise<Object>} - Dados referentes aos próximos passos do TCC.
  * @throws {Error} - Em caso de falha na requisição, lança erro com a mensagem apropriada.
@@ -49,3 +44,4 @@ export async function getProximosPassos(tccId) {
         throw new Error(error.response?.data?.message || 'Erro ao buscar os próximos passos do TCC');
     }
 }
+
