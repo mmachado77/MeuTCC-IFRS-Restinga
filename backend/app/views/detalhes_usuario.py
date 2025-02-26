@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from app.models import Usuario, User, SuperAdmin
-from app.serializers import UsuarioPolymorphicSerializer
+from app.serializers import DetalhesUsuarioPolymorphicSerializer
 
 class DetalhesUsuario(CustomAPIView):
     """
@@ -31,7 +31,7 @@ class DetalhesUsuario(CustomAPIView):
         try:
             # Tenta buscar o usuário no modelo Usuario
             usuario = Usuario.objects.get(user=request.user)
-            serializer = UsuarioPolymorphicSerializer(usuario)
+            serializer = DetalhesUsuarioPolymorphicSerializer(usuario)
             return Response(serializer.data)
 
         except Usuario.DoesNotExist:

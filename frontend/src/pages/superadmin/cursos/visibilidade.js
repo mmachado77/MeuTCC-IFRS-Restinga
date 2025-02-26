@@ -143,13 +143,6 @@ const GerenciarVisibilidadeCursos = () => {
     />
   );
 
-  // Texto do Tooltip (exibido ao passar o mouse no ícone de info)
-  const tooltipContent = `
-    Não é possível excluir cursos, pois isso apagaria em cascata todos 
-    os TCCs e Estudantes associados a esse curso. Desativar a visibilidade 
-    fará com que ele não apareça como opção no momento do cadastro.
-  `;
-
   // Header do Card, com botão "Voltar ao Dashboard"
   const header = (
     <div className="flex justify-between items-center px-6 pt-6">
@@ -164,6 +157,14 @@ const GerenciarVisibilidadeCursos = () => {
       />
     </div>
   );
+  const renderTooltip = () => {
+    return (
+        <div className='flex flex-col gap-1'>
+            <span className='block'>Não é possível excluir cursos, pois isso apagaria em cascata todos os TCCs e Estudantes associados a esse curso.</span>
+            <span className='block'>Desativar a visibilidade fará com que ele não apareça como opção para cadastro.</span>
+        </div>
+    )
+}
 
   return (
     <div className="p-4 max-w-screen-lg mx-auto">
@@ -171,7 +172,21 @@ const GerenciarVisibilidadeCursos = () => {
         <Toast ref={toast} />
 
         {/* Tooltip configurado para mostrar ao passar em cima do ícone */}
-        <Tooltip target=".info-icon" content={tooltipContent} position="right" event="hover" className='max-w-[350px]'/>
+        <Tooltip
+        target=".info-icon"
+        position="left"
+        event="hover"
+        className='max-w-[350px]'
+        pt={{
+          text: {
+          style:
+            { backgroundColor: '#22c55e',
+                
+            }
+          }
+        }}>
+        {renderTooltip()}
+        </Tooltip>
 
         <DataTable
           value={cursos}

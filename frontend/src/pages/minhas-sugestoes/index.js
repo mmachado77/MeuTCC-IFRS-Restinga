@@ -4,6 +4,7 @@ import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import { FilterMatchMode } from 'primereact/api';
 import { GUARDS } from 'meutcc/core/constants';
+import {AdminCursoService} from '../../services/CursoService';
 import TccService from 'meutcc/services/TccService';
 import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
 import { Button } from 'primereact/button';
@@ -11,8 +12,8 @@ import { Dialog } from 'primereact/dialog';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
-
-import { useAuth } from 'meutcc/core/context/AuthContext'; // TODO Ver se essa importação não é redundante
+import { Dropdown } from 'primereact/dropdown'; // Import do componente Dropdown
+import { useAuth } from 'meutcc/core/context/AuthContext';
 
 const SugestoesTemasTccPage = () => {
     const [loading, setLoading] = useState(false);
@@ -29,6 +30,10 @@ const SugestoesTemasTccPage = () => {
     const [themeToDelete, setThemeToDelete] = useState(null);
     const [expandedRows, setExpandedRows] = useState(null);
 
+    // Novos estados para o Dropdown de Cursos
+    const [cursos, setCursos] = useState([]);
+    const [cursoSelecionado, setCursoSelecionado] = useState(null);
+
     const { user } = useAuth();
 
     const initFilters = () => {
@@ -40,18 +45,29 @@ const SugestoesTemasTccPage = () => {
     const fetchSugestoesTcc = async () => {
         setLoading(true);
         try {
-            const data = user.resourcetype === 'Coordenador' ? await TccService.getSugestoes() : await TccService.getMinhasSugestoes();
+            const data = user.resourcetype === 'Coordenador'
+                ? await TccService.getSugestoes()
+                : await TccService.getMinhasSugestoes();
             setSugestoes(data);
-            console.log(data);
         } catch (error) {
-            console.error('Erro ao buscar as sugestoes de temas', error);
+            console.error('Erro ao buscar as sugestões de temas', error);
         }
         setLoading(false);
     };
 
+    // Buscando os cursos do usuário ao montar o componente
     useEffect(() => {
         initFilters();
         fetchSugestoesTcc();
+
+        // Chamada do serviço para obter os cursos do usuário
+        AdminCursoService.getCursosByUsuario()
+            .then(data => {
+                setCursos(data);
+            })
+            .catch(error => {
+                console.error('Erro ao carregar cursos:', error);
+            });
     }, []);
 
     const onTableSearchChange = (e) => {
@@ -65,9 +81,9 @@ const SugestoesTemasTccPage = () => {
     const renderHeader = (
         <div className="flex justify-content-between">
             <IconField iconPosition="left">
-                    <InputIcon className="pi pi-search" />
-                    <InputText value={tableSearchValue} onChange={onTableSearchChange} placeholder="Buscar tema" />
-                </IconField>
+                <InputIcon className="pi pi-search" />
+                <InputText value={tableSearchValue} onChange={onTableSearchChange} placeholder="Buscar tema" />
+            </IconField>
         </div>
     );
 
@@ -89,18 +105,23 @@ const SugestoesTemasTccPage = () => {
         setEditTitulo('');
         setEditDescricao('');
         setSelectedTema(null);
+        setTitulo('');
+        setDescricao('');
+        setCursoSelecionado(null);
     };
 
     const handleSubmit = async () => {
-        console.log('handleSubmit chamado'); // Verifique se isso é logado
+        console.log('handleSubmit chamado'); // Para depuração
         try {
-            const data = { titulo, descricao };
+            // Incluindo o curso selecionado no payload, se necessário
+            const data = { titulo, descricao, curso: cursoSelecionado };
             const response = await TccService.createTema(data);
-            console.log('Resposta da API:', response); // Verifique se isso é logado
+            console.log('Resposta da API:', response);
             fetchSugestoesTcc();
             setDisplayDialog(false);
             setTitulo('');
             setDescricao('');
+            setCursoSelecionado(null);
         } catch (error) {
             console.error('Erro ao criar sugestão', error);
         }
@@ -110,6 +131,8 @@ const SugestoesTemasTccPage = () => {
         setSelectedTema(rowData);
         setEditTitulo(rowData.titulo);
         setEditDescricao(rowData.descricao);
+        // Se o tema possuir informação de curso, pode ser pré-selecionado aqui:
+        setCursoSelecionado(rowData.curso || null);
         setDisplayDialog(true);
     };
 
@@ -120,6 +143,7 @@ const SugestoesTemasTccPage = () => {
                 titulo: editTitulo,
                 descricao: editDescricao,
                 professor: selectedTema.professor.id,
+                curso: cursoSelecionado
             };
             await TccService.updateTema(selectedTema.id, data);
             fetchSugestoesTcc();
@@ -127,6 +151,7 @@ const SugestoesTemasTccPage = () => {
             setSelectedTema(null);
             setEditTitulo('');
             setEditDescricao('');
+            setCursoSelecionado(null);
         } catch (error) {
             console.error('Erro ao atualizar tema', error);
         }
@@ -171,13 +196,39 @@ const SugestoesTemasTccPage = () => {
                 <div className="p-fluid">
                     <div className="p-field">
                         <label htmlFor="titulo">Título</label>
-                        <InputText id="titulo" value={isEdit ? editTitulo : titulo} onChange={(e) => isEdit ? setEditTitulo(e.target.value) : setTitulo(e.target.value)} />
+                        <InputText
+                            id="titulo"
+                            value={isEdit ? editTitulo : titulo}
+                            onChange={(e) => isEdit ? setEditTitulo(e.target.value) : setTitulo(e.target.value)}
+                        />
                     </div>
                     <div className="p-field mt-2">
                         <label htmlFor="descricao">Descrição</label>
-                        <InputTextarea id="descricao" value={isEdit ? editDescricao : descricao} onChange={(e) => isEdit ? setEditDescricao(e.target.value) : setDescricao(e.target.value)} rows={3} />
+                        <InputTextarea
+                            id="descricao"
+                            value={isEdit ? editDescricao : descricao}
+                            onChange={(e) => isEdit ? setEditDescricao(e.target.value) : setDescricao(e.target.value)}
+                            rows={3}
+                        />
                     </div>
-                    <Button label={isEdit ? "Salvar" : "Enviar"} className="p-button-success mt-2" onClick={isEdit ? handleEditSubmit : handleSubmit} />
+                    {/* Dropdown para seleção do curso */}
+                    <div className="p-field mt-2">
+                        <label htmlFor="curso">Curso</label>
+                        <Dropdown
+                            id="curso"
+                            value={cursoSelecionado}
+                            onChange={(e) => setCursoSelecionado(e.value)}
+                            options={cursos}
+                            optionLabel="nome" // Supondo que cada objeto de curso tenha a propriedade "nome"
+                            placeholder="Selecione um curso"
+                            style={{ width: '100%' }}
+                        />
+                    </div>
+                    <Button
+                        label={isEdit ? "Salvar" : "Enviar"}
+                        className="p-button-success mt-2"
+                        onClick={isEdit ? handleEditSubmit : handleSubmit}
+                    />
                 </div>
             </Dialog>
         );
@@ -206,13 +257,24 @@ const SugestoesTemasTccPage = () => {
                     <Button label="Criar Tema" className="p-button-success mb-2" onClick={createTheme} />
                 </div>
                 <div className='py-6 px-2'>
-            <DataTable value={sugestoes} header={renderHeader} emptyMessage="Nenhum tema encontrado" filters={filters} paginator rows={5} tableStyle={{ minWidth: '50rem' }} rowExpansionTemplate={rowExpansionTemplate} expandedRows={expandedRows} onRowToggle={onRowToggle}>
-                <Column expander style={{ width: '3rem' }}></Column>
-                <Column field="titulo" header="Tema" style={{ width: '77%' }}></Column>
-                <Column field="professor.nome" header="Professor" style={{ width: '20%' }}></Column>
-                <Column body={actionBodyTemplate}></Column>
-            </DataTable>
-            </div>
+                    <DataTable
+                        value={sugestoes}
+                        header={renderHeader}
+                        emptyMessage="Nenhum tema encontrado"
+                        filters={filters}
+                        paginator
+                        rows={5}
+                        tableStyle={{ minWidth: '50rem' }}
+                        rowExpansionTemplate={rowExpansionTemplate}
+                        expandedRows={expandedRows}
+                        onRowToggle={onRowToggle}
+                    >
+                        <Column expander style={{ width: '3rem' }}></Column>
+                        <Column field="titulo" header="Tema" style={{ width: '77%' }}></Column>
+                        <Column field="professor.nome" header="Professor" style={{ width: '20%' }}></Column>
+                        <Column body={actionBodyTemplate}></Column>
+                    </DataTable>
+                </div>
                 {renderDialog()}
                 {renderConfirmDialog()}
             </div>

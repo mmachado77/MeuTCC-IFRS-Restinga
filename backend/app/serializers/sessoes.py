@@ -17,7 +17,6 @@ class SessaoSerializer(serializers.ModelSerializer):
     """
     banca = serializers.SerializerMethodField(method_name='get_banca')
     tipo = serializers.CharField(source='get_tipo')
-    documentoTCCSessao = FileDetailSerializer()
 
     class Meta:
         model = Sessao

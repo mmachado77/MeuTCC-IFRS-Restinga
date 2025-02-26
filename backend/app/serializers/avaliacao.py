@@ -15,3 +15,11 @@ class AvaliacaoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Avaliacao
         fields = '__all__'
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if not instance.ficha_avaliacao:
+            data['ficha_avaliacao'] = None
+        if not instance.tcc_definitivo:
+            data['tcc_definitivo'] = None
+        return data

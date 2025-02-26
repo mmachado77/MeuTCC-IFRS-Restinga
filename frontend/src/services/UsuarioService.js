@@ -1,7 +1,12 @@
 import { apiClient } from "meutcc/libs/api"
 
+//TODO: Eliminar esse Service em Produção
 async function listarUsuarios() {
     return apiClient.get('app/listar-usuarios')
+}
+
+async function listarUsuariosSuperAdmin() {
+    return apiClient.get('/superadmin/listar-usuarios')
 }
 
 async function criarUsuario(data) {
@@ -25,6 +30,7 @@ async function atualizarPerfil(data) {
 
 export default {
     listarUsuarios,
+    listarUsuariosSuperAdmin,
     criarUsuario,
     getPerfilById,
     getTccsByUsuarioId,

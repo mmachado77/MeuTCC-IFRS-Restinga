@@ -1,113 +1,103 @@
-from .custom_api_view import CustomAPIView
-from rest_framework import generics, status
+from django.shortcuts import get_object_or_404
+from rest_framework import status
 from rest_framework.response import Response
-from app.models import Professor, ProfessorInterno, StatusCadastro
-from app.serializers import UsuarioPolymorphicSerializer
 from rest_framework.permissions import IsAuthenticated
-from app.services.notificacoes import notificacaoService
+from app.models import ProfessorInterno, ProfessorExterno, Curso, Coordenador
+from app.serializers import ProfessorInternoSerializer, ProfessorExternoSerializer
+from app.permissions import IsSuperAdmin
+from .custom_api_view import CustomAPIView
 
-class ProfessoresPendentesListAPIView(CustomAPIView):
+class ListaProfessoresInternosView(CustomAPIView):
     """
-    API para listar todos os professores pendentes de aprovação.
-
-    Permissões:
-        Apenas usuários autenticados podem acessar esta API.
-
-    Métodos:
-        get(request, format=None): Retorna uma lista de todos os professores pendentes.
+    Lista todos os professores internos pendentes de aprovação.
+    Acesso restrito ao SUPERADMIN.
     """
-    permission_classes = [IsAuthenticated]
-    
-    def get(self, request, format=None):
-        """
-        Retorna uma lista de todos os professores pendentes de aprovação.
+    permission_classes = [IsSuperAdmin]
 
-        Args:
-            request (Request): A requisição HTTP.
-            format (str, opcional): O formato de resposta.
+    def get(self, request):
+        professores = ProfessorInterno.objects.filter(status__aprovacao=False)
+        serializer = ProfessorInternoSerializer(professores, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-        Retorna:
-            Response: Resposta HTTP com a lista de professores pendentes.
-        """
-        professores_pendentes = Professor.objects.filter(status__aprovacao=False, status__justificativa=None)
-        serializer = UsuarioPolymorphicSerializer(professores_pendentes, many=True)
-        return Response(serializer.data)
-
-class AprovarProfessorAPIView(CustomAPIView):
+class AprovarProfessorInternoView(CustomAPIView):
     """
-    API para aprovar o cadastro de um professor.
-
-    Permissões:
-        Apenas usuários autenticados podem acessar esta API.
-
-    Métodos:
-        put(request, idProfessor, format=None): Aprova o cadastro de um professor.
+    Aprova um professor interno.
+    Acesso restrito ao SUPERADMIN.
     """
-    permission_classes = [IsAuthenticated]
-    notificacaoService = notificacaoService()
+    permission_classes = [IsSuperAdmin]
 
-    def put(self, request, idProfessor, format=None):
-        """
-        Aprova o cadastro de um professor.
+    def put(self, request, pk):
+        professor = get_object_or_404(ProfessorInterno, id=pk, status__aprovacao=False)
+        professor.status.aprovacao = True
+        professor.status.justificativa = None  # Resetar a justificativa caso tenha sido recusado anteriormente
+        professor.status.save()
+        return Response({"detail": "Professor aprovado com sucesso."}, status=status.HTTP_200_OK)
 
-        Args:
-            request (Request): A requisição HTTP.
-            idProfessor (int): ID do professor.
-            format (str, opcional): O formato de resposta.
-
-        Retorna:
-            Response: Resposta HTTP confirmando a aprovação ou mensagem de erro.
-        """
-        try:
-            professor = Professor.objects.get(id=idProfessor)
-            status_cadastro = professor.status
-            status_cadastro.aprovacao = True
-            status_cadastro.save()
-            self.notificacaoService.enviarNotificacaoCadastroExternoAprovado(professor)
-            return Response({'status': 'success', 'message': 'Professor aprovado com sucesso!'}, status=status.HTTP_200_OK)
-        except Professor.DoesNotExist:
-            return Response({'status': 'error', 'message': 'Professor não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
-        except StatusCadastro.DoesNotExist:
-            return Response({'status': 'error', 'message': 'Status de cadastro não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
-
-class RecusarProfessorAPIView(CustomAPIView):
+class RecusarProfessorInternoView(CustomAPIView):
     """
-    API para recusar o cadastro de um professor.
+    Recusa um professor interno pendente.
+    Acesso restrito ao SUPERADMIN.
+    """
+    permission_classes = [IsSuperAdmin]
 
-    Permissões:
-        Apenas usuários autenticados podem acessar esta API.
+    def put(self, request, pk):
+        professor = get_object_or_404(ProfessorInterno, id=pk, status__aprovacao=False)
+        professor.status.aprovacao = False
+        professor.status.justificativa = request.data.get("justificativa", "Sem justificativa.")
+        professor.status.save()
+        return Response({"detail": "Professor recusado com justificativa."}, status=status.HTTP_200_OK)
 
-    Métodos:
-        put(request, idProfessor, format=None): Recusa o cadastro de um professor.
+class ListaProfessoresExternosView(CustomAPIView):
+    """
+    Lista professores externos pendentes de aprovação apenas do curso do coordenador logado.
     """
     permission_classes = [IsAuthenticated]
-    notificacaoService = notificacaoService()
 
-    def put(self, request, idProfessor, format=None):
-        """
-        Recusa o cadastro de um professor.
+    def get(self, request):
+        coordCurso = get_object_or_404(Coordenador, user=request.user)
+        curso = get_object_or_404(Curso, pk=coordCurso.curso.id)
 
-        Args:
-            request (Request): A requisição HTTP.
-            idProfessor (int): ID do professor.
-            format (str, opcional): O formato de resposta.
+        professores = ProfessorExterno.objects.filter(
+            curso=curso,
+            status__aprovacao=False
+        )
 
-        Retorna:
-            Response: Resposta HTTP confirmando a recusa ou mensagem de erro.
-        """
-        try:
-            justificativa = request.data.get('justificativa')
-            if(not justificativa):
-                raise Exception("O campo 'justificativa' não pode estar vazio")
-            professor = Professor.objects.get(id=idProfessor)
-            status_cadastro = professor.status
-            status_cadastro.justificativa = justificativa
-            status_cadastro.save()
-            self.notificacaoService.enviarNotificacaoCadastroExternoNegado(professor, justificativa)
-            return Response({'status': 'success', 'message': 'Professor reprovado com sucesso!'}, status=status.HTTP_200_OK)
-        except Professor.DoesNotExist:
-            return Response({'status': 'error', 'message': 'Professor não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
-        except StatusCadastro.DoesNotExist:
-            return Response({'status': 'error', 'message': 'Status de cadastro não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = ProfessorExternoSerializer(professores, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class AprovarProfessorExternoView(CustomAPIView):
+    """
+    Aprova um professor externo e o adiciona automaticamente ao curso do coordenador logado.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, pk):
+        coordCurso = get_object_or_404(Coordenador, user=request.user)
+        curso = get_object_or_404(Curso, pk=coordCurso.curso.id)
+        professor = get_object_or_404(ProfessorExterno, id=pk, curso=curso, status__aprovacao=False)
+
+        professor.status.aprovacao = True
+        professor.status.justificativa = None
+        professor.status.save()
+
+        curso.professores.add(professor)
+        curso.save()
+
+        return Response({"detail": "Professor externo aprovado e adicionado ao curso."}, status=status.HTTP_200_OK)
+
+class RecusarProfessorExternoView(CustomAPIView):
+    """
+    Recusa um professor externo pendente, sem removê-lo do sistema.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, pk):
+        coordCurso = get_object_or_404(Coordenador, user=request.user)
+        curso = get_object_or_404(Curso, pk=coordCurso.curso.id)
+        professor = get_object_or_404(ProfessorExterno, id=pk, curso=curso, status__aprovacao=False)
+
+        professor.status.aprovacao = False
+        professor.status.justificativa = request.data.get("justificativa", "Sem justificativa.")
+        professor.status.save()
+
+        return Response({"detail": "Professor externo recusado com justificativa."}, status=status.HTTP_200_OK)

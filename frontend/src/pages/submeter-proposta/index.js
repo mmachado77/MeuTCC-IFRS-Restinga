@@ -1,21 +1,19 @@
+import React from 'react';
+import { useRouter } from 'next/router';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
-import React from 'react';
 import { Dropdown } from 'primereact/dropdown';
 import { Checkbox } from 'primereact/checkbox';
 import TccService from 'meutcc/services/TccService';
-import ProfessorService from 'meutcc/services/ProfessorService';
-import SemestreService from 'meutcc/services/SemestreService';
+import SubmeterServices from './services/SubmeterServices';
 import toast from 'react-hot-toast';
-import { useRouter } from 'next/router';
 import { GUARDS } from 'meutcc/core/constants';
 import LoadingSpinner from 'meutcc/components/ui/LoadingSpinner';
-import { set } from 'date-fns';
 import { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
+import CustomAvatar from '../../components/ui/CustomAvatar'; // Certifique-se de que o caminho esteja correto
 
 const SubmeterPropostaPage = () => {
-
     const [loading, setLoading] = React.useState(false);
     const [selectedOrientador, setSelectedOrientador] = React.useState(null);
     const [selectedCoorientador, setSelectedCoorientador] = React.useState(null);
@@ -30,39 +28,64 @@ const SubmeterPropostaPage = () => {
     const [estaNoPrazo, setEstaNoPrazo] = React.useState(false);
 
     const router = useRouter();
-    
+
+    // Template para exibir o avatar e o nome do professor
+    const professorOptionTemplate = (option) => {
+        if (!option) return null;
+        return (
+            <div className="flex items-center">
+                <CustomAvatar
+                    image={option.avatar}
+                    fullname={option.name}
+                    size={30}
+                />
+                <div className='ps-3'>{option.name}</div>
+            </div>
+        );
+    };
+
     React.useEffect(() => {
         const fetchJaPossuiProposta = async () => {
-            
             setLoading(true);
             try {
                 const data = await TccService.getPossuiTcc();
-
-                if (data.possuiProposta == true) {
+                if (data.possuiProposta === true) {
                     router.push('/meus-tccs');
-                }else{
+                } else {
                     setLoading(false);
                 }
-                handleApiResponse(response);
+                // Se necessário, trate a resposta aqui:
+                // handleApiResponse(response);
             } catch (error) {
                 handleApiResponse(error.response);
                 setLoading(false);
             }
-        }
+        };
 
         fetchJaPossuiProposta();
 
         const fetchProfessores = async () => {
-
-            setLoading(true);
             try {
-                const data = await ProfessorService.getProfessores();
-                const professores = data.map((professor) => ({ name: professor.nome, value: professor.id }));
-    
-                setOrientadores(professores);
-                setCoorientadores(professores);
-                handleApiResponse(response);
+                // Para o dropdown de orientador utiliza o service de professores internos
+                const dataInternos = await SubmeterServices.getProfessoresInternosByCurso();
+                const professoresInternos = dataInternos.map((professor) => ({
+                    name: professor.nome,
+                    value: professor.id,
+                    avatar: professor.avatar,
+                }));
+                setOrientadores(professoresInternos);
 
+                // Para o dropdown de coorientador utiliza o service padrão
+                const dataCoorientadores = await SubmeterServices.getProfessoresByCurso();
+                const professores = dataCoorientadores.map((professor) => ({
+                    name: professor.nome,
+                    value: professor.id,
+                    avatar: professor.avatar,
+                }));
+                setCoorientadores(professores);
+
+                // Se necessário, trate a resposta aqui:
+                // handleApiResponse(response);
             } catch (error) {
                 handleApiResponse(error.response);
             }
@@ -71,29 +94,31 @@ const SubmeterPropostaPage = () => {
         fetchProfessores();
 
         const verificarPrazoEnvioProposta = async () => {
-            try{
-                const data = await SemestreService.getPrazoEnvioProposta();
+            try {
+                const data = await SubmeterServices.getPrazoEnvioProposta();
                 const hoje = new Date();
                 const dataAbertura = new Date(data.dataAberturaPrazoPropostas);
                 const dataFechamento = new Date(data.dataFechamentoPrazoPropostas);
-    
                 if (hoje >= dataAbertura && hoje <= dataFechamento) {
                     setEstaNoPrazo(true);
                 } else {
                     setEstaNoPrazo(false);
                 }
-                handleApiResponse(response);
-
-            }catch(error){
+                // handleApiResponse(response);
+            } catch (error) {
                 handleApiResponse(error.response);
             }
         };
 
         verificarPrazoEnvioProposta();
+    }, [router]);
 
-    }, []);   
+    // Filtra os coorientadores para não incluir o professor selecionado como orientador
+    const filteredCoorientadores = selectedOrientador
+        ? coorientadores.filter((prof) => prof.value !== selectedOrientador)
+        : coorientadores;
 
-    if(loading){
+    if (loading) {
         return <LoadingSpinner />;
     }
 
@@ -101,7 +126,6 @@ const SubmeterPropostaPage = () => {
         event.preventDefault();
 
         let isValid = true;
-
         setLoading(true);
 
         const formData = new FormData(event.currentTarget);
@@ -140,7 +164,7 @@ const SubmeterPropostaPage = () => {
             return;
         }
 
-        if(!afirmoQueConversei) {
+        if (!afirmoQueConversei) {
             toast.error('Você precisa afirmar que conversou com o professor sobre a proposta de TCC');
             setLoading(false);
             return;
@@ -152,82 +176,153 @@ const SubmeterPropostaPage = () => {
             return;
         }
 
-        const response = await TccService.submeterProposta(jsonData);
+        try {
+            const { status, data } = await TccService.submeterProposta(jsonData);
 
-        if (response) {
-            toast.success('Proposta submetida com sucesso');
-        } else {
-            toast.error('Erro ao submeter proposta');
+            if (status === 201) {
+                toast.success('Proposta submetida com sucesso');
+                setLoading(false);
+                router.push('/meus-tccs');
+            } else {
+                toast.error('Erro ao submeter proposta:', data);
+            }
+        } catch (error) {
+            toast.error('Erro ao submeter proposta: ', error.response?.data);
         }
-
         setLoading(false);
-        router.push('/meus-tccs');
-
-    }
+    };
 
     const handleTemCoorientadorChange = (e) => {
         setTemCoorientador(!temCoorientador);
         setSelectedCoorientador(null);
-    }
+    };
 
-    if(!estaNoPrazo){
-        return <div className='max-w-screen-md mx-auto bg-white m-3 mt-6 flex flex-col'>
-            <div className='py-3 border-0 border-b border-dashed border-gray-200'>
-                <h1 className='heading-1 text-center text-gray-700'>Submeter Proposta de TCC</h1>
+    if (!estaNoPrazo) {
+        return (
+            <div className="max-w-screen-md mx-auto bg-white m-3 mt-6 flex flex-col">
+                <div className="py-3 border-0 border-b border-dashed border-gray-200">
+                    <h1 className="heading-1 text-center text-gray-700">Submeter Proposta de TCC</h1>
+                </div>
+                <div className="py-6 px-9">
+                    <p className="text-center">Não estamos no período de envio de propostas.</p>
+                </div>
             </div>
-            <div className='py-6 px-9'>
-                <p className="text-center">Não estamos no período de envio de propostas.</p>
-            </div>
-        </div>;
-    }else{
-        return <div className='max-w-screen-md mx-auto bg-white m-3 mt-6 flex flex-col'>
-            <div className='py-3 border-0 border-b border-dashed border-gray-200'>
-                <h1 className='heading-1 text-center text-gray-700'>Submeter Proposta de TCC</h1>
-            </div>
+        );
+    } else {
+        return (
+            <div className="max-w-screen-md mx-auto bg-white m-3 mt-6 flex flex-col">
+                <div className="py-3 border-0 border-b border-dashed border-gray-200">
+                    <h1 className="heading-1 text-center text-gray-700">Submeter Proposta de TCC</h1>
+                </div>
 
-            <div className='py-6 px-9'>
-                <form onSubmit={onSubmit}>
-                    <div className='flex flex-wrap align-items-center mb-3 gap-2'>
-                        <label htmlFor='tema' className='p-sr-only'>Tema</label>
-                        <InputText id='tema' name='tema' placeholder='Tema' className={'w-full ' + (temaMensagemErro ? 'p-invalid' : '')} />
-                        { temaMensagemErro && <small id='tema-help' className='text-red-500 py-1 px-2'>{temaMensagemErro}</small> }
-                    </div>
-
-                    <div className='flex flex-wrap align-items-center mb-3 gap-2'>
-                        <InputTextarea id='resumo' name='resumo' placeholder='Escreva um resumo sobre o que será abordado em seu TCC' rows={6} className={'w-full ' + (resumoMensagemErro ? 'p-invalid' : '')} />
-                        { resumoMensagemErro && <small id='tema-help' className='text-red-500 py-1 px-2'>{resumoMensagemErro}</small> }
-                    </div>
-
-                    <div className='flex flex-row align-items-center mb-3 gap-2'>
-                        <div className='w-1/2'>
-                            <Dropdown value={selectedOrientador} name='orientador' onChange={(e) => setSelectedOrientador(e.value)} options={orientadores} optionLabel="name" placeholder="Selecione o orientador" className={"w-full md:w-14rem" + (orientadorMensagemErro ? 'p-invalid' : '')} />
-                            { orientadorMensagemErro && <small id='tema-help' className='text-red-500 py-1 px-2'>{orientadorMensagemErro}</small> }
+                <div className="py-6 px-9">
+                    <form onSubmit={onSubmit}>
+                        <div className="flex flex-wrap align-items-center mb-3 gap-2">
+                            <label htmlFor="tema" className="p-sr-only">
+                                Tema
+                            </label>
+                            <InputText
+                                id="tema"
+                                name="tema"
+                                placeholder="Tema"
+                                className={'w-full ' + (temaMensagemErro ? 'p-invalid' : '')}
+                            />
+                            {temaMensagemErro && (
+                                <small id="tema-help" className="text-red-500 py-1 px-2">
+                                    {temaMensagemErro}
+                                </small>
+                            )}
                         </div>
-                        <div className='w-1/2'>
-                            <Dropdown value={selectedCoorientador} name='coorientador' disabled={!temCoorientador} onChange={(e) => setSelectedCoorientador(e.value)} options={coorientadores} optionLabel="name" placeholder="Selecione o coorientador" className={"w-full md:w-14rem" + (coorientadorMensagemErro ? 'p-invalid' : '')} />
-                            { coorientadorMensagemErro && <small id='tema-help' className='text-red-500 py-1 px-2'>{coorientadorMensagemErro}</small> }
-                            <div className="flex align-items-center py-3">
-                                <Checkbox inputId="temCoorientador" onChange={handleTemCoorientadorChange} checked={temCoorientador} />
-                                <label htmlFor="temCoorientador" className="ml-2">Tem coorientador</label>
+
+                        <div className="flex flex-wrap align-items-center mb-3 gap-2">
+                            <InputTextarea
+                                id="resumo"
+                                name="resumo"
+                                placeholder="Escreva um resumo sobre o que será abordado em seu TCC"
+                                rows={6}
+                                className={'w-full ' + (resumoMensagemErro ? 'p-invalid' : '')}
+                            />
+                            {resumoMensagemErro && (
+                                <small id="tema-help" className="text-red-500 py-1 px-2">
+                                    {resumoMensagemErro}
+                                </small>
+                            )}
+                        </div>
+
+                        <div className="flex flex-row align-items-center mb-3 gap-2">
+                            <div className="w-1/2">
+                                <Dropdown
+                                    value={selectedOrientador}
+                                    name="orientador"
+                                    onChange={(e) => setSelectedOrientador(e.value)}
+                                    options={orientadores}
+                                    optionLabel="name"
+                                    placeholder="Selecione o orientador"
+                                    className={'w-full md:w-14rem ' + (orientadorMensagemErro ? 'p-invalid' : '')}
+                                    itemTemplate={professorOptionTemplate}
+                                />
+                                {orientadorMensagemErro && (
+                                    <small id="tema-help" className="text-red-500 py-1 px-2">
+                                        {orientadorMensagemErro}
+                                    </small>
+                                )}
+                            </div>
+                            <div className="w-1/2">
+                                <Dropdown
+                                    value={selectedCoorientador}
+                                    name="coorientador"
+                                    disabled={!temCoorientador}
+                                    onChange={(e) => setSelectedCoorientador(e.value)}
+                                    // Remove o orientador selecionado da lista de coorientadores
+                                    options={filteredCoorientadores}
+                                    optionLabel="name"
+                                    placeholder="Selecione o coorientador"
+                                    className={'w-full md:w-14rem ' + (coorientadorMensagemErro ? 'p-invalid' : '')}
+                                    itemTemplate={professorOptionTemplate}
+                                />
+                                {coorientadorMensagemErro && (
+                                    <small id="tema-help" className="text-red-500 py-1 px-2">
+                                        {coorientadorMensagemErro}
+                                    </small>
+                                )}
+                                <div className="flex align-items-center py-3">
+                                    <Checkbox
+                                        inputId="temCoorientador"
+                                        onChange={handleTemCoorientadorChange}
+                                        checked={temCoorientador}
+                                    />
+                                    <label htmlFor="temCoorientador" className="ml-2">
+                                        Tem coorientador
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
+                        <div className="flex flex-wrap align-items-center mb-3 gap-1 pt-2">
+                            <Checkbox
+                                inputId="afirmoQueConversei"
+                                name="afirmoQueConversei"
+                                onChange={(e) => setAfirmoQueConversei(!afirmoQueConversei)}
+                                checked={afirmoQueConversei}
+                            />
+                            <label htmlFor="afirmoQueConversei" className="ml-2">
+                                Afirmo que conversei presencialmente com o professor sobre minha proposta de TCC
+                            </label>
+                        </div>
 
-                    <div className="flex flex-wrap align-items-center mb-3 gap-1 pt-2">
-                        <Checkbox inputId="afirmoQueConversei" name='afirmoQueConversei' onChange={(e) => setAfirmoQueConversei(!afirmoQueConversei)} checked={afirmoQueConversei} />
-                        <label htmlFor="afirmoQueConversei" className="ml-2">Afirmo que conversei presencialmente com o professor sobre minha proposta de TCC</label>
-                    </div>
-
-                    <div className="flex flex-wrap align-items-center mb-3 gap-2">
-                        <Button label={loading ? "Submetendo proposta" : "Submeter proposta"} loading={loading} className='w-full' />
-                    </div>
-                </form>
+                        <div className="flex flex-wrap align-items-center mb-3 gap-2">
+                            <Button
+                                label={loading ? 'Submetendo proposta' : 'Submeter proposta'}
+                                loading={loading}
+                                className="w-full"
+                            />
+                        </div>
+                    </form>
+                </div>
             </div>
-    </div>;
+        );
     }
-
-}
+};
 
 SubmeterPropostaPage.guards = [GUARDS.ESTUDANTE];
 SubmeterPropostaPage.title = 'Submeter Proposta de TCC';

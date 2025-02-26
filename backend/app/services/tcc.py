@@ -50,7 +50,9 @@ class TccService:
         if(self.possuiProposta(usuario)):
             raise Exception('Usuário já possui uma proposta de TCC')
         
-        semestreAtual = Semestre.objects.latest('id')
+        semestreAtual = Semestre.semestre_atual()
+        if semestreAtual is None:
+            raise Exception('Não há semestre cadastrado. Contate o Administrado do Sistema')
         tcc = Tcc.objects.create(autor = usuario, semestre = semestreAtual, **serializer.validated_data)
  
         TccStatus.objects.create(tcc=tcc, status=StatusTccEnum.PROPOSTA_ANALISE_PROFESSOR)

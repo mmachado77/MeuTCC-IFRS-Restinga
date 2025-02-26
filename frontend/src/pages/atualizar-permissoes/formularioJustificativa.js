@@ -4,29 +4,35 @@ import { Button } from "primereact/button";
 import toast from "react-hot-toast";
 import ProfessorService from "meutcc/services/ProfessorService";
 
-export default function FormularioJustificativa({ onSetVisibility, onPosAvaliacao, professor }) {
+export default function FormularioJustificativa({ onSetVisibility, atualizaProfessoresPosAvaliacao, professor }) {
     const [mensagemJustificativa, setMensagemJustificativa] = useState('');
 
     const [mensagemErro, setMensagemErro] = useState('');
 
     const handleRecusarProfessorClick = async () => {
-        if (mensagemJustificativa === '') {
+        if (mensagemJustificativa.trim() === '') {
             setMensagemErro('A Justificativa é obrigatória.');
-            return
+            return;
         }
         setMensagemErro('');
-        recusarProfessor()
-    }
-
+    
+        await recusarProfessor();
+    };
+    
     const recusarProfessor = async () => {
-        const data = await toast.promise(ProfessorService.recusarProfessor(professor.id, {
-            justificativa: mensagemJustificativa
-        }), {
-            loading: 'Recusando professor...',
-            success: 'Professor recusado com sucesso!',
-            error: 'Erro ao recusar professor.',
-        });
-        onPosAvaliacao()
+        try {
+            await toast.promise(
+                ProfessorService.recusarProfessor(professor.id, mensagemJustificativa),
+                {
+                    loading: 'Recusando professor...',
+                    success: 'Professor recusado com sucesso!',
+                    error: 'Erro ao recusar professor.',
+                }
+            );
+            atualizaProfessoresPosAvaliacao();
+        } catch (error) {
+            console.error('Erro ao recusar professor:', error);
+        }
     };
 
     return (<>

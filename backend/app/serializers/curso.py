@@ -12,6 +12,14 @@ class CursoSimplificadoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Curso
         fields = ['id', 'sigla', 'nome']
+
+class CursoLimiteOrientacoesSerializer(serializers.ModelSerializer):
+    """
+    Serializer para retornar apenas id, sigla e nome do curso.
+    """
+    class Meta:
+        model = Curso
+        fields = ['id', 'sigla', 'nome', 'limite_orientacoes']
         
 class CursoSerializer(serializers.ModelSerializer):
     """
@@ -32,6 +40,7 @@ class CursoSerializer(serializers.ModelSerializer):
             'prazo_propostas_fim',
             'ultima_atualizacao',
             'data_criacao',
+            'tipo_avaliacao'
         ]
 
 class CoordenadorNomeSerializer(serializers.Serializer):
@@ -134,7 +143,7 @@ class CursoDetailSerializer(serializers.ModelSerializer):
         """
         Ordena e retorna os professores do curso.
         """
-        professores = obj.professores.all().order_by("nome")  # Ordena por nome
+        professores = obj.professores.filter(status__aprovacao=True).order_by("nome")  # Ordena por nome
         return ProfessorSerializer(professores, many=True).data  # Serializa os professores
 
     

@@ -60,7 +60,6 @@ export const AppLayout = ({ children, guards }) => {
                     { label: 'Validar Sessões', icon: 'pi pi-fw pi-calendar', url: '/sessoes-futuras' },
                 ]
             },
-            { label: 'Lista de Usuários', icon:'pi pi-fw pi-users', url: '/lista-usuarios'},
             {
                 label: 'Sugestões de Tema', icon: 'pi pi-fw pi-list', url: '',
                 items: [
@@ -112,7 +111,7 @@ export const AppLayout = ({ children, guards }) => {
             console.error('Erro ao carregar notificações:', error);
         }
     };
-
+/*
     const fetchConfigs = async () => {
         try {
             const data = await ConfiguracoesService.getCoordenador();
@@ -121,12 +120,12 @@ export const AppLayout = ({ children, guards }) => {
             console.error('Erro ao buscar as configurações', error);
         }
     };
-
+*/
     React.useEffect(() => {
         if (isUserAuth) {
         loadNotifications();
         }
-        fetchConfigs();
+        //fetchConfigs();
     }, [])
 
 
@@ -158,7 +157,7 @@ export const AppLayout = ({ children, guards }) => {
             <footer className='bg-green-900 text-white' style={{ background: 'rgb(0 49 21)' }}>
                 <div className="max-w-screen-lg mx-auto flex flex-col-reverse md:flex-row items-center justify-between">
                     <div className="md:max-w-80 p-10 text-xs border-0 border-r-2 border-dashed text-gray-300 bg-black/20 border-black/20">
-                        <Image src="/if.png" width={70} height={95} />
+                        <Image src="/if.png" width={70} height={95}  alt="Logo ifrs"/>
                         <p>
                             <b>Desenvolvido por:</b>
                         </p>
@@ -175,7 +174,7 @@ export const AppLayout = ({ children, guards }) => {
                         </p>
                         <p>Rua Alberto Hoffmann, 285 | Bairro Restinga | CEP: 91791-508 | Porto Alegre/RS</p>
                         <p>
-                            Coordenador: {coordenadorNome} - <a href="mailto:ads@restinga.ifrs.edu.br" className="anchor-link">ads@restinga.ifrs.edu.br</a>
+                        Telefone: (51) 3247-8400
                         </p>
                     </div>
                 </div>

@@ -1,8 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import { TccProvider } from './context/TccContext';
-import DetalhesHeader from './components/DetalhesHeader';
-import DetalhesBody from './components/DetalhesBody';
+import MontaTela from './montaTela';
 
 const DetalhesTCCPage = () => {
     const router = useRouter();
@@ -12,9 +11,8 @@ const DetalhesTCCPage = () => {
 
     return (
         <TccProvider tccId={tccId}>
-            <div className="detalhes-tcc-page mt-6">
-                <DetalhesHeader />
-
+            <div>
+                <MontaTela/>
             </div>
         </TccProvider>
     );

@@ -1,9 +1,9 @@
 from .usuario import *
 from .statusCadastro import *
 from .professor import *
+from .curso import *
 from .professorInterno import *
 from .professorExterno import *
-from .curso import *
 from .templateAvaliacao import *
 from .criterioAvaliacao import *
 from .estudante import *
@@ -18,7 +18,6 @@ from .nota import *
 from .coordenador import *
 from .tccStatus import *
 from .tema import *
-from .semestreCoordenador import *
 from .mensagem import *
 from .credenciais import *
 from .superadmin import SuperAdmin, SuperAdminManager

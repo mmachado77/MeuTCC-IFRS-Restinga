@@ -1,5 +1,5 @@
 from django.db import models
-from . import Professor
+from . import Professor, Curso
 
 class ProfessorExterno(Professor):
     """
@@ -15,6 +15,7 @@ class ProfessorExterno(Professor):
     identidade = models.FileField(blank=True, null=True, upload_to='media/professoresExterno/identidade')
     diploma = models.FileField(blank=True, null=True, upload_to='media/professoresExterno/diploma')
     dataStatus = models.DateTimeField(auto_now=True)
+    curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='professores_externos', default=1)
 
     class Meta:
         abstract = False

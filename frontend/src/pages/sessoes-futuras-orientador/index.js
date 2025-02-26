@@ -28,7 +28,7 @@ const SessoesFuturas = () => {
     );
 };
 
-SessoesFuturas.guards = [GUARDS.COORDENADOR];
+SessoesFuturas.guards = [GUARDS.COORDENADOR, GUARDS.PROFESSOR_INTERNO];
 SessoesFuturas.title = 'Sessões Futuras';
 
 export default SessoesFuturas;

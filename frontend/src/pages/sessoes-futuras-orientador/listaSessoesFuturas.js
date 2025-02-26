@@ -127,7 +127,7 @@ export default function ListaSessoesFuturas() {
     return (
         <div>
             <div className="card">
-                <DataTable value={sessoes} selection={sessaoSelecionada} dataKey="id" paginator rows={5} currentPageReportTemplate="Showing {first} to {last} of {totalRecords} sessions">
+                <DataTable value={sessoes} selection={sessaoSelecionada} dataKey="id" paginator rows={5} currentPageReportTemplate="Showing {first} to {last} of {totalRecords} sessions" emptyMessage="Não há nenhuma sessão para ser validada.">
                     <Column field="tcc.autor.nome" header="Autor" sortable />
                     <Column field="tipo" header="Tipo" sortable />
                     <Column field="data_inicio" header="Data e Hora" body={dataInicioTemplate} sortable />

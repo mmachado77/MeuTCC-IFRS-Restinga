@@ -10,6 +10,9 @@ const AdminCursoService = {
     getCursos: () => {
         return apiClient.get('/superadmin/cursos/').then(response => response.data); // Endpoint para superadmin
     },
+    getCursosByUsuario: () => {
+        return apiClient.get('app/meus-cursos/').then(response => response.data); 
+    },
     getCursoById: (cursoId) => {
         return apiClient.get(`/superadmin/cursos/${cursoId}/`).then(response => response.data);
     },
@@ -23,6 +26,15 @@ const AdminCursoService = {
     getHistoricoCoordenadores: (cursoId) => {
         return apiClient.get(`/superadmin/cursos/${cursoId}/historico-coordenadores/`)
             .then(response => response.data);
+    },
+    async getProfessoresAptosParaCoordenador() {
+        try {
+            const response = await apiClient.get('app/curso/professores-internos/');
+            return response.data;
+        } catch (error) {
+            console.error("Erro ao buscar professores do curso", error);
+            throw error;
+        }
     },
     adicionarProfessor: (cursoId, professorId) => {
         return apiClient.post(`/superadmin/cursos/${cursoId}/adicionar-professor/`, { professor_id: professorId })

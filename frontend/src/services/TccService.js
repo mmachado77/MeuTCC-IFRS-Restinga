@@ -1,8 +1,18 @@
 import { apiClient } from "meutcc/libs/api";
 
 async function submeterProposta(data) {
-    return apiClient.post('/app/criar-tcc', data).then((response) => response.data);
-}
+    try {
+      const response = await apiClient.post('/app/criar-tcc', data);
+      // Retorne um objeto contendo status e dados
+      return { 
+        status: response.status,
+        data: response.data
+      };
+    } catch (error) {
+      // Você pode dar throw para tratar o erro no local que chamar
+      throw error; 
+    }
+  }
 
 async function getTccsByAluno() {
     return apiClient.get('/app/tccs-by-aluno').then((response) => response.data);
@@ -22,6 +32,10 @@ async function getDetalhesTCC(tccId) {
 
 async function getListarTccsPendente() {
     return apiClient.get('/app/listar-tccs-pendente').then((response) => response.data);
+}
+
+async function getOrientacoesSimultaneas() {
+    return apiClient.get('/app/orientacoes-simultaneas').then((response) => response.data);
 }
 
 async function responderProposta(tccId, data) {
@@ -68,6 +82,11 @@ async function getTccsPublicados() {
     return apiClient.get('/app/tccs-publicados').then((response) => response.data);
 }
 
+async function getProximosPassos(tccid) {
+    return apiClient.get('/app/proximos-passos', tccid).then((response) => response.data);
+}
+
+
 async function getTccsByUsuario() {
     return apiClient.get('/app/user-tccs').then((response) => response.data);
 }
@@ -98,6 +117,7 @@ export default {
     getDetalhesTCC,
     responderProposta,
     getListarTccsPendente,
+    getOrientacoesSimultaneas,
     getPossuiTcc,
     getTccsByAluno,
     getTccsByOrientador,
@@ -112,6 +132,7 @@ export default {
     downloadDocumentoSessao,
     getTccsPublicados,
     getSugestoes,
+    getProximosPassos,
     getMinhasSugestoes,
     createTema,
     updateTema,

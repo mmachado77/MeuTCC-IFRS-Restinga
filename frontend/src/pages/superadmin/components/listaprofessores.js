@@ -27,7 +27,7 @@ const ListaProfessores = ({ curso }) => {
 
     const carregarProfessoresDisponiveis = async () => {
         try {
-            const todosProfessores = await ProfessorService.getProfessoresInternos();
+            const todosProfessores = await ProfessorService.getProfessores();
             const idsJaAssociados = professoresAtualizados.map((prof) => prof.id);
             setProfessoresDisponiveis(
                 todosProfessores.filter((professor) => !idsJaAssociados.includes(professor.id))

@@ -3,9 +3,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
-from app.models import Curso, SuperAdmin
+from app.models import *
+from app.enums import *
 from app.permissions import *
 from app.serializers.curso import *
+from app.serializers.tcc import *
+from app.serializers.usuario import *
 from .custom_api_view import CustomAPIView
 from django.shortcuts import get_object_or_404
 
@@ -426,3 +429,171 @@ class CriarCursoView(APIView):
                 status=status.HTTP_201_CREATED
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+##Views Públicas Para o resto do sistema
+
+class ProfessoresCursoView(APIView):
+    """
+    Retorna os professores associados ao curso do estudante autenticado, apenas aqueles aprovados.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        usuario = None
+
+        # Primeiro tenta encontrar o estudante
+        try:
+            usuario = Estudante.objects.get(user=request.user)
+        except Estudante.DoesNotExist:
+            pass
+
+        # Se não encontrou estudante, tenta encontrar o coordenador
+        if not usuario:
+            try:
+                usuario = Coordenador.objects.get(user=request.user)
+            except Coordenador.DoesNotExist:
+                return Response({"detail": "Usuário não encontrado como Estudante ou Coordenador."}, status=404)
+        curso = usuario.curso
+        professores = curso.professores.filter(status__aprovacao=True)  # Apenas aprovados
+        serializer = ProfessorSerializer(professores, many=True)
+        return Response(serializer.data)
+    
+class ProfessoresInternosCursoView(APIView):
+    """
+    Retorna apenas os professores internos associados ao curso do estudante ou coordenador autenticado, 
+    apenas aqueles aprovados.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        usuario = None
+
+        # Primeiro tenta encontrar o estudante
+        try:
+            usuario = Estudante.objects.get(user=request.user)
+        except Estudante.DoesNotExist:
+            pass
+
+        # Se não encontrou estudante, tenta encontrar o coordenador
+        if not usuario:
+            try:
+                usuario = Coordenador.objects.get(user=request.user)
+            except Coordenador.DoesNotExist:
+                pass
+        if SuperAdmin.objects.filter(user=request.user).exists():
+            return Response({"detail: Não foi possível identificar o seu curso. Repita a operação com a conta de Coordenador."}, status=404)
+
+        
+        # Obtém o curso associado ao usuário encontrado
+        curso = usuario.curso
+        professores_internos = ProfessorInterno.objects.filter(cursos=curso, status__aprovacao=True)  # Apenas aprovados
+        serializer = ProfessorSerializer(professores_internos, many=True)
+        return Response(serializer.data)
+
+
+class PrazoEnvioPropostaCursoView(APIView):
+    """
+    Retorna os prazos de envio de propostas dos cursos associados ao usuário autenticado.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        usuario = Usuario.objects.get(user=request.user)
+
+        if usuario.tipo in [UsuarioTipoEnum.COORDENADOR, UsuarioTipoEnum.ESTUDANTE]:
+            curso = usuario.curso  # Obtém o curso único do usuário
+            return Response({
+                "curso": curso.nome,
+                "sigla": curso.sigla,
+                "dataAberturaPrazoPropostas": curso.prazo_propostas_inicio,
+                "dataFechamentoPrazoPropostas": curso.prazo_propostas_fim
+            })
+
+        elif usuario.tipo == UsuarioTipoEnum.PROFESSOR_INTERNO:
+            cursos = Curso.objects.filter(professores=usuario)  # Filtra cursos em que o professor está associado
+            cursos_prazos = [
+                {
+                    "curso": curso.nome,
+                    "sigla": curso.sigla,
+                    "dataAberturaPrazoPropostas": curso.prazo_propostas_inicio,
+                    "dataFechamentoPrazoPropostas": curso.prazo_propostas_fim
+                }
+                for curso in cursos
+            ]
+            return Response({"cursos": cursos_prazos})
+
+        elif usuario.tipo == UsuarioTipoEnum.PROFESSOR_EXTERNO:
+            return Response({"message": "Acesso permitido, mas sem cursos associados."})
+
+        return Response({"error": "Tipo de usuário não reconhecido."}, status=400)
+    
+class CursosUsuarioView(CustomAPIView):
+    """
+    API para listar os cursos do usuário autenticado.
+
+    - Se for professor, retorna todos os cursos em que atua.
+    - Se for coordenador, retorna apenas o curso que coordena.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Obtém o usuário customizado a partir do usuário autenticado
+        usuario = Usuario.objects.get(user=request.user)
+        cursos = Curso.objects.none()  # Inicializa como vazio
+
+        if usuario.tipo == UsuarioTipoEnum.PROFESSOR_INTERNO:
+            # Utilize o request.user (instância do modelo User) para buscar o professor interno
+            professor = ProfessorInterno.objects.get(user=request.user)
+            cursos = professor.cursos.all()
+
+        elif usuario.tipo == UsuarioTipoEnum.COORDENADOR:
+            # Utilize o request.user para buscar o coordenador
+            coordenador = Coordenador.objects.get(user=request.user)
+            # Como serializer espera uma lista, use filter() em vez de get()
+            cursos = Curso.objects.filter(id=coordenador.curso.id)
+
+        serializer = CursoSimplificadoSerializer(cursos, many=True)
+        return Response(serializer.data)
+
+class ProfessorOrientacoesView(CustomAPIView):
+    """
+    API para listar os cursos e limites de orientação do professor autenticado,
+    além de verificar se possui TCCs ativos.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        usuario = request.user
+        
+        try:
+            professor = ProfessorInterno.objects.get(user=usuario)
+        except ProfessorInterno.DoesNotExist:
+            return Response({'error': 'Usuário não é um professor interno'}, status=404)
+        
+        professor_data = ProfessorNomeSerializer(professor).data
+        cursos = CursoLimiteOrientacoesSerializer(professor.cursos.all(), many=True).data
+        
+        # Identificar TCCs ativos do professor
+        tccs_ativos = []
+        tccs_orientados = Tcc.objects.filter(orientador=professor)
+        
+        for tcc in tccs_orientados:
+            ultimo_status = TccStatus.objects.filter(tcc=tcc).order_by('-dataStatus').first()
+            if ultimo_status and ultimo_status.status not in [
+                StatusTccEnum.PROPOSTA_ANALISE_PROFESSOR,
+                StatusTccEnum.PROPOSTA_RECUSADA_PROFESSOR,
+                StatusTccEnum.PROPOSTA_RECUSADA_COORDENADOR,
+                StatusTccEnum.REPROVADO_PREVIA,
+                StatusTccEnum.REPROVADO_FINAL,
+                StatusTccEnum.APROVADO
+            ]:
+                tccs_ativos.append(tcc)
+        
+        tccs_ativos_serialized = TccPublicSerializer(tccs_ativos, many=True).data
+        professor_data["qtdOrientacoesAtivas"] = len(tccs_ativos)
+        
+        return Response({
+            'professor': professor_data,
+            'cursos': cursos,
+            'tccs_ativos': tccs_ativos_serialized
+        })

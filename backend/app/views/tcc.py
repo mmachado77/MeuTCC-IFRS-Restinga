@@ -1,11 +1,16 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.exceptions import NotFound, PermissionDenied
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from django.db.models import Max, F, Q
-from app.enums import StatusTccEnum, UsuarioTipoEnum
-from app.models import Tcc, TccStatus, Usuario, Estudante, Semestre, Professor, Coordenador, Sessao, Banca, Tema
-from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer, TemaSerializer, TccEditSerializer, TccPublicSerializer, DetalhesTccPublicSerializer
+from ..services.status_mapping_service import get_status_mapping
+from ..services.calcular_checklist_tcc import calcular_checklist_tcc
+from ..services.cta_tcc import get_cta
+from app.enums import StatusTccEnum, UsuarioTipoEnum, RegraSessaoPublicaEnum
+from app.models import Tcc, TccStatus, ProfessorInterno, Usuario, Estudante, Semestre, Professor, Coordenador, Sessao, Banca, Tema, Curso
+from app.serializers import TccSerializer, TccCreateSerializer, TccStatusResponderPropostaSerializer, TemaSerializer, TccEditSerializer, TccPublicSerializer, DetalhesTccPublicSerializer, TCCPendentesSerializer
 from app.services.proposta import PropostaService
 from app.services.tcc import TccService
 from app.services.notificacoes import notificacaoService
@@ -35,7 +40,8 @@ class ListarTccPendente(CustomAPIView):
         tccs = None
         if usuario.tipo == UsuarioTipoEnum.COORDENADOR: 
             tccs = Tcc.objects.all().annotate(max_id=Max('tccstatus__id')).filter(
-                tccstatus__id=F('max_id'), 
+                tccstatus__id=F('max_id'),
+                curso = usuario.curso,
                 semestre=semestreAtual, 
                 tccstatus__status=StatusTccEnum.PROPOSTA_ANALISE_COORDENADOR)
         elif usuario.isProfessor():
@@ -46,33 +52,63 @@ class ListarTccPendente(CustomAPIView):
                 tccstatus__status=StatusTccEnum.PROPOSTA_ANALISE_PROFESSOR
             )
 
-        serializer = TccSerializer(tccs, many=True)
+        serializer = TCCPendentesSerializer(tccs, many=True)
         return Response(serializer.data)
     
 class TCCs(CustomAPIView):
     """
-    API para listar todos os TCCs.
+    API para listar os TCCs de um curso.
+
+    Esta API retorna todos os TCCs pertencentes ao curso do coordenador autenticado.
+
+    Permissões:
+        - Apenas usuários autenticados que sejam coordenadores de curso podem acessar.
 
     Métodos:
-        get(request): Retorna todos os TCCs.
+        - GET: Retorna todos os TCCs do curso do coordenador autenticado.
+
+    Respostas:
+        - 200 OK: Lista de TCCs do curso.
+        - 403 Forbidden: Usuário não tem permissão para acessar os TCCs.
+        - 404 Not Found: Coordenador ou curso não encontrados.
     """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         """
-        Retorna todos os TCCs.
+        Retorna todos os TCCs do curso do coordenador autenticado.
 
         Args:
             request (Request): A requisição HTTP.
 
         Retorna:
-            Response: Resposta HTTP com todos os TCCs ou mensagem de erro.
+            Response: Lista de TCCs do curso ou erro apropriado.
         """
-     
-        tccs = Tcc.objects.all()
-        serializer = TccSerializer(tccs, many=True)
+        try:
+            # Obtém o coordenador autenticado
+            coordCurso = get_object_or_404(Coordenador, user=request.user)
+            
+            # Obtém o curso do coordenador
+            curso = get_object_or_404(Curso, pk=coordCurso.curso.id)
+
+            # Filtra os TCCs do curso
+            tccs = Tcc.objects.filter(curso=curso)
+
+            # Serializa os dados
+            serializer = TCCPendentesSerializer(tccs, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except PermissionDenied:
+            return Response(
+                {"detail": "Você não tem permissão para acessar esta lista de TCCs."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        except Exception as e:
+            return Response(
+                {"detail": "Erro ao buscar os TCCs.", "erro": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
         
-        return Response(serializer.data)
     
 class TCCsByAluno(CustomAPIView):
     """
@@ -96,35 +132,37 @@ class TCCsByAluno(CustomAPIView):
         usuario = Usuario.objects.get(user=request.user)
         tccs = Tcc.objects.filter(autor = usuario)
         
-        serializer = TccSerializer(tccs, many=True)
+        serializer = TCCPendentesSerializer(tccs, many=True)
         return Response(serializer.data)
     
 
 class TCCsByOrientador(CustomAPIView):
     """
-    API para listar todos os TCCs de um orientador.
-
-    Métodos:
-        get(request): Retorna todos os TCCs do orientador autenticado.
+    API para listar todos os TCCs relacionados ao professor autenticado.
+    Isso inclui TCCs em que ele atua como orientador, coorientador ou avaliador.
     """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         """
-        Retorna todos os TCCs do orientador autenticado.
-
-        Args:
-            request (Request): A requisição HTTP.
-
-        Retorna:
-            Response: Resposta HTTP com todos os TCCs do orientador ou mensagem de erro.
+        Retorna todos os TCCs relacionados ao professor autenticado.
+        Filtra TCCs onde:
+          - o professor é orientador (campo 'orientador'),
+          - o professor é coorientador (campo 'coorientador') ou
+          - o professor é avaliador, isto é, consta na lista de professores da banca associada
+            a alguma sessão do TCC (usando os related_names 'sessoes' em Tcc e 'bancas' em Sessao).
         """
         usuario = Usuario.objects.get(user=request.user)
-        
-        tccs = Tcc.objects.filter(Q(orientador=usuario) | Q(coorientador=usuario))
-        
-        serializer = TccSerializer(tccs, many=True)
+        tccs = Tcc.objects.filter(
+            Q(orientador=usuario) |
+            Q(coorientador=usuario) |
+            Q(sessoes__bancas__professores=usuario)
+        ).distinct()
+
+        serializer = TCCPendentesSerializer(tccs, many=True)
         return Response(serializer.data)
+
+
     
 class PossuiProposta(CustomAPIView):
     """
@@ -175,7 +213,13 @@ class CriarTCCView(CustomAPIView):
         # Validar "afirmo que conversei com o orientador e coorientador sobre o tema do TCC."
         try:
             usuario = Estudante.objects.get(user=request.user)
-            serializer = TccCreateSerializer(data=request.data)
+            curso = usuario.curso  # Obtém o curso do estudante autenticado
+            
+            # Criar um dicionário mutável para adicionar o curso ao payload
+            dados_tcc = request.data.copy()
+            dados_tcc['curso'] = curso.id  # Adiciona o ID do curso ao payload
+            
+            serializer = TccCreateSerializer(data=dados_tcc)
 
             if not serializer.is_valid():
                 print (serializer.errors)
@@ -317,15 +361,13 @@ class DetalhesTCCView(CustomAPIView):
         except Tcc.DoesNotExist:
             return Response({'status': 'error', "message": "TCC não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
-        # Verifica se existem sessões associadas ao TCC e recupera os usuários da banca
-        if Sessao.objects.filter(tcc=tcc).exists():
-            sessoes = Sessao.objects.filter(tcc=tcc)
-            for sessao in sessoes:
-                if Banca.objects.filter(sessao=sessao).exists():
-                    bancas.append(Banca.objects.get(sessao=sessao))
-            for banca in bancas:
-                for professor in banca.professores.all():
-                    users_banca.append(professor.user)
+        # Obtém o último status do TCC
+        ultimo_status = TccStatus.objects.filter(tcc=tcc).order_by('-dataStatus').first()
+        status_atual = ultimo_status.status if ultimo_status else None
+
+        # Determina as flags concluído e reprovado
+        concluido = status_atual in StatusTccEnum.statusTccConcluido()
+        reprovado = status_atual in StatusTccEnum.statusTccCancelado()
 
         user = request.user
         if user.is_authenticated:
@@ -333,22 +375,40 @@ class DetalhesTCCView(CustomAPIView):
 
             # Verifica se o usuário está relacionado ao TCC
             if (str(user) == 'admin') or (user == tcc.autor.user) or (user == tcc.orientador.user) or (
-                tcc.coorientador and user == tcc.coorientador.user) or (coord.exists()) or (user in users_banca):
+                tcc.coorientador and user == tcc.coorientador.user) or (coord.exists()):
                 # Usuário relacionado ao TCC - retorna detalhes completos
                 serializer = TccSerializer(tcc)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                data = serializer.data
+                data.update({'concluido': concluido, 'reprovado': reprovado})
+                return Response(data, status=status.HTTP_200_OK)
 
-        # Verifica se o último status permite acesso público
-        ultimo_status = TccStatus.objects.filter(tcc=tcc).order_by('-dataStatus').first()
-        if ultimo_status and ultimo_status.status in [StatusTccEnum.FINAL_AGENDADA, StatusTccEnum.APROVADO]:
-            # Usuário não relacionado - retorna apenas dados públicos
+            # Verifica se o usuário faz parte da banca
+            if Sessao.objects.filter(tcc=tcc).exists():
+                sessoes = Sessao.objects.filter(tcc=tcc)
+                for sessao in sessoes:
+                    if Banca.objects.filter(sessao=sessao).exists():
+                        bancas.append(Banca.objects.get(sessao=sessao))
+                for banca in bancas:
+                    for professor in banca.professores.all():
+                        users_banca.append(professor.user)
+
+            if user in users_banca:
+                serializer = TccSerializer(tcc)
+                data = serializer.data
+                data.update({'concluido': concluido, 'reprovado': reprovado})
+                return Response(data, status=status.HTTP_200_OK)
+
+        # Verifica se o status permite acesso público
+        if status_atual in [StatusTccEnum.FINAL_AGENDADA, StatusTccEnum.APROVADO]:
             serializer = DetalhesTccPublicSerializer(tcc)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
+            data = serializer.data
+            data.update({'concluido': concluido, 'reprovado': reprovado})
+            return Response(data, status=status.HTTP_200_OK)
 
         # Caso contrário, retorna uma mensagem de permissão negada
         return Response({'status': 'alert', "message": "Você não tem permissão para visualizar este TCC."},
                         status=status.HTTP_403_FORBIDDEN)
+
 
 
             
@@ -401,29 +461,50 @@ class TCCsPublicadosView(CustomAPIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-
 class TemasSugeridosView(CustomAPIView):
     """
-    API para listar todos os temas sugeridos.
+    API para listar os temas sugeridos filtrados pelo curso do usuário.
 
     Métodos:
-        get(request): Retorna todos os temas sugeridos.
+        get(request): Retorna os temas sugeridos filtrados conforme o tipo de usuário.
     """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         """
-        Retorna todos os temas sugeridos.
+        Retorna os temas sugeridos conforme o curso do usuário.
 
         Args:
             request (Request): A requisição HTTP.
 
         Retorna:
-            Response: Resposta HTTP com todos os temas sugeridos ou mensagem de erro.
+            Response: Resposta HTTP com os temas sugeridos filtrados.
         """
-        temas = Tema.objects.all()
+        # Recupera a instância do usuário customizado a partir do usuário autenticado.
+        usuario = Usuario.objects.get(user=request.user)
+        temas = Tema.objects.none()  # Inicializa sem temas
+
+        if usuario.tipo == UsuarioTipoEnum.ESTUDANTE:
+            # Se for estudante, pega os temas do curso do estudante.
+            estudante = Estudante.objects.filter(user=request.user).first()
+            if estudante:
+                temas = Tema.objects.filter(curso=estudante.curso)
+
+        elif usuario.tipo == UsuarioTipoEnum.COORDENADOR:
+            # Se for coordenador, pega os temas do curso que coordena.
+            coordenador = Coordenador.objects.filter(user=request.user).first()
+            if coordenador:
+                temas = Tema.objects.filter(curso=coordenador.curso)
+
+        elif usuario.tipo == UsuarioTipoEnum.PROFESSOR_INTERNO:
+            # Se for professor, pega os temas de todos os cursos em que ele atua.
+            professor = ProfessorInterno.objects.filter(user=request.user).first()
+            if professor:
+                temas = Tema.objects.filter(curso__in=professor.cursos.all())
+
         serializer = TemaSerializer(temas, many=True)
         return Response(serializer.data)
+
 
 class MeusTemasSugeridosView(CustomAPIView):
     """
@@ -444,10 +525,12 @@ class MeusTemasSugeridosView(CustomAPIView):
         Retorna:
             Response: Resposta HTTP com todos os temas sugeridos pelo professor ou mensagem de erro.
         """
+        # Recupera o usuário customizado a partir do request.
         professor = Usuario.objects.get(user=request.user)
-        temas = Tema.objects.filter(professor = professor)
+        temas = Tema.objects.filter(professor=professor)
         serializer = TemaSerializer(temas, many=True)
         return Response(serializer.data)
+
     
 class CriarTemaView(CustomAPIView):
     """
@@ -472,7 +555,28 @@ class CriarTemaView(CustomAPIView):
         if isinstance(perfil, Coordenador) or isinstance(perfil, Professor):
             usuario_id = request.user.id
         else:
-            return Response({'status': 'error', "message": "Usuário não autorizado para criar um tema."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'status': 'error', "message": "Usuário não autorizado para criar um tema."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Copia os dados enviados na requisição
+        dados = request.data.copy()
+
+        # Se o campo 'curso' for um objeto (dict) com os dados do curso, extrai o seu id.
+        if 'curso' in dados and isinstance(dados['curso'], dict):
+            curso_obj = dados.get('curso')
+            dados['curso'] = curso_obj.get('id')
+
+        # Preenche o campo professor com o usuário autenticado (assumindo que request.user seja uma instância de Usuario)
+        dados['professor'] = usuario_id
+
+        serializer = TemaSerializer(data=dados, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class AtualizarTemaView(CustomAPIView):
     """
@@ -539,3 +643,111 @@ class ExcluirTemaView(CustomAPIView):
 
         tema.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class TccProximosPassos(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        # Espera-se um DTO com, ao menos, o ID do TCC.
+        tccid = request.data.get("tccid")
+        if not tccid:
+            return Response(
+                {'status': 'error', "message": "TCC ID não fornecido."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Encontra o objeto Tcc
+        try:
+            tcc = Tcc.objects.get(id=tccid)
+        except Tcc.DoesNotExist:
+            return Response(
+                {'status': 'error', "message": "TCC não encontrado."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Busca o status atual do TCC (o mais recente, ordenado por dataStatus)
+        status_atual = TccStatus.objects.filter(tcc=tcc).order_by('-dataStatus').first()
+        if not status_atual:
+            return Response(
+                {'status': 'error', "message": "Status do TCC não encontrado."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        try:
+            curso = Curso.objects.get(id=tcc.curso.id)
+        except Curso.DoesNotExist:
+            return Response(
+                {'status': 'error', "message": "Curso não encontrado."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Obtém a regra de sessão do curso e converte para o enum adequado.
+        try:
+            regra_sessao = RegraSessaoPublicaEnum(curso.regra_sessao_publica)
+        except ValueError:
+            return Response(
+                {'status': 'error', "message": "Regra de sessão inválida no curso."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        status_objects = TccStatus.objects.filter(tcc=tcc)
+        for status_obj in status_objects:
+            if status_obj.status == StatusTccEnum.PREVIA_ORIENTADOR:
+                regra_sessao = RegraSessaoPublicaEnum.OBRIGATORIO
+                break
+
+        # Obtém o mapping de status para o TCC conforme a regra do curso
+        mapping = get_status_mapping(regra_sessao)
+        
+        # Determina o status e a mensagem do status atual, bem como o próximo status obrigatório
+        current_status_value = status_atual.status  # Ex: "DESENVOLVIMENTO"
+        current_index = None
+        current_message = ""
+        instrucoes = None
+
+        for item in mapping:
+            if item["status"] == current_status_value:
+                current_index = item["index"]
+                current_message = item.get("mensagem", None)
+                break
+
+        if current_index is not None:
+            for item in mapping:
+                if item["index"] > current_index and item["required"]:
+                    instrucoes = item.get("instrucoes", None)
+                    break
+        # Sinaliza se o status atual for 'DESENVOLVIMENTO' e a sessão prévia for opcional (Regra OPCIONAL)
+        previa_opcional = False
+        if status_atual.status == StatusTccEnum.DESENVOLVIMENTO and regra_sessao == RegraSessaoPublicaEnum.OPCIONAL:
+            previa_opcional = True
+        
+        if status_atual.status == StatusTccEnum.AJUSTE:
+            instrucoes = "Realize os ajustes e solicite nova avaliação."
+        if status_atual.status == StatusTccEnum.APROVADO:
+            instrucoes = "Providencie, assine e submeta o Termo de Autorização de Publicação."
+
+        checklist = calcular_checklist_tcc(tcc)
+
+        try:
+            cta_result = get_cta(checklist, status_atual) or {}  # Garante que cta_result é um dicionário
+            cta_key = cta_result.get("chave")  # Acessa diretamente as chaves sem nível extra
+            cta_value = cta_result.get("valor")
+        except Exception as e:
+            # Log do erro inesperado para facilitar o debug
+            print(f"Erro inesperado: {e}")
+            cta_key = None
+            cta_value = None
+        # Monta e retorna a resposta, incluindo a mensagem do status atual, as instruções do próximo status e o checklist
+        return Response({
+            "status_atual": {
+                "status": status_atual.status,
+                "dataStatus": status_atual.dataStatus,
+                "mensagem": current_message,
+                "instrucoes": instrucoes,
+            },
+            "previa_opcional": previa_opcional,
+            "checklist": checklist,
+            "cta": {
+                "chave": cta_key,
+                "valor": cta_value
+            }
+            }, status=status.HTTP_200_OK)
