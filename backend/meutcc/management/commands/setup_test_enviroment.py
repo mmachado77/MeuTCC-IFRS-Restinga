@@ -12,15 +12,17 @@ class Command(BaseCommand):
 
         # 🔐 Criar credencial do Google Drive a partir do settings, se não existir
         if not Credenciais.objects.exists():
-            json_env = getattr(settings, "GOOGLE_DRIVE_CREDENTIALS_JSON", None)
-            if json_env:
+            creds_dict = getattr(settings, "GOOGLE_DRIVE_CREDENTIALS_JSON", None)
+            if creds_dict:
                 try:
-                    Credenciais.objects.create(access_token=json_env)
+                    import json
+                    Credenciais.objects.create(access_token=json.dumps(creds_dict))
                     self.stdout.write(self.style.SUCCESS("✅ Credencial de Drive criada a partir do settings."))
                 except Exception as e:
                     self.stdout.write(self.style.ERROR(f"❌ Erro ao salvar credencial: {e}"))
             else:
                 self.stdout.write(self.style.WARNING("⚠️ Nenhuma variável GOOGLE_DRIVE_CREDENTIALS_JSON encontrada."))
+
 
         # 📦 Executar base.py
         try:
