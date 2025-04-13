@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTccContext } from 'meutcc/pages/detalhes-tcc-copy/context/TccContext';
+import { useTccContext } from 'meutcc/pages/detalhes-tcc/context/TccContext';
 import { Tag } from 'primereact/tag';
 import { Button } from 'primereact/button';
 import ComentariosTabView from './ComentariosTabView';

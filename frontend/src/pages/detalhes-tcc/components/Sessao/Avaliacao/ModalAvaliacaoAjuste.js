@@ -4,7 +4,7 @@ import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { InputTextarea } from 'primereact/inputtextarea';
 import AvaliacaoService from '../../../../../services/AvaliacaoService';
-import { useTccContext } from 'meutcc/pages/detalhes-tcc-copy/context/TccContext';
+import { useTccContext } from 'meutcc/pages/detalhes-tcc/context/TccContext';
 
 const ModalAvaliacaoAjuste = ({ visible, onHide }) => {
   const toast = useRef(null);
