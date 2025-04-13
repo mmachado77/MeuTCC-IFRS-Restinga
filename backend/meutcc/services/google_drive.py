@@ -39,7 +39,9 @@ class GoogleDriveService:
         request.session['state'] = state
         authorization_url, state = flow.authorization_url(
             access_type='offline',
-            state=state)
+            prompt='consent',
+            state=state
+        )
         return redirect(authorization_url)
     
     def fetch_token(self, request):
