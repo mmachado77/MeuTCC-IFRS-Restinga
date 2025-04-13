@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import AvaliacaoService from '../../../../../services/AvaliacaoService';
-import { useTccContext } from 'meutcc/pages/detalhes-tcc-copy/context/TccContext';
+import { useTccContext } from 'meutcc/pages/detalhes-tcc/context/TccContext';
 import ModalAvaliacaoAjuste from './ModalAvaliacaoAjuste'
 
 const FileItemAjuste = () => {

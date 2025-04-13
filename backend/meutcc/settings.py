@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'notifications',
     'django_apscheduler',
     'axes',
+    'meutcc'
 ]
 
 

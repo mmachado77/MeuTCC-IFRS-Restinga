@@ -4,7 +4,7 @@ import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { toast } from 'react-toastify';
 import SessoesService from 'meutcc/services/SessoesService';
-import { useTccContext } from 'meutcc/pages/detalhes-tcc-copy/context/TccContext';
+import { useTccContext } from 'meutcc/pages/detalhes-tcc/context/TccContext';
 
 const AvaliaPreviaOrientador = ({ sessaoId, comment, avaliar }) => {
   const [visible, setVisible] = useState(false);

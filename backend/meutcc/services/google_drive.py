@@ -37,7 +37,11 @@ class GoogleDriveService:
         flow = self.init_flow()
         state = str(uuid4())
         request.session['state'] = state
-        authorization_url, state = flow.authorization_url(access_type='offline', state=state)
+        authorization_url, state = flow.authorization_url(
+            access_type='offline',
+            prompt='consent',
+            state=state
+        )
         return redirect(authorization_url)
     
     def fetch_token(self, request):
@@ -101,7 +105,8 @@ class GoogleDriveService:
             return file.get("id")
         
         except Exception as e:
-            return None
+            print("Erro ao fazer upload:", e)
+            raise  # ← para ver o traceback completo
     
     def download_file(self, file_id):
         try:

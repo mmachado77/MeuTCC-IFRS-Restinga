@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Button } from 'primereact/button';
 import AvaliaFinal from './AvaliaFinal'; // ajuste o caminho conforme sua estrutura
 import AvaliacaoService from '../../../services/AvaliacaoService';
-import { useTccContext } from 'meutcc/pages/detalhes-tcc-copy/context/TccContext';
+import { useTccContext } from 'meutcc/pages/detalhes-tcc/context/TccContext';
 import { handleApiResponse } from 'meutcc/core/utils/apiResponseHandler';
 import { Tooltip } from 'primereact/tooltip';
 import { Badge } from 'primereact/badge';
