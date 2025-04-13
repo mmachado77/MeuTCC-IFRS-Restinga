@@ -36,7 +36,7 @@ class ListarTccPendente(CustomAPIView):
             Response: Resposta HTTP com os TCCs pendentes ou mensagem de erro.
         """
         usuario = Usuario.objects.get(user=request.user)
-        semestreAtual = Semestre.objects.latest('id')
+        semestreAtual = Semestre.semestre_atual()
         tccs = None
         if usuario.tipo == UsuarioTipoEnum.COORDENADOR: 
             tccs = Tcc.objects.all().annotate(max_id=Max('tccstatus__id')).filter(
