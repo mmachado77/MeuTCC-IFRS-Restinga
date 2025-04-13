@@ -45,7 +45,7 @@ ads = Curso.objects.create(
     ultima_atualizacao=datetime.today(),
     data_criacao=datetime.today(),
     limite_orientacoes=3,
-    regra_sessao_publica="OBRIGATORIO",
+    regra_sessao_publica="Obrigatório",
     prazo_propostas_inicio=datetime.today(),
     prazo_propostas_fim=datetime.today() + timedelta(days=30),
     visible=True
