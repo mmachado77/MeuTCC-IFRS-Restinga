@@ -30,7 +30,9 @@ if not User.objects.filter(email="sistema.tcc@restinga.ifrs.edu.br").exists():
 # 🟢 Status de Cadastro
 # ==========================
 
-status = StatusCadastro.objects.create(aprovacao=True)
+status1 = StatusCadastro.objects.create(aprovacao=True)
+status2 = StatusCadastro.objects.create(aprovacao=True)
+status3 = StatusCadastro.objects.create(aprovacao=True)
 
 # ==========================
 # 🏫 Criação de Curso ADS
@@ -54,12 +56,12 @@ ads = Curso.objects.create(
 # ==========================
 
 professores = [
-    ("André Schneider", "12345678911", "andre@restinga.ifrs.edu.br", "1994000401"),
-    ("Carla Souza", "12345678912", "carla@restinga.ifrs.edu.br", "1994000402"),
-    ("Diego Martins", "12345678913", "diego@restinga.ifrs.edu.br", "1994000403"),
+    ("André Schneider", "12345678911", "andre@restinga.ifrs.edu.br", "1994000401", status1),
+    ("Carla Souza", "12345678912", "carla@restinga.ifrs.edu.br", "1994000402", status2),
+    ("Diego Martins", "12345678913", "diego@restinga.ifrs.edu.br", "1994000403", status3),
 ]
 
-for nome, cpf, email, matricula in professores:
+for nome, cpf, email, matricula, status in professores:
     if not User.objects.filter(email=email).exists():
         user = User.objects.create_user(email, email, "senha123")
         prof = ProfessorInterno.objects.create(
@@ -84,16 +86,12 @@ Semestre.objects.create(
     periodo='2025/1',
     dataAberturaSemestre='2025-01-01',
     dataFechamentoSemestre='2025-06-30',
-    dataAberturaPrazoPropostas='2025-03-20',
-    dataFechamentoPrazoPropostas='2025-04-15',
 )
 
 Semestre.objects.create(
     periodo='2024/1',
     dataAberturaSemestre='2024-01-01',
     dataFechamentoSemestre='2024-06-30',
-    dataAberturaPrazoPropostas='2024-03-20',
-    dataFechamentoPrazoPropostas='2024-04-15',
 )
 
 # ==========================

@@ -39,6 +39,8 @@ npm run dev
 O frontend estará disponível em:  
 [`http://localhost:3000`](http://localhost:3000)
 
+> Só carregará corretamente quando o servidor (backend) estiver configurado e rodando.
+
 ## 🔧 Instalação do Backend
 
 O backend foi desenvolvido em Django 5, com integração ao Google Drive, Autenticação Google e outras ferramentas.
@@ -132,11 +134,16 @@ Esse comando:
 
 ---
 
-Depois disso, você já pode iniciar o sistema normalmente.
+
+## 🚀 Iniciar o sistema
+
+Com as configurações feitas, você poderá utilizar o sistema
+
+Utilize um terminal para o backend e outro para o frontend
 
 ### 🚀 Inicie o servidor
 
-Para iniciar o backend localmente, rode:
+Para iniciar o backend localmente, navegue até '/backend' e execute:
 
 ```bash
 py manage.py runserver
@@ -146,6 +153,17 @@ O sistema estará disponível em: [`http://127.0.0.1:8000`](http://127.0.0.1:800
 
 ---
 
-### 👨‍💻 Dúvidas ou contribuições?
+### 🚀 Inicie o frontend
+
+Com o backend executando em um terminal, navegue até '/frontend' e execute:
+
+```bash
+npm run dev
+```
+
+O frontend estará disponível em:  
+[`http://localhost:3000`](http://localhost:3000)
+
+# 👨‍💻 Dúvidas ou contribuições?
 
 Fique à vontade para abrir uma issue ou entrar em contato comigo!
