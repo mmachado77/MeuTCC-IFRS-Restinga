@@ -24,12 +24,12 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.WARNING("⚠️ Nenhuma variável GOOGLE_DRIVE_CREDENTIALS_JSON encontrada."))
 
 
-        # 📦 Executar base.py
+        # 📦 Executar testBase.py
         try:
-            self.stdout.write("📂 Executando seeds/testes/base.py...")
-            exec(open("seeds/testes/base.py", encoding="utf-8").read())
+            self.stdout.write("📂 Executando seeds/testes/testBase.py...")
+            exec(open("seeds/testes/testBase.py", encoding="utf-8").read())
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f"❌ Erro ao executar base.py: {e}"))
+            self.stdout.write(self.style.ERROR(f"❌ Erro ao executar testBase.py: {e}"))
 
         # 💬 Executar mensagens.py
         try:
