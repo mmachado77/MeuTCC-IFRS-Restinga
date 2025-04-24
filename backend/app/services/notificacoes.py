@@ -20,6 +20,7 @@ class notificacaoService:
     """
 
     def enviarNotificacaoProposta(self, estudante_user, data):
+        return
         """
         Envia notificação de proposta para orientador e coorientador.
 
@@ -99,6 +100,7 @@ class notificacaoService:
             print(f"Erro ao enviar notificação: {e}")
 
     def enviarNotificacaoCadastroExterno(self, request_user, cadastro_data):
+        return
         """
         Envia notificação de cadastro externo para o coordenador.
 
@@ -148,6 +150,7 @@ class notificacaoService:
             print(f"Erro ao enviar notificação: {e}")
 
     def enviarNotificacaoCadastroExternoAprovado(self, professor):
+        return
         """
         Envia notificação de aprovação de cadastro externo.
 
@@ -176,6 +179,7 @@ class notificacaoService:
             print(f"Erro ao enviar notificação: {e}")
 
     def enviarNotificacaoCadastroExternoNegado(self, professor, justificativa):
+        return
         """
         Envia notificação de negação de cadastro externo.
 
@@ -206,6 +210,7 @@ class notificacaoService:
             print(f"Erro ao enviar notificação: {e}")
 
     def enviarNotificacaoAgendamentoBanca(self, coord, sessao, banca):
+        return
         """
         Envia notificação de agendamento de banca.
 
@@ -218,7 +223,7 @@ class notificacaoService:
             Exception: Para erros ao enviar notificações.
         """
 
-        mensagem_professores = Mensagem.objects.get(identificador="SESSAO002")
+        mensagem_professores = Mensagem.objects.get(identificador="SESSAO002") 
         mensagem_estudante = Mensagem.objects.get(identificador="SESSAO003")
 
         try:
@@ -293,6 +298,7 @@ class notificacaoService:
             print(f"Erro ao enviar notificação: {e}")
 
     def enviarNotificacaoLembreteSessaoSemana(self, user, sessao):
+        return
         """
         Envia notificação de lembrete de sessão uma semana antes.
 
@@ -377,6 +383,7 @@ class notificacaoService:
             print(f"Erro ao enviar notificação: {e}")
 
     def enviarNotificacaoLembreteSessaoDia(self, user, sessao):
+        return
         """
         Envia notificação de lembrete de sessão no dia anterior.
 
@@ -462,6 +469,7 @@ class notificacaoService:
 
 
 def substituirParametros(text, replacements):
+    return
     """
     Substitui os parâmetros no texto com os valores fornecidos.
 
