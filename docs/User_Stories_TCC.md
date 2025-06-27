@@ -3,7 +3,7 @@
 **V-001**\
 **Como** um visitante,\
 **Quero** visualizar as próximas defesas agendadas,\
-**Para que** eu possa acompanhar os TCCs que acontecerão em breve.
+**Para que** eu possa assistir os TCCs que acontecerão em breve.
 
 **V-002**\
 **Como** um visitante,\
@@ -12,8 +12,8 @@
 
 **V-003**\
 **Como** um visitante,\
-**Quero** visualizar uma lista de trabalhos prontos aprovados,\
-**Para que** eu possa consultar projetos já concluídos e disponíveis na biblioteca.
+**Quero** visualizar uma lista de trabalhos concluídos e aprovados,\
+**Para que** eu possa acessar a biblioteca de TCC's do Sistema
 
 **V-004**\
 **Como** um visitante,\
@@ -52,7 +52,7 @@
 
 **U-005**\
 **Como** um novo usuário autenticado,\
-**Quero** visualizar o formulário com campos adicionais de acordo com meu tipo de perfil,\
+**Quero** visualizar o formulário de cadastro com campos adicionais de acordo o tipo escolhido,\
 **Para que** eu possa preencher corretamente as informações exigidas para Estudante, Professor ou Coordenador.
 
 > 📄 *Exemplo: Estudante → Matrícula e CPF; Professor → Título, área de atuação; Coordenador → similar ao Professor, mas com permissão extra após aprovação.*
@@ -75,7 +75,7 @@
 **Como** Superadmin,\
 **Quero** editar informações de qualquer curso,\
 **Para que** eu possa manter os dados atualizados.\
-> ℹ️ *Inclui nome do curso, regra de sessão pública, descrição, visibilidade...*
+> ℹ️ *Nome do curso, regra de sessão pública, prazos para envio descrição, visibilidade...*
 
 **S-004**\
 **Como** Superadmin,\
@@ -128,13 +128,13 @@
 **E-001**  
 **Como** estudante,  
 **Quero** visualizar sugestões de temas do meu curso,  
-**Para que** eu possa escolher um tema relevante para meu TCC.  
+**Para que** eu possa explorar possibilidades relevantes para meu TCC.
 > 🔎 Rota: `/sugestoes-temas-tcc`  
 > 🎯 Lista apenas sugestões de professores do mesmo curso.
 
 **E-002**  
 **Como** estudante,  
-**Quero** visualizar meus TCCs ativos ou passados,  
+**Quero** visualizar uma lista com meus TCCs,  
 **Para que** eu possa acompanhar minha trajetória acadêmica.  
 > 🔎 Rota: `/meus-tccs`  
 > 🧪 Exibe botão “Submeter Proposta” se o prazo estiver aberto.
