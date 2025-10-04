@@ -1,66 +1,70 @@
-# 📘 Sistema de Gerenciamento de TCC
+# Thesis Project — TCC Management System
 
-Este repositório contém o sistema completo de gerenciamento de Trabalhos de Conclusão de Curso (TCC), dividido em frontend e backend.
+This repository contains the full implementation of the **TCC (Final Graduation Project) Management System**, developed as my undergraduate thesis and one of my most ambitious solo projects.
 
-Abaixo estão as instruções para configuração do ambiente local, especialmente preparadas para testes e contribuições.
+The system is divided into **frontend** and **backend** components.  
+Below you will find setup instructions for running the project locally, prepared for testing, development, and academic demonstration purposes.
 
-## 🔧 Instalação do Frontend
+---
 
-O frontend foi desenvolvido com Next.js, PrimeReact, TailwindCSS e outras bibliotecas modernas. Para rodar a interface localmente:
+## Frontend Installation
 
-### 📁 Navegação até a pasta do frontend
+The frontend is built with **Next.js**, **PrimeReact**, **TailwindCSS**, and other modern libraries.  
+Follow the steps below to run the user interface locally.
 
-Abra um terminal e execute:
+### 1. Navigate to the frontend directory
+
+Open a terminal and run:
 
 ```bash
 cd frontend
 ```
 
-> Certifique-se de estar na raiz do projeto (`/MeuTCC-IFRS-Restinga`) antes de rodar esse comando.
+> Make sure you are in the project root (`/MeuTCC-IFRS-Restinga`) before running this command.
 
-### 📦 Instalação das dependências
+### 2. Install dependencies
 
-Em seguida, execute:
+Run:
 
 ```bash
 npm install
 ```
 
-> Isso instalará as dependências necessárias.
+> This installs all required frontend dependencies.
 
-### 🚀 Executando o sistema em modo de desenvolvimento
+### 3. Run the development server
 
-Após instalar, execute:
+After installation, start the frontend using:
 
 ```bash
 npm run dev
 ```
 
-O frontend estará disponível em:  
-[`http://localhost:3000`](http://localhost:3000)
+The application will be available at:  
+[http://localhost:3000](http://localhost:3000)
 
-> Só carregará corretamente quando o servidor (backend) estiver configurado e rodando.
-
-## 🔧 Instalação do Backend
-
-O backend foi desenvolvido em Django 5, com integração ao Google Drive, Autenticação Google e outras ferramentas.
-A seguir estão os passos necessários para rodar localmente.
+> The interface will load correctly only when the backend server is running.
 
 ---
 
-### 📁 Acesse a pasta do backend
+## Backend Installation
 
-Abra um terminal e execute:
+The backend was developed using **Django 5**, with integration for **Google Drive**, **Google Authentication**, and other academic workflow tools.  
+Follow these steps to set it up locally.
+
+### 1. Navigate to the backend directory
+
+Open a terminal and run:
 
 ```bash
 cd backend
 ```
 
-> Certifique-se de estar na raiz do projeto (`/MeuTCC-IFRS-Restinga`) antes de rodar esse comando.
+> Make sure you are in the project root (`/MeuTCC-IFRS-Restinga`) before running this command.
 
-### 📦 Instale as dependências
+### 2. Install dependencies
 
-Certifique-se de ter o **Python** instalado. Em seguida, rode:
+Ensure **Python** is installed, then execute:
 
 ```bash
 pip install -r requirements.txt
@@ -68,11 +72,11 @@ pip install -r requirements.txt
 
 ---
 
-### ⚙️ Configure as variáveis do sistema
+### 3. Configure environment variables
 
-1. Abra a pasta `meutcc/`
-2. Duplique o arquivo `env_example_settings.py` e renomeie como `env_settings.py`
-3. Preencha todos os campos abaixo com os dados fornecidos:
+1. Open the `meutcc/` directory.  
+2. Duplicate the file `env_example_settings.py` and rename it to `env_settings.py`.  
+3. Fill in the following fields with your own credentials:
 
 ```python
 GOOGLE_OAUTH2_CLIENT_ID = ""
@@ -104,66 +108,66 @@ GOOGLE_DRIVE_CREDENTIALS_JSON = '''{ ... }'''
 
 ---
 
-### 🧬 Atualize o banco de dados
+### 4. Initialize the database
 
-Volte ao terminal e execute:
+Run the following commands to apply migrations:
 
 ```bash
 py manage.py makemigrations
-```
-
-Em seguida, execute:
-
-```bash
 py manage.py migrate
 ```
 
 ---
 
-### 🌱 Popule o sistema com dados de teste
+### 5. Seed the system with test data
 
-Use o comando customizado incluído no projeto:
+Use the custom command included in the project:
 
 ```bash
 py manage.py setup_test_enviroment
 ```
 
-Esse comando:
-
-- Executa os scripts de seed com dados simulados de usuários, cursos, professores, estudantes e demais itens essenciais.
+This command runs seed scripts that generate simulated data for users, courses, professors, students, and other essential entities for testing and demonstration.
 
 ---
 
+## Running the System
 
-## 🚀 Iniciar o sistema
+Once the environment is configured, run the backend and frontend simultaneously in separate terminals.
 
-Com as configurações feitas, você poderá utilizar o sistema
+### 1. Start the backend server
 
-Utilize um terminal para o backend e outro para o frontend
-
-### 🚀 Inicie o servidor
-
-Para iniciar o backend localmente, navegue até '/backend' e execute:
+From the `/backend` directory, run:
 
 ```bash
 py manage.py runserver
 ```
 
-O sistema estará disponível em: [`http://127.0.0.1:8000`](http://127.0.0.1:8000)
+The backend will be available at:  
+[http://127.0.0.1:8000](http://127.0.0.1:8000)
 
 ---
 
-### 🚀 Inicie o frontend
+### 2. Start the frontend
 
-Com o backend executando em um terminal, navegue até '/frontend' e execute:
+With the backend running, open another terminal, navigate to `/frontend`, and execute:
 
 ```bash
 npm run dev
 ```
 
-O frontend estará disponível em:  
-[`http://localhost:3000`](http://localhost:3000)
+The frontend will be available at:  
+[http://localhost:3000](http://localhost:3000)
 
-# 👨‍💻 Dúvidas ou contribuições?
+---
 
-Fique à vontade para abrir uma issue ou entrar em contato comigo!
+## Contributing or Reporting Issues
+
+If you wish to contribute, suggest improvements, or report bugs, please open an issue in this repository.  
+Contributions and feedback are welcome, especially from academic collaborators or developers interested in educational management systems.
+
+---
+
+**Author:** Matheus Machado  
+Undergraduate Thesis — IFRS Campus Restinga  
+[GitHub @mmachado77](https://github.com/mmachado77)
